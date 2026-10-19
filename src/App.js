@@ -19,6 +19,9 @@ function App() {
   const [items, setItems] = useState([]);
   const [serialNumbers, setSerialNumbers] = useState([]);
   const [repairs, setRepairs] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [buildings, setBuildings] = useState([]);
+  const [floors, setFloors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data from Supabase
@@ -49,6 +52,83 @@ function App() {
 
         if (repairsError) throw repairsError;
 
+        // Fetch reference data from single table
+        let allRefData = [];
+        let referenceError = null;
+
+        try {
+          const { data: refData, error: refError } = await supabase
+            .from('reference_data')
+            .select('*')
+            .order('type, name');
+
+          if (refError) throw refError;
+          allRefData = refData;
+        } catch (refError) {
+          console.warn('Failed to fetch reference data table, falling back to computed values:', refError);
+          referenceError = refError;
+        }
+
+        // Separate data by type
+        let deptData = [];
+        let buildData = [];
+        let floorData = [];
+        if (!referenceError && allRefData && allRefData.length > 0) {
+          deptData = allRefData.filter(item => item.type === 'department').map(item => ({
+            id: item.id,
+            name: item.name,
+            building_default: item.building_default,
+            floor_default: item.floor_default
+          }));
+          buildData = allRefData.filter(item => item.type === 'building').map(item => ({
+            id: item.id,
+            name: item.name
+          }));
+          floorData = allRefData.filter(item => item.type === 'floor').map(item => ({
+            id: item.id,
+            floor_name: item.name
+          }));
+        }
+
+        // Compute fallback from serialNumbers if reference data is empty or fetch failed
+        let fallbackDepartments = [];
+        let fallbackBuildings = [];
+        let fallbackFloors = [];
+        if (snData && snData.length > 0) {
+          fallbackDepartments = [...new Set(snData.map(sn => sn.dept_used).filter(Boolean))];
+          fallbackBuildings = [...new Set(snData.map(sn => sn.building).filter(Boolean))];
+          fallbackFloors = [...new Set(snData.map(sn => sn.floor).filter(Boolean))];
+          // Sort fallback arrays
+          fallbackDepartments.sort();
+          fallbackBuildings.sort();
+          // For floors, try to sort numerically if possible, otherwise alphabetically
+          fallbackFloors.sort((a, b) => {
+            const numA = parseInt(a);
+            const numB = parseInt(b);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return numA - numB;
+            }
+            return a.localeCompare(b);
+          });
+        }
+
+        // Set state: use reference data if not empty and fetch succeeded, otherwise fallback
+        setDepartments(
+          (referenceError === null && deptData.length > 0)
+            ? deptData
+            : fallbackDepartments.map((d, index) => ({ id: index + 1, name: d }))
+        );
+        setBuildings(
+          (referenceError === null && buildData.length > 0)
+            ? buildData
+            : fallbackBuildings.map((b, index) => ({ id: index + 1, name: b }))
+        );
+        setFloors(
+          (referenceError === null && floorData.length > 0)
+            ? floorData
+            : fallbackFloors.map((f, index) => ({ id: index + 1, floor_name: f }))
+        );
+
         setItems(itemsData || []);
         setSerialNumbers(snData || []);
         setRepairs(repairsData || []);
@@ -60,6 +140,9 @@ function App() {
         setItems([]);
         setSerialNumbers([]);
         setRepairs([]);
+        setDepartments([]);
+        setBuildings([]);
+        setFloors([]);
       } finally {
         setLoading(false);
       }
@@ -250,6 +333,9 @@ function App() {
                 items={items}
                 serialNumbers={serialNumbers}
                 repairs={repairs}
+                departments={departments}
+                buildings={buildings}
+                floors={floors}
                 onAddItem={addItem}
                 onUpdateItem={updateItem}
                 onDeleteItem={deleteItem}
@@ -301,6 +387,9 @@ function App() {
               <Details
                 items={items}
                 serialNumbers={serialNumbers}
+                departments={departments}
+                buildings={buildings}
+                floors={floors}
                 onAddItem={addItem}
                 onUpdateItem={updateItem}
                 onDeleteItem={deleteItem}

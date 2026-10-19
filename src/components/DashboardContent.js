@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import WithdrawModal from './WithdrawModal';
 
-const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber }) => {
+const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, departments, buildings, floors }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [availableSerialNumbers, setAvailableSerialNumbers] = useState([]);
@@ -186,6 +186,9 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
         onHide={() => setShowWithdrawModal(false)}
         items={items}
         serialNumbers={serialNumbers}
+        departments={departments}
+        buildings={buildings}
+        floors={floors}
         onItemChange={handleItemChange}
         onSNChange={handleSNChange}
         onChange={handleChange}
