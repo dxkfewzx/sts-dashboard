@@ -212,3 +212,78 @@ SET building_default = 'อาคาร 2', floor_default = 'ชั้น 3'
 WHERE type = 'department' AND name = 'ธุรการรังสีวิทยา';
 ```
 ในอนาคตสามารถปรับปรุงโค้ดเพื่อใช้อัตโนมัติกรอกฟิลด์อาคารและชั้นเมื่อเลือกแผนกในฟอร์มได้
+
+---
+
+## การแก้ไขล่าสุด (2026-10-22)
+
+ในวันที่ 2026-10-22 ได้ทำการแก้ไขบั๊กสำคัญและปรับปรุงระบบยืนยันตัวตน (Authentication) รวมถึงการย้ายข้อมูลอ้างอิงไปใช้ตาราง `departments` เป็นแหล่งข้อมูลหลัก (Single Source of Truth) ดังนี้:
+
+### 1. แก้ไขบั๊กลูปไม่รู้จบใน WithdrawModal.js (Maximum Update Depth Exceeded)
+- **ปัญหา**: เกิด `Maximum update depth exceeded` ที่บรรทัด 24 เมื่อเปิด modal เบิกอุปกรณ์
+- **สาเหตุ**: `useEffect` เรียกฟังก์ชัน `onChange` ใน dependency array ทำให้เกิดการ re-render ซ้ำไม่รู้จบ
+- **การแก้ไข**:
+  - ลบการเรียก `onChange` ออกจาก dependency array ของ `useEffect` ที่กรองชั้นและหน่วยงาน
+  - ใช้การอัปเดต state โดยตรงแทนการเรียก callback
+
+### 2. ปรับปรุง Dropdown แบบเรียงซ้อน (Cascading Dropdowns) ให้ถูกต้อง
+- **วัตถุประสงค์**: เลือกอาคาร → แสดงชั้นของอาคารนั้น → เลือกชั้น → แสดงหน่วยงานในชั้นนั้นของอาคารนั้น
+- **การแก้ไข**:
+  - ปรับปรุง WithdrawModal.js และ Details.js ให้กรองข้อมูลจากตาราง `serial_numbers` และ `departments` อย่างถูกต้อง
+  - ใช้ building + floor เป็นคีย์รวมเพื่อความแม่นยำ
+
+### 3. ย้ายข้อมูลอ้างอิงจาก reference_data ไปใช้ตาราง departments แทน
+- **เหตุผล**: ตาราง `departments` มีโครงสร้างที่เหมาะสมกว่า (มี `dept_id`, `dept_name`, `building_default`, `floor_default`) และเป็นแหล่งข้อมูลที่ถูกต้องกว่า
+- **การแก้ไข**:
+  - อัปเดต `src/App.js` ให้ดึงข้อมูลจากตาราง `departments` แทน `reference_data`
+  - สร้าง buildings, floors, departments จากข้อมูลในตาราง `departments` โดยอัตโนมัติ
+  - Buildings = unique `building_default`
+  - Floors = unique combination ของ `building_default` + `floor_default`
+  - Departments = map ทุกแถวจาก `dept_name`, `building_default`, `floor_default`
+
+### 4. ระบบ Authentication (Supabase Auth) และ Protected Routes
+- **เพิ่มระบบ Login ใหม่**:
+  - สร้าง `src/context/AuthContext.jsx` - Context สำหรับจัดการ session ผู้ใช้
+  - สร้าง `src/hooks/useAuth.js` - Hook สำหรับเข้าถึง auth state
+  - สร้าง `src/components/ProtectedRoute.jsx` - Component สำหรับป้องกัน route ที่ต้องล็อกอิน
+  - สร้าง `src/components/Login.jsx` - หน้าล็อกอินสวยงาม พร้อม validation และ SweetAlert2
+
+- **ปรับปรุง App.js**:
+  - ห่อหุ้มด้วย `AuthProvider`
+  - ใช้ `ProtectedRoute` สำหรับทุก route ยกเว้น `/login`
+  - ใช้ `useLocation` เพื่อซ่อน Sidebar ในหน้า login
+  - Login เป็นหน้าหลัก (entry point) เมื่อยังไม่ได้ล็อกอิน
+
+### 5. แก้ไขบั๊กใน Details.js หน้าแก้ไขข้อมูล (Critical Fix)
+- **ปัญหา**: "ข้อมูลมีอยู่แล้ว แต่ยังเลือก ชั้น กับ แผนก ไม่ได้ ในส่วนแก้ไข"
+- **สาเหตุ**: มีโค้ดซ้ำซ้อนและผิดพลาดที่บรรทัด 207-292 ใช้ตรรกะเก่า (อ้างอิง `buildings` และ `serialNumbers`) ทับซ้อนตรรกะใหม่ที่ใช้ `departments` table
+- **การแก้ไข 3 จุดสำคัญ**:
+  1. **บรรทัด 231-233 (ลบออก)**: โค้ดที่ reset floor เป็นค่าว่างทุกครั้งที่ `editSN` เปลี่ยน
+  2. **บรรทัด 246 (แก้ไข dependency)**: เปลี่ยนจาก `[departments, floors, editSN]` เป็น `[departments, floors, editSN?.building]` ป้องกันการกรองซ้ำเมื่อเปิด modal
+  3. **บรรทัด 264-269 (แก้ไข dependency)**: เปลี่ยนจาก `[editSN?.floor, editSN]` เป็น `[editSN?.floor]` เท่านั้น ป้องกันการ reset `dept_used` เมื่อเปิด modal
+
+### 6. ใช้ SweetAlert2 ทุกส่วนของแอปพลิเคชัน
+- แทนที่ `alert()`, `confirm()`, `prompt()` ทั้งหมดด้วย `Swal.fire()`
+- ใช้สไตล์ที่สอดคล้องกัน: สีปุ่ม `#4e73df`, `#d33`, `#3085d6`, ไอคอน Bootstrap Icons
+
+### 7. สคริปต์ SQL สำหรับ Production
+- **`setup_test_data.sql`**: ข้อมูลทดสอบครบถ้วน (6 แผนก, 5 รายการสินค้า, 8 หมายเลขเครื่อง)
+- **`supabase_rls_setup.sql`**: เปิดใช้งาน RLS และสร้าง policies สำหรับ authenticated users
+- **รันใน Supabase SQL Editor**: ทั้ง 2 ไฟล์ก่อนใช้งานจริง
+
+### 8. ผลลัพธ์จากการแก้ไข:
+- ✅ แอปพลิเคชันรันได้ที่ http://localhost:3000 (port 3000)
+- ✅ Build สำเร็จไม่มี errors หรือ warnings
+- ✅ หน้า Login เป็นหน้าหลัก สวยงาม ทันสมัย
+- ✅ Sidebar ซ่อนในหน้า Login แสดงหลังล็อกอิน
+- ✅ Dropdown แบบเรียงซ้อนทำงานถูกต้อง: อาคาร → ชั้น → หน่วยงาน
+- ✅ หน้า Details แก้ไขข้อมูลเลือกชั้นและหน่วยงานได้แล้ว
+- ✅ ระบบ Auth ทำงานครบ: ล็อกอิน, ล็อกเอาท์, Protected Routes, Session persistence
+- ✅ ใช้ SweetAlert2 ทุก dialog แล้ว
+- ✅ ใช้ตาราง `departments` เป็น Single Source of Truth แล้ว
+
+### วิธีการตั้งค่า Production:
+1. รัน `setup_test_data.sql` ใน Supabase SQL Editor
+2. รัน `supabase_rls_setup.sql` ใน Supabase SQL Editor  
+3. สร้างผู้ใช้ใน Supabase Auth Dashboard (Authentication → Users → Add user)
+4. เข้าใช้งานที่ http://localhost:3000

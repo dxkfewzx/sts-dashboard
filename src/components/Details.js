@@ -82,7 +82,7 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
 
   // Handle cascading dropdowns for add SN form - filter floors based on selected building
   useEffect(() => {
-    if (!buildings || buildings.length === 0) {
+    if (!departments || departments.length === 0) {
       setFilteredFloorsAdd(floors);
       return;
     }
@@ -94,20 +94,18 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // Find the building reference to get its ID
-    const buildingRef = buildings.find(b => b.name === selectedBuilding);
-    if (!buildingRef) {
-      setFilteredFloorsAdd(floors);
-      return;
-    }
+    // Filter floors that have departments in this building (from departments table)
+    const buildingFloors = [...new Set(
+      departments
+        .filter(d => d.building_name === selectedBuilding && d.floor_name)
+        .map(d => d.floor_name)
+    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
 
-    // Filter floors that belong to this building
-    const buildingFloors = floors.filter(floor => floor.building_id === buildingRef.id);
     setFilteredFloorsAdd(buildingFloors.length > 0 ? buildingFloors : floors);
 
     // Reset floor selection when building changes
     setAddSNForm(prev => ({ ...prev, floor: '' }));
-  }, [buildings, floors, addSNForm.building]);
+  }, [departments, floors, addSNForm.building]);
 
   // Handle cascading dropdowns for add SN form - filter departments based on selected floor (and building)
   useEffect(() => {
@@ -125,55 +123,19 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // If we have a floor selected, find departments that have serial numbers on that floor
-    if (selectedFloor) {
-      // Find the floor reference to get its ID
-      const floorRef = floors.find(f => f.floor_name === selectedFloor);
-      if (!floorRef) {
-        setFilteredDepartmentsAdd(departments);
-        return;
-      }
+    // Filter departments based on building and floor from departments table
+    let filteredDepts = departments;
 
-      // Find serial numbers that match this floor and get their departments
-      const deptNamesFromFloor = serialNumbers
-        .filter(sn => sn.floor === selectedFloor && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        deptNamesFromFloor.includes(dept.name)
-      );
-
-      setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
-    }
-
-    // If we have only a building selected, find departments that have serial numbers in that building
     if (selectedBuilding) {
-      // Find the building reference to get its ID
-      const buildingRef = buildings.find(b => b.name === selectedBuilding);
-      if (!buildingRef) {
-        setFilteredDepartmentsAdd(departments);
-        return;
-      }
-
-      // Find serial numbers that match this building and get their departments
-      const deptNamesFromBuilding = serialNumbers
-        .filter(sn => sn.building === selectedBuilding && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        deptNamesFromBuilding.includes(dept.name)
-      );
-
-      setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
+      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
     }
 
-    // Default case
-    setFilteredDepartmentsAdd(departments);
-  }, [departments, serialNumbers, floors, buildings, addSNForm.floor, addSNForm.building]);
+    if (selectedFloor) {
+      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
+    }
+
+    setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
+  }, [departments, addSNForm.floor, addSNForm.building]);
 
   // Reset department selection when floor changes for add SN form
   useEffect(() => {
@@ -182,7 +144,7 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
 
   // Handle cascading dropdowns - filter floors based on selected building
   useEffect(() => {
-    if (!buildings || buildings.length === 0) {
+    if (!departments || departments.length === 0) {
       setFilteredFloors(floors);
       return;
     }
@@ -194,29 +156,18 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // Filter floors based on whether they're associated with the selected building in serialNumbers
-    // This works for both reference data (with IDs) and fallback data (with names)
-    const associatedFloors = serialNumbers
-      .filter(sn => sn.building === selectedBuilding && sn.floor)
-      .map(sn => sn.floor);
+    // Filter floors that have departments in this building (from departments table)
+    const buildingFloors = [...new Set(
+      departments
+        .filter(d => d.building_name === selectedBuilding && d.floor_name)
+        .map(d => d.floor_name)
+    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
 
-    // Get unique floor names
-    const uniqueAssociatedFloors = [...new Set(associatedFloors)];
-
-    // If we found associations, show only those floors; otherwise show all floors
-    if (uniqueAssociatedFloors.length > 0) {
-      const buildingFloors = floors.filter(floor =>
-        uniqueAssociatedFloors.includes(floor.floor_name)
-      );
-      setFilteredFloors(buildingFloors.length > 0 ? buildingFloors : floors);
-    } else {
-      // No specific associations found, show all floors
-      setFilteredFloors(floors);
-    }
+    setFilteredFloors(buildingFloors.length > 0 ? buildingFloors : floors);
 
     // Reset floor selection when building changes
     setBulkForm(prev => ({ ...prev, floor: '' }));
-  }, [buildings, floors, bulkForm.building, serialNumbers]);
+  }, [departments, floors, bulkForm.building]);
 
   // Handle cascading dropdowns - filter departments based on selected floor (and building)
   useEffect(() => {
@@ -234,165 +185,28 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // If we have a floor selected, find departments that have serial numbers on that floor
-    if (selectedFloor) {
-      // Find serial numbers that match this floor and get their departments
-      const deptNamesFromFloor = serialNumbers
-        .filter(sn => sn.floor === selectedFloor && sn.dept_used)
-        .map(sn => sn.dept_used);
+    // Filter departments based on building and floor from departments table
+    let filteredDepts = departments;
 
-      // Get unique department names
-      const uniqueDeptNamesFromFloor = [...new Set(deptNamesFromFloor)];
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        uniqueDeptNamesFromFloor.includes(dept.name)
-      );
-
-      setFilteredDepartments(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
-    }
-
-    // If we have only a building selected, find departments that have serial numbers in that building
     if (selectedBuilding) {
-      // Find serial numbers that match this building and get their departments
-      const deptNamesFromBuilding = serialNumbers
-        .filter(sn => sn.building === selectedBuilding && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get unique department names
-      const uniqueDeptNamesFromBuilding = [...new Set(deptNamesFromBuilding)];
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        uniqueDeptNamesFromBuilding.includes(dept.name)
-      );
-
-      setFilteredDepartments(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
+      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
     }
 
-    // Default case
-    setFilteredDepartments(departments);
-  }, [departments, serialNumbers, floors, buildings, bulkForm.floor, bulkForm.building]);
+    if (selectedFloor) {
+      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
+    }
+
+    setFilteredDepartments(filteredDepts.length > 0 ? filteredDepts : departments);
+  }, [departments, bulkForm.floor, bulkForm.building]);
 
   // Reset department selection when floor changes
   useEffect(() => {
     setBulkForm(prev => ({ ...prev, dept_used: '' }));
   }, [bulkForm.floor]);
 
-  // Handle cascading dropdowns for add SN form - filter floors based on selected building
-  useEffect(() => {
-    if (!buildings || buildings.length === 0) {
-      setFilteredFloorsAdd(floors);
-      return;
-    }
-
-    const selectedBuilding = addSNForm.building;
-    if (!selectedBuilding) {
-      // No building selected, show all floors
-      setFilteredFloorsAdd(floors);
-      return;
-    }
-
-    // Filter floors based on whether they're associated with the selected building in serialNumbers
-    // This works for both reference data (with IDs) and fallback data (with names)
-    const associatedFloors = serialNumbers
-      .filter(sn => sn.building === selectedBuilding && sn.floor)
-      .map(sn => sn.floor);
-
-    // Get unique floor names
-    const uniqueAssociatedFloors = [...new Set(associatedFloors)];
-
-    // If we found associations, show only those floors; otherwise show all floors
-    if (uniqueAssociatedFloors.length > 0) {
-      const buildingFloors = floors.filter(floor =>
-        uniqueAssociatedFloors.includes(floor.floor_name)
-      );
-      setFilteredFloorsAdd(buildingFloors.length > 0 ? buildingFloors : floors);
-    } else {
-      // No specific associations found, show all floors
-      setFilteredFloorsAdd(floors);
-    }
-
-    // Reset floor selection when building changes
-    setAddSNForm(prev => ({ ...prev, floor: '' }));
-  }, [buildings, floors, addSNForm.building, serialNumbers]);
-
-  // Handle cascading dropdowns for add SN form - filter departments based on selected floor (and building)
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredDepartmentsAdd([]);
-      return;
-    }
-
-    const selectedFloor = addSNForm.floor;
-    const selectedBuilding = addSNForm.building;
-
-    if (!selectedFloor && !selectedBuilding) {
-      // Neither floor nor building selected, show all departments
-      setFilteredDepartmentsAdd(departments);
-      return;
-    }
-
-    // If we have a floor selected, find departments that have serial numbers on that floor
-    if (selectedFloor) {
-      // Find the floor reference to get its ID
-      const floorRef = floors.find(f => f.floor_name === selectedFloor);
-      if (!floorRef) {
-        setFilteredDepartmentsAdd(departments);
-        return;
-      }
-
-      // Find serial numbers that match this floor and get their departments
-      const deptNamesFromFloor = serialNumbers
-        .filter(sn => sn.floor === selectedFloor && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        deptNamesFromFloor.includes(dept.name)
-      );
-
-      setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
-    }
-
-    // If we have only a building selected, find departments that have serial numbers in that building
-    if (selectedBuilding) {
-      // Find the building reference to get its ID
-      const buildingRef = buildings.find(b => b.name === selectedBuilding);
-      if (!buildingRef) {
-        setFilteredDepartmentsAdd(departments);
-        return;
-      }
-
-      // Find serial numbers that match this building and get their departments
-      const deptNamesFromBuilding = serialNumbers
-        .filter(sn => sn.building === selectedBuilding && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        deptNamesFromBuilding.includes(dept.name)
-      );
-
-      setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
-    }
-
-    // Default case
-    setFilteredDepartmentsAdd(departments);
-  }, [departments, serialNumbers, floors, buildings, addSNForm.floor, addSNForm.building]);
-
-  // Reset department selection when floor changes for add SN form
-  useEffect(() => {
-    setAddSNForm(prev => ({ ...prev, dept_used: '' }));
-  }, [addSNForm.floor]);
-
   // Handle cascading dropdowns for edit SN form - filter floors based on selected building
   useEffect(() => {
-    if (!buildings || buildings.length === 0) {
+    if (!departments || departments.length === 0) {
       setFilteredFloorsEdit(floors);
       return;
     }
@@ -404,31 +218,18 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // Filter floors based on whether they're associated with the selected building in serialNumbers
-    // This works for both reference data (with IDs) and fallback data (with names)
-    const associatedFloors = serialNumbers
-      .filter(sn => sn.building === selectedBuilding && sn.floor)
-      .map(sn => sn.floor);
+    // Filter floors that have departments in this building (from departments table)
+    const buildingFloors = [...new Set(
+      departments
+        .filter(d => d.building_name === selectedBuilding && d.floor_name)
+        .map(d => d.floor_name)
+    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
 
-    // Get unique floor names
-    const uniqueAssociatedFloors = [...new Set(associatedFloors)];
+    setFilteredFloorsEdit(buildingFloors.length > 0 ? buildingFloors : floors);
 
-    // If we found associations, show only those floors; otherwise show all floors
-    if (uniqueAssociatedFloors.length > 0) {
-      const buildingFloors = floors.filter(floor =>
-        uniqueAssociatedFloors.includes(floor.floor_name)
-      );
-      setFilteredFloorsEdit(buildingFloors.length > 0 ? buildingFloors : floors);
-    } else {
-      // No specific associations found, show all floors
-      setFilteredFloorsEdit(floors);
-    }
-
-    // Reset floor selection when building changes
-    if (editSN) {
-      setEditSN(prev => ({ ...prev, floor: '' }));
-    }
-  }, [buildings, floors, editSN, serialNumbers]);
+    // Reset floor selection only when building actually changes (not on initial load)
+    // We track previous building via a ref to avoid resetting floor on initial edit modal open
+  }, [departments, floors, editSN?.building]);
 
   // Handle cascading dropdowns for edit SN form - filter departments based on selected floor (and building)
   useEffect(() => {
@@ -446,54 +247,27 @@ const Details = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, 
       return;
     }
 
-    // If we have a floor selected, find departments that have serial numbers on that floor
-    if (selectedFloor) {
-      // Find serial numbers that match this floor and get their departments
-      const deptNamesFromFloor = serialNumbers
-        .filter(sn => sn.floor === selectedFloor && sn.dept_used)
-        .map(sn => sn.dept_used);
+    // Filter departments based on building and floor from departments table
+    let filteredDepts = departments;
 
-      // Get unique department names
-      const uniqueDeptNamesFromFloor = [...new Set(deptNamesFromFloor)];
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        uniqueDeptNamesFromFloor.includes(dept.name)
-      );
-
-      setFilteredDepartmentsEdit(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
-    }
-
-    // If we have only a building selected, find departments that have serial numbers in that building
     if (selectedBuilding) {
-      // Find serial numbers that match this building and get their departments
-      const deptNamesFromBuilding = serialNumbers
-        .filter(sn => sn.building === selectedBuilding && sn.dept_used)
-        .map(sn => sn.dept_used);
-
-      // Get unique department names
-      const uniqueDeptNamesFromBuilding = [...new Set(deptNamesFromBuilding)];
-
-      // Get department references for these names
-      const filteredDepts = departments.filter(dept =>
-        uniqueDeptNamesFromBuilding.includes(dept.name)
-      );
-
-      setFilteredDepartmentsEdit(filteredDepts.length > 0 ? filteredDepts : departments);
-      return;
+      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
     }
 
-    // Default case
-    setFilteredDepartmentsEdit(departments);
-  }, [departments, serialNumbers, floors, buildings, editSN?.floor, editSN?.building]);
+    if (selectedFloor) {
+      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
+    }
+
+    setFilteredDepartmentsEdit(filteredDepts.length > 0 ? filteredDepts : departments);
+  }, [departments, editSN?.floor, editSN?.building]);
 
   // Reset department selection when floor changes for edit SN form
   useEffect(() => {
     if (editSN) {
       setEditSN(prev => ({ ...prev, dept_used: '' }));
     }
-  }, [editSN?.floor, editSN]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editSN?.floor]);
 
   // Handle add SN submit
   const handleAddSNSubmit = async (e) => {
