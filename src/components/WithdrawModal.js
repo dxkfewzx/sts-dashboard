@@ -63,6 +63,25 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
     setFilteredDepartments(filteredDepts.length > 0 ? filteredDepts : departments);
   }, [show, departments, formData.building_info, formData.floor_info]);
 
+  // Auto-fill building and floor when department is selected
+  useEffect(() => {
+    if (!show) return;
+
+    const selectedDeptName = formData.dept_info;
+    if (!selectedDeptName) return;
+
+    // Find the department in the departments array to get its default building and floor
+    const selectedDept = departments.find(d => d.name === selectedDeptName);
+    if (selectedDept) {
+      if (selectedDept.building_name && !formData.building_info) {
+        onChange({ target: { name: 'building_info', value: selectedDept.building_name } });
+      }
+      if (selectedDept.floor_name && !formData.floor_info) {
+        onChange({ target: { name: 'floor_info', value: selectedDept.floor_name } });
+      }
+    }
+  }, [show, departments, formData.dept_info, onChange]);
+
   // Handle floor change: reset department selection when floor changes
   useEffect(() => {
     if (!show) return;

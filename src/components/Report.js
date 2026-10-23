@@ -1,6 +1,12 @@
 import React from 'react';
+import { useItems, useSerialNumbers, useRepairs, useWithdrawalLogs } from '../hooks/useSupabase';
 
-const Report = ({ items, serialNumbers, repairs, withdrawalLogs, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, onAddRepair, onUpdateRepair, onDeleteRepair, onWithdraw, onReturn }) => {
+const Report = () => {
+  const { items } = useItems();
+  const { serialNumbers } = useSerialNumbers();
+  const { repairs } = useRepairs();
+  const { withdrawalLogs } = useWithdrawalLogs();
+
   // Calculate statistics
   const totalItems = items.length;
   const availableSN = serialNumbers.filter(sn => sn.status === 'Available').length;

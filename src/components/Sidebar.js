@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Swal from 'sweetalert2';
 
-const Sidebar = ({ items, serialNumbers, repairs, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, onAddRepair, onUpdateRepair, onDeleteRepair }) => {
+const Sidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
 

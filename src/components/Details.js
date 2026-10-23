@@ -1,529 +1,260 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useData } from '../context/DataContext';
+import { useCascadingDropdowns, useItemSerialNumbers, useItemHistory, useSNHistory } from '../hooks/useCascadingDropdowns';
+import {
+  INITIAL_SN_FORM,
+  INITIAL_BULK_FORM,
+  INITIAL_RETURN_FORM,
+  createSNFormData,
+  createBulkSNArray,
+  createReturnFormData,
+} from '../constants/snForms';
+import {
+  getSNStatusBadgeClass,
+  getSNStatusText,
+  getWithdrawalActionBadgeClass,
+  getWithdrawalActionText,
+} from '../utils/status';
+import { operationToast, confirm } from '../utils/toast';
+import AddSNModal from './modals/AddSNModal';
+import BulkAddSNModal from './modals/BulkAddSNModal';
+import EditSNModal from './modals/EditSNModal';
+import ReturnModal from './modals/ReturnModal';
+import HistoryModal from './modals/HistoryModal';
 
-const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, onWithdraw, onReturn, departments, buildings, floors }) => {
+const Details = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const itemId = parseInt(id);
-  const [item, setItem] = useState(null);
-  const [itemSerialNumbers, setItemSerialNumbers] = useState([]);
-  const [activeTab, setActiveTab] = useState('serials'); // 'serials' | 'history' | 'stats'
+
+  const {
+    items,
+    serialNumbers,
+    withdrawalLogs,
+    departments,
+    buildings,
+    floors,
+    addSerialNumber,
+    updateSerialNumber,
+    deleteSerialNumber,
+    onReturn,
+  } = useData();
+
+  // Item & Serial Numbers
+  const item = items.find(i => i.id === itemId) || null;
+  const itemSerialNumbers = useItemSerialNumbers(itemId, serialNumbers);
+  const itemHistoryLogs = useItemHistory(itemSerialNumbers, withdrawalLogs);
+
+  // UI State
+  const [activeTab, setActiveTab] = useState('serials');
   const [showAddSNModal, setShowAddSNModal] = useState(false);
   const [showAddBulkSNModal, setShowAddBulkSNModal] = useState(false);
   const [showEditSNModal, setShowEditSNModal] = useState(false);
   const [editSN, setEditSN] = useState(null);
-  const [bulkForm, setBulkForm] = useState({
-    serial_numbers: '',
-    brand: '',
-    status: 'Available',
-    job_number: '',
-    withdrawer_name: '',
-    dept_used: '',
-    building: '',
-    floor: '',
-    receive_date: '',
-    withdraw_date: ''
-  });
-
-  // State for Return modal
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [returnSN, setReturnSN] = useState(null);
-  const [returnForm, setReturnForm] = useState({
-    receiver_name: '',
-    return_condition: 'good',
-    return_note: ''
-  });
-
-  // State for History modal (for single SN)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historySN, setHistorySN] = useState(null);
 
-  // Form state for adding SN
-  const [addSNForm, setAddSNForm] = useState({
-    serial_number: '',
-    brand: '',
-    status: 'Available',
-    job_number: '',
-    withdrawer_name: '',
-    dept_used: '',
-    building: '',
-    floor: '',
-    receive_date: '',
-    withdraw_date: ''
-  });
+  // Form States
+  const [addSNForm, setAddSNForm] = useState(INITIAL_SN_FORM);
+  const [bulkForm, setBulkForm] = useState(INITIAL_BULK_FORM);
+  const [returnForm, setReturnForm] = useState(INITIAL_RETURN_FORM);
 
-  // State for cascading dropdowns in add SN form
-  const [filteredFloorsAdd, setFilteredFloorsAdd] = useState([]);
-  const [filteredDepartmentsAdd, setFilteredDepartmentsAdd] = useState([]);
+  // Cascading Dropdowns for Add SN form
+  const addDropdowns = useCascadingDropdowns(
+    addSNForm,
+    departments,
+    floors,
+    setAddSNForm
+  );
 
-  // State for cascading dropdowns in edit SN form
-  const [filteredFloorsEdit, setFilteredFloorsEdit] = useState([]);
-  const [filteredDepartmentsEdit, setFilteredDepartmentsEdit] = useState([]);
+  // Cascading Dropdowns for Bulk form
+  const bulkDropdowns = useCascadingDropdowns(
+    bulkForm,
+    departments,
+    floors,
+    setBulkForm
+  );
 
-  // State for cascading dropdowns
-  const [filteredFloors, setFilteredFloors] = useState([]);
-  const [filteredDepartments, setFilteredDepartments] = useState([]);
+  // Cascading Dropdowns for Edit form
+  const editDropdowns = useCascadingDropdowns(
+    editSN || { building: '', floor: '' },
+    departments,
+    floors,
+    setEditSN
+  );
 
-  // Handle input changes for add SN form
+  // Handle input changes
   const handleAddSNChange = (e) => {
     if (!e.target) return;
     const { name, value } = e.target;
     setAddSNForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle input changes for edit SN form
+  const handleBulkChange = (e) => {
+    const { name, value } = e.target;
+    setBulkForm(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleEditSNChange = (e) => {
     if (!e.target) return;
     const { name, value } = e.target;
     setEditSN(prev => ({ ...prev, [name]: value }));
   };
 
-  // Fetch item and its serial numbers
-  useEffect(() => {
-    const fetchData = async () => {
-      // Find item
-      const foundItem = items.find(item => item.id === itemId);
-      setItem(foundItem || null);
+  const handleReturnChange = (e) => {
+    const { name, value } = e.target;
+    setReturnForm(prev => ({ ...prev, [name]: value }));
+  };
 
-      // Find serial numbers for this item and sort by ID ascending (low to high)
-      const snForItem = serialNumbers
-        .filter(sn => sn.item_id === itemId)
-        .sort((a, b) => a.id - b.id);
-      setItemSerialNumbers(snForItem);
-    };
-
-    fetchData();
-  }, [items, serialNumbers, itemId]);
-
-  // Debug: log onReturn prop
-  useEffect(() => {
-    console.log('Details component onReturn prop:', typeof onReturn, onReturn);
-  }, [onReturn]);
-
-  // Handle cascading dropdowns for add SN form - filter floors based on selected building
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredFloorsAdd(floors);
-      return;
-    }
-
-    const selectedBuilding = addSNForm.building;
-    if (!selectedBuilding) {
-      // No building selected, show all floors
-      setFilteredFloorsAdd(floors);
-      return;
-    }
-
-    // Filter floors that have departments in this building (from departments table)
-    const buildingFloors = [...new Set(
-      departments
-        .filter(d => d.building_name === selectedBuilding && d.floor_name)
-        .map(d => d.floor_name)
-    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
-
-    setFilteredFloorsAdd(buildingFloors.length > 0 ? buildingFloors : floors);
-
-    // Reset floor selection when building changes
-    setAddSNForm(prev => ({ ...prev, floor: '' }));
-  }, [departments, floors, addSNForm.building]);
-
-  // Handle cascading dropdowns for add SN form - filter departments based on selected floor (and building)
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredDepartmentsAdd([]);
-      return;
-    }
-
-    const selectedFloor = addSNForm.floor;
-    const selectedBuilding = addSNForm.building;
-
-    if (!selectedFloor && !selectedBuilding) {
-      // Neither floor nor building selected, show all departments
-      setFilteredDepartmentsAdd(departments);
-      return;
-    }
-
-    // Filter departments based on building and floor from departments table
-    let filteredDepts = departments;
-
-    if (selectedBuilding) {
-      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
-    }
-
-    if (selectedFloor) {
-      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
-    }
-
-    setFilteredDepartmentsAdd(filteredDepts.length > 0 ? filteredDepts : departments);
-  }, [departments, addSNForm.floor, addSNForm.building]);
-
-  // Reset department selection when floor changes for add SN form
-  useEffect(() => {
-    setAddSNForm(prev => ({ ...prev, dept_used: '' }));
-  }, [addSNForm.floor]);
-
-  // Handle cascading dropdowns - filter floors based on selected building
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredFloors(floors);
-      return;
-    }
-
-    const selectedBuilding = bulkForm.building;
-    if (!selectedBuilding) {
-      // No building selected, show all floors
-      setFilteredFloors(floors);
-      return;
-    }
-
-    // Filter floors that have departments in this building (from departments table)
-    const buildingFloors = [...new Set(
-      departments
-        .filter(d => d.building_name === selectedBuilding && d.floor_name)
-        .map(d => d.floor_name)
-    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
-
-    setFilteredFloors(buildingFloors.length > 0 ? buildingFloors : floors);
-
-    // Reset floor selection when building changes
-    setBulkForm(prev => ({ ...prev, floor: '' }));
-  }, [departments, floors, bulkForm.building]);
-
-  // Handle cascading dropdowns - filter departments based on selected floor (and building)
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredDepartments([]);
-      return;
-    }
-
-    const selectedFloor = bulkForm.floor;
-    const selectedBuilding = bulkForm.building;
-
-    if (!selectedFloor && !selectedBuilding) {
-      // Neither floor nor building selected, show all departments
-      setFilteredDepartments(departments);
-      return;
-    }
-
-    // Filter departments based on building and floor from departments table
-    let filteredDepts = departments;
-
-    if (selectedBuilding) {
-      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
-    }
-
-    if (selectedFloor) {
-      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
-    }
-
-    setFilteredDepartments(filteredDepts.length > 0 ? filteredDepts : departments);
-  }, [departments, bulkForm.floor, bulkForm.building]);
-
-  // Reset department selection when floor changes
-  useEffect(() => {
-    setBulkForm(prev => ({ ...prev, dept_used: '' }));
-  }, [bulkForm.floor]);
-
-  // Handle cascading dropdowns for edit SN form - filter floors based on selected building
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredFloorsEdit(floors);
-      return;
-    }
-
-    const selectedBuilding = editSN?.building || '';
-    if (!selectedBuilding) {
-      // No building selected, show all floors
-      setFilteredFloorsEdit(floors);
-      return;
-    }
-
-    // Filter floors that have departments in this building (from departments table)
-    const buildingFloors = [...new Set(
-      departments
-        .filter(d => d.building_name === selectedBuilding && d.floor_name)
-        .map(d => d.floor_name)
-    )].map((floor_name, index) => ({ id: index + 1, floor_name, building_name: selectedBuilding }));
-
-    setFilteredFloorsEdit(buildingFloors.length > 0 ? buildingFloors : floors);
-
-    // Reset floor selection only when building actually changes (not on initial load)
-    // We track previous building via a ref to avoid resetting floor on initial edit modal open
-  }, [departments, floors, editSN?.building]);
-
-  // Handle cascading dropdowns for edit SN form - filter departments based on selected floor (and building)
-  useEffect(() => {
-    if (!departments || departments.length === 0) {
-      setFilteredDepartmentsEdit([]);
-      return;
-    }
-
-    const selectedFloor = editSN?.floor || '';
-    const selectedBuilding = editSN?.building || '';
-
-    if (!selectedFloor && !selectedBuilding) {
-      // Neither floor nor building selected, show all departments
-      setFilteredDepartmentsEdit(departments);
-      return;
-    }
-
-    // Filter departments based on building and floor from departments table
-    let filteredDepts = departments;
-
-    if (selectedBuilding) {
-      filteredDepts = filteredDepts.filter(d => d.building_name === selectedBuilding);
-    }
-
-    if (selectedFloor) {
-      filteredDepts = filteredDepts.filter(d => d.floor_name === selectedFloor);
-    }
-
-    setFilteredDepartmentsEdit(filteredDepts.length > 0 ? filteredDepts : departments);
-  }, [departments, editSN?.floor, editSN?.building]);
-
-  // Reset department selection when floor changes for edit SN form
-  useEffect(() => {
-    if (editSN) {
-      setEditSN(prev => ({ ...prev, dept_used: '' }));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editSN?.floor]);
-
-  // Handle add SN submit
+  // Submit Handlers
   const handleAddSNSubmit = async (e) => {
     e.preventDefault();
-    const { serial_number, brand, status, job_number, withdrawer_name, dept_used, building, floor, receive_date, withdraw_date } = addSNForm;
-
-    if (!serial_number) {
-      alert('กรุณากรอกหมายเลขเครื่อง');
+    if (!addSNForm.serial_number) {
+      operationToast.validationError('กรุณากรอกหมายเลขเครื่อง');
       return;
     }
 
     try {
-      await onAddSerialNumber({
-        item_id: itemId,
-        serial_number,
-        brand: brand || '',
-        status: status || 'Available',
-        job_number: job_number || '',
-        withdrawer_name: withdrawer_name || '',
-        dept_used: dept_used || '',
-        building: building || '',
-        floor: floor || '',
-        receive_date: receive_date || null,
-        withdraw_date: withdraw_date || null
-      });
-      setAddSNForm({
-        serial_number: '',
-        brand: '',
-        status: 'Available',
-        job_number: '',
-        withdrawer_name: '',
-        dept_used: '',
-        building: '',
-        floor: '',
-        receive_date: '',
-        withdraw_date: ''
-      });
+      await addSerialNumber(createSNFormData(addSNForm, itemId));
+      setAddSNForm(INITIAL_SN_FORM);
       setShowAddSNModal(false);
-      alert('เพิ่มหมายเลขเครื่องสำเร็จ!');
-      // Refresh SN list
-      const snForItem = serialNumbers.filter(sn => sn.item_id === itemId);
-      setItemSerialNumbers(snForItem);
+      operationToast.created('หมายเลขเครื่อง');
     } catch (error) {
       console.error('Error adding serial number:', error);
-      alert('เกิดข้อผิดพลาดในการเพิ่มหมายเลขเครื่อง');
+      operationToast.createError('หมายเลขเครื่อง', error?.message);
     }
   };
 
-  // Handle bulk form changes
-  const handleBulkChange = (e) => {
-    const { name, value } = e.target;
-    setBulkForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle bulk add SN submit
   const handleAddBulkSNSubmit = async (e) => {
     e.preventDefault();
-    const { serial_numbers, brand, status, job_number, withdrawer_name, dept_used, building, floor, receive_date, withdraw_date } = bulkForm;
-
-    // Split serial numbers by newline and filter out empty lines
-    const snList = serial_numbers
+    const snList = bulkForm.serial_numbers
       .split('\n')
       .map(sn => sn.trim())
       .filter(sn => sn.length > 0);
 
     if (snList.length === 0) {
-      alert('กรุณากรอกหมายเลขเครื่องอย่างน้อย 1 รายการ');
+      operationToast.validationError('กรุณากรอกหมายเลขเครื่องอย่างน้อย 1 รายการ');
       return;
     }
 
     try {
-      // Add each serial number
-      for (const sn of snList) {
-        await onAddSerialNumber({
-          item_id: itemId,
-          serial_number: sn,
-          brand: brand || '',
-          status: status || 'Available',
-          job_number: job_number || '',
-          withdrawer_name: withdrawer_name || '',
-          dept_used: dept_used || '',
-          building: building || '',
-          floor: floor || '',
-          receive_date: receive_date || null,
-          withdraw_date: withdraw_date || null
-        });
+      const snArray = createBulkSNArray(bulkForm, itemId);
+      for (const snData of snArray) {
+        await addSerialNumber(snData);
       }
-
-      // Reset form and close modal
-      setBulkForm({
-        serial_numbers: '',
-        brand: '',
-        status: 'Available',
-        job_number: '',
-        withdrawer_name: '',
-        dept_used: '',
-        building: '',
-        floor: '',
-        receive_date: '',
-        withdraw_date: ''
-      });
+      setBulkForm(INITIAL_BULK_FORM);
       setShowAddBulkSNModal(false);
-      alert(`เพิ่มหมายเลขเครื่องสำเร็จทั้งหมด ${snList.length} รายการ`);
-
-      // Refresh SN list
-      const snForItem = serialNumbers.filter(sn => sn.item_id === itemId);
-      setItemSerialNumbers(snForItem);
+      operationToast.created(`${snList.length} หมายเลขเครื่อง`);
     } catch (error) {
       console.error('Error adding serial numbers:', error);
-      alert('เกิดข้อผิดพลาดในการเพิ่มหมายเลขเครื่อง');
+      operationToast.createError('หมายเลขเครื่อง', error?.message);
     }
   };
 
-  // Handle edit SN submit
   const handleEditSNSubmit = async (e) => {
     e.preventDefault();
     if (!editSN) return;
 
-    const { id, serial_number, brand, status, job_number, withdrawer_name, dept_used, building, floor, receive_date, withdraw_date } = editSN;
-
-    if (!serial_number) {
-      alert('กรุณากรอกหมายเลขเครื่อง');
+    if (!editSN.serial_number) {
+      operationToast.validationError('กรุณากรอกหมายเลขเครื่อง');
       return;
     }
 
     try {
-      await onUpdateSerialNumber(id, {
-        serial_number,
-        brand: brand || '',
-        status: status || 'Available',
-        job_number: job_number || '',
-        withdrawer_name: withdrawer_name || '',
-        dept_used: dept_used || '',
-        building: building || '',
-        floor: floor || '',
-        receive_date: receive_date || null,
-        withdraw_date: withdraw_date || null
-      });
+      await updateSerialNumber(editSN.id, createSNFormData(editSN, itemId));
       setShowEditSNModal(false);
-      alert('แก้ไขสำเร็จ!');
-      // Refresh SN list
-      const snForItem = serialNumbers.filter(sn => sn.item_id === itemId);
-      setItemSerialNumbers(snForItem);
+      setEditSN(null);
+      operationToast.updated('หมายเลขเครื่อง');
     } catch (error) {
       console.error('Error updating serial number:', error);
-      alert('เกิดข้อผิดพลาดในการแก้ไขหมายเลขเครื่อง');
+      operationToast.updateError('หมายเลขเครื่อง', error?.message);
     }
   };
 
-  // Handle delete SN
   const handleDeleteSN = async (id) => {
-    if (window.confirm('คุณต้องการลบหมายเลขเครื่องนี้หรือไม่?')) {
-      try {
-        await onDeleteSerialNumber(id);
-        alert('ลบสำเร็จ!');
-        // Refresh SN list
-        const snForItem = serialNumbers.filter(sn => sn.item_id === itemId);
-        setItemSerialNumbers(snForItem);
-      } catch (error) {
-        console.error('Error deleting serial number:', error);
-        alert('เกิดข้อผิดพลาดในการลบหมายเลขเครื่อง');
+    const confirmed = await confirm({
+      title: 'ยืนยันการลบ?',
+      text: 'คุณต้องการลบหมายเลขเครื่องนี้หรือไม่?',
+    });
+    if (!confirmed) return;
+
+    try {
+      const result = await deleteSerialNumber(id);
+      if (result.success) {
+        operationToast.deleted('หมายเลขเครื่อง');
+      } else {
+        // Check for foreign key constraint error
+        const errorMsg = result.error?.message || '';
+        if (errorMsg.includes('foreign key') || errorMsg.includes('violates foreign key') || errorMsg.includes('23503')) {
+          operationToast.error('ไม่สามารถลบได้', 'หมายเลขเครื่องนี้มีประวัติการเบิก-คืนอยู่ โปรดลบประวัติในตาราง withdrawal_logs ก่อน หรือตั้งค่า CASCADE DELETE ในฐานข้อมูล');
+        } else {
+          operationToast.deleteError('หมายเลขเครื่อง', errorMsg);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting serial number:', error);
+      const errorMsg = error?.message || '';
+      if (errorMsg.includes('foreign key') || errorMsg.includes('violates foreign key') || errorMsg.includes('23503')) {
+        operationToast.error('ไม่สามารถลบได้', 'หมายเลขเครื่องนี้มีประวัติการเบิก-คืนอยู่ โปรดลบประวัติในตาราง withdrawal_logs ก่อน หรือตั้งค่า CASCADE DELETE ในฐานข้อมูล');
+      } else {
+        operationToast.deleteError('หมายเลขเครื่อง', errorMsg);
       }
     }
   };
 
-  // Handle Return - open modal for Withdrawn items
+  // Return modal handlers
   const handleOpenReturnModal = (sn) => {
     setReturnSN(sn);
     setReturnForm({
-      receiver_name: '',
-      return_condition: 'good',
-      return_note: '',
+      ...INITIAL_RETURN_FORM,
       job_number: sn.job_number || '',
       dept_used: sn.dept_used || '',
       building: sn.building || '',
-      floor: sn.floor || ''
+      floor: sn.floor || '',
     });
     setShowReturnModal(true);
   };
 
-  // Handle Return submit
   const handleReturnSubmit = async (e) => {
     e.preventDefault();
     if (!returnSN) return;
 
-    const { receiver_name, return_condition, return_note, job_number, dept_used, building, floor } = returnForm;
-    if (!receiver_name || !return_condition) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
-      return;
-    }
-
-    // Debug: check if onReturn is available
-    if (typeof onReturn !== 'function') {
-      console.error('onReturn prop is not a function:', onReturn);
-      alert('ข้อผิดพลาด: ฟังก์ชัน onReturn ไม่พร้อมใช้งาน (โปรดรีเฟรชหน้าเว็บด้วย Ctrl+Shift+R)');
+    if (!returnForm.receiver_name || !returnForm.return_condition) {
+      operationToast.validationError('กรุณากรอกข้อมูลให้ครบถ้วน');
       return;
     }
 
     try {
-      const result = await onReturn(returnSN.id, {
-        receiver_name,
-        return_condition,
-        return_note,
-        job_number,
-        dept_used,
-        building,
-        floor,
-        performed_by: 'current_user' // TODO: get from auth
-      });
-
-      if (result.success) {
-        setShowReturnModal(false);
-        setReturnSN(null);
-        alert('บันทึกการคืนอุปกรณ์สำเร็จ');
-        // Refresh SN list
-        const snForItem = serialNumbers.filter(sn => sn.item_id === itemId);
-        setItemSerialNumbers(snForItem);
-      } else {
-        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + (result?.error?.message || JSON.stringify(result?.error)));
-      }
+      await onReturn(returnSN.id, createReturnFormData(returnForm, returnSN));
+      setShowReturnModal(false);
+      setReturnSN(null);
+      setReturnForm(INITIAL_RETURN_FORM);
+      operationToast.returned();
     } catch (error) {
       console.error('Error returning:', error);
-      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + (error?.message || error?.error?.message || JSON.stringify(error)));
+      operationToast.returnError(error?.message);
     }
   };
 
-  // Handle History - open modal
+  // History modal handler
   const handleOpenHistoryModal = (sn) => {
     setHistorySN(sn);
     setShowHistoryModal(true);
   };
 
-  // Get history logs for a serial number
-  const getHistoryLogs = (snId) => {
-    if (!withdrawalLogs || withdrawalLogs.length === 0) return [];
-    return withdrawalLogs.filter(log => log.serial_number_id === snId);
-  };
+  // History logs for the selected SN (for HistoryModal)
+  const historySNLogs = useSNHistory(historySN?.id, withdrawalLogs);
+
+  // Stats
+  const stats = [
+    { label: 'ทั้งหมด', value: itemSerialNumbers.length, icon: 'bi-boxes', iconColor: 'primary', iconBg: 'primary-light' },
+    { label: 'พร้อมใช้งาน', value: itemSerialNumbers.filter(sn => sn.status === 'Available').length, icon: 'bi-check-circle-fill', iconColor: 'success', iconBg: 'success-light' },
+    { label: 'เบิกออกแล้ว', value: itemSerialNumbers.filter(sn => sn.status === 'Withdrawn').length, icon: 'bi-box-arrow-right', iconColor: 'warning', iconBg: 'warning-light' },
+    { label: 'อยู่ระหว่างซ่อม', value: itemSerialNumbers.filter(sn => sn.status === 'Repair').length, icon: 'bi-tools', iconColor: 'danger', iconBg: 'danger-light' },
+  ];
 
   if (!item) {
     return (
@@ -534,31 +265,6 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
       </div>
     );
   }
-
-  // Helper: Compute stats for the Stats tab
-  const totalSNs = itemSerialNumbers.length;
-  const availableSNs = itemSerialNumbers.filter(sn => sn.status === 'Available').length;
-  const withdrawnSNs = itemSerialNumbers.filter(sn => sn.status === 'Withdrawn').length;
-  const repairSNs = itemSerialNumbers.filter(sn => sn.status === 'Repair').length;
-
-  // Stats cards data
-  const statsCards = [
-    { label: 'ทั้งหมด', value: totalSNs, icon: 'bi-boxes', iconColor: 'primary', iconBg: 'primary-light' },
-    { label: 'พร้อมใช้งาน', value: availableSNs, icon: 'bi-check-circle-fill', iconColor: 'success', iconBg: 'success-light' },
-    { label: 'เบิกออกแล้ว', value: withdrawnSNs, icon: 'bi-box-arrow-right', iconColor: 'warning', iconBg: 'warning-light' },
-    { label: 'อยู่ระหว่างซ่อม', value: repairSNs, icon: 'bi-tools', iconColor: 'danger', iconBg: 'danger-light' },
-  ];
-
-  // Get all history logs for this item
-  const getItemHistoryLogs = () => {
-    if (!withdrawalLogs || withdrawalLogs.length === 0) return [];
-    const itemSNIds = itemSerialNumbers.map(sn => sn.id);
-    return withdrawalLogs
-      .filter(log => itemSNIds.includes(log.serial_number_id))
-      .sort((a, b) => new Date(b.performed_at) - new Date(a.performed_at));
-  };
-
-  const itemHistoryLogs = getItemHistoryLogs();
 
   return (
     <div>
@@ -581,9 +287,12 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
           >
             <i className="bi bi-plus-square"></i> เพิ่มหลายรายการ
           </button>
-          <a href="/inventory" className="btn btn-outline-secondary btn-sm">
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => navigate('/inventory')}
+          >
             <i className="bi bi-arrow-left"></i> กลับไปรายการ
-          </a>
+          </button>
         </div>
       </div>
 
@@ -612,7 +321,7 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
               onClick={() => setActiveTab('serials')}
               aria-selected={activeTab === 'serials'}
             >
-              <i className="bi bi-list-ul me-1"></i> หมายเลขเครื่อง ({totalSNs})
+              <i className="bi bi-list-ul me-1"></i> หมายเลขเครื่อง ({itemSerialNumbers.length})
             </button>
             <button
               role="tab"
@@ -636,8 +345,8 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
         <div className="card-body p-0">
           {/* Tab Panel: Serial Numbers */}
           <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'serials'} style={{ display: activeTab === 'serials' ? 'block' : 'none' }}>
-            <div className="table-container">
-              <table className="table table-striped mb-0">
+            <div className="table-responsive" style={{ overflowX: 'auto', maxWidth: '100%' }}>
+              <table className="table table-striped mb-0" style={{ minWidth: '1000px', whiteSpace: 'nowrap' }}>
                 <thead>
                   <tr>
                     <th style={{ width: '40px', minWidth: '40px' }}>#</th>
@@ -667,8 +376,8 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                         <td className="text-truncate fw-medium" title={sn.serial_number}>{sn.serial_number}</td>
                         <td className="text-truncate" title={sn.brand || ''}>{sn.brand || '-'}</td>
                         <td style={{ textAlign: 'center' }}>
-                          <span className={getStatusBadgeClass(sn.status)}>
-                            {getStatusText(sn.status)}
+                          <span className={getSNStatusBadgeClass(sn.status)}>
+                            {getSNStatusText(sn.status)}
                           </span>
                         </td>
                         <td className="text-truncate" title={sn.job_number || ''}>{sn.job_number || '-'}</td>
@@ -683,17 +392,6 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                           <div className="d-flex justify-content-center gap-1">
                             <button
                               className="btn-action btn-edit"
-                              data-id={sn.id}
-                              data-serial_number={sn.serial_number}
-                              data-brand={sn.brand || ''}
-                              data-status={sn.status}
-                              data-job_number={sn.job_number || ''}
-                              data-withdrawer_name={sn.withdrawer_name || ''}
-                              data-dept_used={sn.dept_used || ''}
-                              data-building={sn.building || ''}
-                              data-floor={sn.floor || ''}
-                              data-receive_date={sn.receive_date || ''}
-                              data-withdraw_date={sn.withdraw_date || ''}
                               onClick={() => {
                                 setEditSN({
                                   id: sn.id,
@@ -706,7 +404,7 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                                   building: sn.building || '',
                                   floor: sn.floor || '',
                                   receive_date: sn.receive_date || '',
-                                  withdraw_date: sn.withdraw_date || ''
+                                  withdraw_date: sn.withdraw_date || '',
                                 });
                                 setShowEditSNModal(true);
                               }}
@@ -717,7 +415,6 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                             {sn.status === 'Withdrawn' && (
                               <button
                                 className="btn-action btn-return"
-                                data-id={sn.id}
                                 onClick={() => handleOpenReturnModal(sn)}
                                 title="รับคืนอุปกรณ์"
                               >
@@ -726,7 +423,6 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                             )}
                             <button
                               className="btn-action btn-history"
-                              data-id={sn.id}
                               onClick={() => handleOpenHistoryModal(sn)}
                               title="ดูประวัติ"
                             >
@@ -734,7 +430,6 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                             </button>
                             <button
                               className="btn-action btn-del"
-                              data-id={sn.id}
                               onClick={() => handleDeleteSN(sn.id)}
                               title="ลบ"
                             >
@@ -752,8 +447,8 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
 
           {/* Tab Panel: History */}
           <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'history'} style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
-            <div className="table-container">
-              <table className="table table-striped mb-0">
+            <div className="table-responsive" style={{ overflowX: 'auto', maxWidth: '100%' }}>
+              <table className="table table-striped mb-0" style={{ minWidth: '1100px', whiteSpace: 'nowrap' }}>
                 <thead>
                   <tr>
                     <th style={{ width: '40px', minWidth: '40px' }}>#</th>
@@ -779,15 +474,13 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
                   ) : (
                     itemHistoryLogs.map((log, index) => {
                       const sn = itemSerialNumbers.find(s => s.id === log.serial_number_id);
-                      const actionBadgeClass = log.action === 'withdraw' ? 'badge-warning' : 'badge-success';
-                      const actionText = log.action === 'withdraw' ? 'เบิก' : 'คืน';
                       return (
                         <tr key={log.id}>
                           <td className="text-muted fw-bold">{index + 1}</td>
                           <td className="fw-medium">{sn?.serial_number || '-'}</td>
                           <td style={{ textAlign: 'center' }}>
-                            <span className={'badge ' + actionBadgeClass}>
-                              {actionText}
+                            <span className={'badge ' + getWithdrawalActionBadgeClass(log.action)}>
+                              {getWithdrawalActionText(log.action)}
                             </span>
                           </td>
                           <td>{log.job_number || '-'}</td>
@@ -811,7 +504,7 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
           <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'stats'} style={{ display: activeTab === 'stats' ? 'block' : 'none' }}>
             <div className="card-body">
               <div className="row g-3">
-                {statsCards.map((stat, index) => (
+                {stats.map((stat, index) => (
                   <div key={index} className="col-6 col-md-3">
                     <div className="stat-card">
                       <div className={'stat-card-icon bg-' + stat.iconBg + ' text-' + stat.iconColor}>
@@ -827,694 +520,70 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
           </div>
         </div>
       </div>
-    {/* Return Modal */}
-      <div
-        className={'modal fade ' + (showReturnModal ? 'show' : '')}
-        tabIndex="-1"
-        aria-hidden={!showReturnModal}
-        style={{ display: showReturnModal ? 'block' : 'none' }}
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <form onSubmit={handleReturnSubmit} className="modal-content border-0 shadow-lg rounded-4">
-            <div className="modal-header border-0 p-4 pb-0">
-              <h5 className="modal-title fw-bold">รับคืนอุปกรณ์: {returnSN?.serial_number}</h5>
-              <button type="button" className="btn-close" onClick={() => setShowReturnModal(false)}></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ชื่อผู้รับคืน</label>
-                <input
-                  type="text"
-                  name="receiver_name"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  placeholder="ระบุชื่อผู้รับคืน..."
-                  value={returnForm.receiver_name}
-                  onChange={(e) => setReturnForm(prev => ({ ...prev, receiver_name: e.target.value }))}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">สภาพอุปกรณ์</label>
-                <select
-                  name="return_condition"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={returnForm.return_condition}
-                  onChange={(e) => setReturnForm(prev => ({ ...prev, return_condition: e.target.value }))}
-                  required
-                >
-                  <option value="good">ดี (ใช้งานได้ปกติ)</option>
-                  <option value="damaged">ชำรุด</option>
-                  <option value="need_repair">ต้องซ่อม</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">หมายเหตุ</label>
-                <textarea
-                  name="return_note"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  rows="3"
-                  placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)..."
-                  value={returnForm.return_note}
-                  onChange={(e) => setReturnForm(prev => ({ ...prev, return_note: e.target.value }))}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">เลข Job (จากการเบิก)</label>
-                <input
-                  type="text"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={returnForm.job_number || '-'}
-                  readOnly
-                />
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">หน่วยงาน (จากการเบิก)</label>
-                  <input
-                    type="text"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={returnForm.dept_used || '-'}
-                    readOnly
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">อาคาร (จากการเบิก)</label>
-                  <input
-                    type="text"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={returnForm.building || '-'}
-                    readOnly
-                  />
-                </div>
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">ชั้น (จากการเบิก)</label>
-                  <input
-                    type="text"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={returnForm.floor || '-'}
-                    readOnly
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="modal-footer border-0 p-4 pt-0">
-              <button
-                type="button"
-                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-                onClick={() => setShowReturnModal(false)}
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
-              >
-                ยืนยันการรับคืน
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
 
-      {/* History Modal */}
-      <div
-        className={'modal fade ' + (showHistoryModal ? 'show' : '')}
-        tabIndex="-1"
-        aria-hidden={!showHistoryModal}
-        style={{ display: showHistoryModal ? 'block' : 'none' }}
-      >
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content border-0 shadow-lg rounded-4">
-            <div className="modal-header border-0 p-4 pb-0">
-              <h5 className="modal-title fw-bold">ประวัติการเบิก-คืน: {historySN?.serial_number}</h5>
-              <button type="button" className="btn-close" onClick={() => setShowHistoryModal(false)}></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0" style={{ fontSize: '0.85rem' }}>
-                  <thead className="table-light" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    <tr>
-                      <th style={{ width: '40px', minWidth: '40px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>#</th>
-                      <th style={{ width: '130px', minWidth: '110px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>หมายเลขเครื่อง</th>
-                      <th style={{ width: '90px', minWidth: '80px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>การกระทำ</th>
-                      <th style={{ width: '100px', minWidth: '90px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>เลข Job</th>
-                      <th style={{ width: '100px', minWidth: '90px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>ผู้เบิก / ผู้คืน</th>
-                      <th style={{ width: '100px', minWidth: '90px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>แผนก</th>
-                      <th style={{ width: '100px', minWidth: '90px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>อาคาร/ชั้น</th>
-                      <th style={{ width: '80px', minWidth: '70px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>สภาพ</th>
-                      <th style={{ width: '150px', minWidth: '120px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>หมายเหตุ</th>
-                      <th style={{ width: '90px', minWidth: '80px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>ผู้บันทึก</th>
-                      <th style={{ width: '140px', minWidth: '130px', padding: '0.6rem 0.5rem', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', border: 'none' }}>วันที่/เวลา</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getHistoryLogs(historySN?.id).length === 0 ? (
-                      <tr>
-                        <td colSpan="11" className="text-center text-muted py-4">
-                          ยังไม่มีประวัติการเบิก-คืน
-                        </td>
-                      </tr>
-                    ) : (
-                      getHistoryLogs(historySN?.id).map((log, index) => (
-                        <tr key={log.id}>
-                          <td className="text-muted fw-bold">{index + 1}</td>
-                          <td className="fw-medium">{historySN?.serial_number || '-'}</td>
-                          <td style={{ textAlign: 'center' }}>
-                            <span className={log.action === 'withdraw' ? 'badge-warning' : 'badge-success'}>
-                              {log.action === 'withdraw' ? 'เบิก' : 'คืน'}
-                            </span>
-                          </td>
-                          <td>{log.job_number || '-'}</td>
-                          <td>{log.action === 'withdraw' ? log.withdrawer_name : log.receiver_name}</td>
-                          <td>{log.dept_used || '-'}</td>
-                          <td>{log.building || '-'} {log.floor ? ' (ชั้น ' + log.floor + ')' : ''}</td>
-                          <td>{log.condition || '-'}</td>
-                          <td>{log.note || '-'}</td>
-                          <td>{log.performed_by || '-'}</td>
-                          <td className="text-muted small">
-                            {log.performed_at ? new Date(log.performed_at).toLocaleString() : '-'}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="modal-footer border-0 p-4 pt-0">
-              <button
-                type="button"
-                className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
-                onClick={() => setShowHistoryModal(false)}
-              >
-                ปิด
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Modals */}
+      <AddSNModal
+        show={showAddSNModal}
+        onHide={() => setShowAddSNModal(false)}
+        onSubmit={handleAddSNSubmit}
+        formData={addSNForm}
+        onChange={handleAddSNChange}
+        filteredFloors={addDropdowns.filteredFloors}
+        filteredDepartments={addDropdowns.filteredDepartments}
+        departments={departments}
+        buildings={buildings}
+        floors={floors}
+      />
 
-      {/* Edit SN Modal */}
-      <div
-        className={'modal fade ' + (showEditSNModal ? 'show' : '')}
-        tabIndex="-1"
-        aria-hidden={!showEditSNModal}
-        style={{ display: showEditSNModal ? 'block' : 'none' }}
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <form onSubmit={handleEditSNSubmit} className="modal-content border-0 shadow-lg rounded-4">
-            <div className="modal-header border-0 p-4 pb-0">
-              <h5 className="modal-title fw-bold">แก้ไขหมายเลขเครื่อง</h5>
-              <button type="button" className="btn-close" onClick={() => setShowEditSNModal(false)}></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="mb-3">
-                <label className="form-label small fw-bold">หมายเลขเครื่อง</label>
-                <input
-                  type="text"
-                  name="serial_number"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={editSN?.serial_number || ''}
-                  onChange={handleEditSNChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ยี่ห้อ</label>
-                <input
-                  type="text"
-                  name="brand"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={editSN?.brand || ''}
-                  onChange={handleEditSNChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">สถานะ</label>
-                <select
-                  name="status"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={editSN?.status || ''}
-                  onChange={handleEditSNChange}
-                >
-                  <option value="Available">พร้อมใช้งาน</option>
-                  <option value="Withdrawn">เบิกออกแล้ว</option>
-                  <option value="Repair">อยู่ระหว่างซ่อม</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">เลข Job</label>
-                <input
-                  type="text"
-                  name="job_number"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={editSN?.job_number || ''}
-                  onChange={handleEditSNChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ชื่อผู้เบิก</label>
-                <input
-                  type="text"
-                  name="withdrawer_name"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={editSN?.withdrawer_name || ''}
-                  onChange={handleEditSNChange}
-                />
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">แผนก</label>
-                  <select
-                    name="dept_used"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={editSN?.dept_used || ''}
-                    onChange={handleEditSNChange}
-                  >
-                    <option value="">-- เลือกแผนก --</option>
-                    {filteredDepartmentsEdit.map(dept => (
-                      <option key={dept.id} value={dept.name}>{dept.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">อาคาร</label>
-                  <select
-                    name="building"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={editSN?.building || ''}
-                    onChange={handleEditSNChange}
-                  >
-                    <option value="">-- เลือกอาคาร --</option>
-                    {buildings.map(building => (
-                      <option key={building.id} value={building.name}>{building.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">ชั้น</label>
-                  <select
-                    name="floor"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={editSN?.floor || ''}
-                    onChange={handleEditSNChange}
-                  >
-                    <option value="">-- เลือกชั้น --</option>
-                    {filteredFloorsEdit.map(floor => (
-                      <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">วันที่รับ</label>
-                  <input
-                    type="date"
-                    name="receive_date"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={editSN?.receive_date || ''}
-                    onChange={handleEditSNChange}
-                  />
-                </div>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">วันที่เบิก</label>
-                <input
-                  type="date"
-                  name="withdraw_date"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={editSN?.withdraw_date || ''}
-                  onChange={handleEditSNChange}
-                />
-              </div>
-            </div>
-            <div className="modal-footer border-0 p-4 pt-0">
-              <button
-                type="button"
-                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-                onClick={() => setShowEditSNModal(false)}
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
-              >
-                บันทึกการแก้ไข
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <BulkAddSNModal
+        show={showAddBulkSNModal}
+        onHide={() => setShowAddBulkSNModal(false)}
+        onSubmit={handleAddBulkSNSubmit}
+        formData={bulkForm}
+        onChange={handleBulkChange}
+        filteredFloors={bulkDropdowns.filteredFloors}
+        filteredDepartments={bulkDropdowns.filteredDepartments}
+        buildings={buildings}
+      />
 
-      {/* Add SN Modal */}
-      <div
-        className={'modal fade ' + (showAddSNModal ? 'show' : '')}
-        tabIndex="-1"
-        aria-hidden={!showAddSNModal}
-        style={{ display: showAddSNModal ? 'block' : 'none' }}
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <form onSubmit={handleAddSNSubmit} className="modal-content border-0 shadow-lg rounded-4">
-            <div className="modal-header border-0 p-4 pb-0">
-              <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่อง</h5>
-              <button type="button" className="btn-close" onClick={() => setShowAddSNModal(false)}></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="mb-3">
-                <label className="form-label small fw-bold">หมายเลขเครื่อง</label>
-                <input
-                  type="text"
-                  name="serial_number"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  placeholder="ระบุหมายเลขเครื่อง..."
-                  value={addSNForm.serial_number}
-                  onChange={handleAddSNChange}
-                  required
-                  autoFocus
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ยี่ห้อ</label>
-                <input
-                  type="text"
-                  name="brand"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  placeholder="ระบุยี่ห้อ (ถ้ามี)..."
-                  value={addSNForm.brand}
-                  onChange={handleAddSNChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">สถานะ</label>
-                <select
-                  name="status"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={addSNForm.status}
-                  onChange={handleAddSNChange}
-                >
-                  <option value="Available">พร้อมใช้งาน</option>
-                  <option value="Withdrawn">เบิกออกแล้ว</option>
-                  <option value="Repair">อยู่ระหว่างซ่อม</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">เลข Job</label>
-                <input
-                  type="text"
-                  name="job_number"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={addSNForm.job_number}
-                  onChange={handleAddSNChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ชื่อผู้เบิก</label>
-                <input
-                  type="text"
-                  name="withdrawer_name"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={addSNForm.withdrawer_name}
-                  onChange={handleAddSNChange}
-                />
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">แผนก</label>
-                  <select
-                    name="dept_used"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={addSNForm.dept_used}
-                    onChange={handleAddSNChange}
-                  >
-                    <option value="">-- เลือกแผนก --</option>
-                    {filteredDepartmentsAdd.map(dept => (
-                      <option key={dept.id} value={dept.name}>{dept.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">อาคาร</label>
-                  <select
-                    name="building"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={addSNForm.building}
-                    onChange={handleAddSNChange}
-                  >
-                    <option value="">-- เลือกอาคาร --</option>
-                    {buildings.map(building => (
-                      <option key={building.id} value={building.name}>{building.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">ชั้น</label>
-                  <select
-                    name="floor"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={addSNForm.floor}
-                    onChange={handleAddSNChange}
-                  >
-                    <option value="">-- เลือกชั้น --</option>
-                    {filteredFloorsAdd.map(floor => (
-                      <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">วันที่รับ</label>
-                  <input
-                    type="date"
-                    name="receive_date"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={addSNForm.receive_date}
-                    onChange={handleAddSNChange}
-                  />
-                </div>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">วันที่เบิก</label>
-                <input
-                  type="date"
-                  name="withdraw_date"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={addSNForm.withdraw_date}
-                  onChange={handleAddSNChange}
-                />
-              </div>
-            </div>
-            <div className="modal-footer border-0 p-4 pt-0">
-              <button
-                type="button"
-                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-                onClick={() => setShowAddSNModal(false)}
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
-              >
-                บันทึกข้อมูล
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <EditSNModal
+        show={showEditSNModal}
+        onHide={() => {
+          setShowEditSNModal(false);
+          setEditSN(null);
+        }}
+        onSubmit={handleEditSNSubmit}
+        formData={editSN}
+        onChange={handleEditSNChange}
+        filteredFloors={editDropdowns.filteredFloors}
+        filteredDepartments={editDropdowns.filteredDepartments}
+        buildings={buildings}
+      />
 
-      {/* Add Bulk SN Modal */}
-      <div
-        className={'modal fade ' + (showAddBulkSNModal ? 'show' : '')}
-        tabIndex="-1"
-        aria-hidden={!showAddBulkSNModal}
-        style={{ display: showAddBulkSNModal ? 'block' : 'none' }}
-      >
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <form onSubmit={handleAddBulkSNSubmit} className="modal-content border-0 shadow-lg rounded-4">
-            <div className="modal-header border-0 p-4 pb-0">
-              <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่องหลายรายการ</h5>
-              <button type="button" className="btn-close" onClick={() => setShowAddBulkSNModal(false)}></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="mb-3">
-                <label className="form-label small fw-bold">หมายเลขเครื่อง <span className="text-danger">*</span></label>
-                <textarea
-                  name="serial_numbers"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  rows="6"
-                  placeholder="กรอกหมายเลขเครื่องทีละบรรทัด เช่น:
-SN001
-SN002
-SN003"
-                  value={bulkForm.serial_numbers}
-                  onChange={handleBulkChange}
-                  required
-                />
-                <div className="form-text">แต่ละบรรทัด = 1 หมายเลขเครื่อง (ขั้นต่ำ 1 รายการ)</div>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ยี่ห้อ (ใช้ร่วมกันทั้งหมด)</label>
-                <input
-                  type="text"
-                  name="brand"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  placeholder="ระบุยี่ห้อ (ถ้ามี)..."
-                  value={bulkForm.brand}
-                  onChange={handleBulkChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">สถานะ (ใช้ร่วมกันทั้งหมด)</label>
-                <select
-                  name="status"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={bulkForm.status}
-                  onChange={handleBulkChange}
-                >
-                  <option value="Available">พร้อมใช้งาน</option>
-                  <option value="Withdrawn">เบิกออกแล้ว</option>
-                  <option value="Repair">อยู่ระหว่างซ่อม</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">เลข Job (ใช้ร่วมกันทั้งหมด)</label>
-                <input
-                  type="text"
-                  name="job_number"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={bulkForm.job_number}
-                  onChange={handleBulkChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">ชื่อผู้เบิก (ใช้ร่วมกันทั้งหมด)</label>
-                <input
-                  type="text"
-                  name="withdrawer_name"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={bulkForm.withdrawer_name}
-                  onChange={handleBulkChange}
-                />
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">แผนก (ใช้ร่วมกันทั้งหมด)</label>
-                  <select
-                    name="dept_used"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={bulkForm.dept_used}
-                    onChange={handleBulkChange}
-                  >
-                    <option value="">-- เลือกแผนก --</option>
-                    {filteredDepartments.map(dept => (
-                      <option key={dept.id} value={dept.name}>{dept.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">อาคาร (ใช้ร่วมกันทั้งหมด)</label>
-                  <select
-                    name="building"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={bulkForm.building}
-                    onChange={handleBulkChange}
-                  >
-                    <option value="">-- เลือกอาคาร --</option>
-                    {buildings.map(building => (
-                      <option key={building.id} value={building.name}>{building.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row g-2">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">ชั้น (ใช้ร่วมกันทั้งหมด)</label>
-                  <select
-                    name="floor"
-                    className="form-select border-0 bg-light p-3 rounded-3"
-                    value={bulkForm.floor}
-                    onChange={handleBulkChange}
-                  >
-                    <option value="">-- เลือกชั้น --</option>
-                    {filteredFloors.map(floor => (
-                      <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label small fw-bold">วันที่รับ (ใช้ร่วมกันทั้งหมด)</label>
-                  <input
-                    type="date"
-                    name="receive_date"
-                    className="form-control border-0 bg-light p-3 rounded-3"
-                    value={bulkForm.receive_date}
-                    onChange={handleBulkChange}
-                  />
-                </div>
-              </div>
-              <div className="mb-3">
-                <label className="form-label small fw-bold">วันที่เบิก (ใช้ร่วมกันทั้งหมด)</label>
-                <input
-                  type="date"
-                  name="withdraw_date"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={bulkForm.withdraw_date}
-                  onChange={handleBulkChange}
-                />
-              </div>
-              <div className="alert alert-info small mb-0">
-                <i className="bi bi-info-circle me-1"></i>
-                จะเพิ่มหมายเลขเครื่องจำนวน {bulkForm.serial_numbers.split('\n').map(s => s.trim()).filter(s => s.length > 0).length} รายการ
-              </div>
-            </div>
-            <div className="modal-footer border-0 p-4 pt-0">
-              <button
-                type="button"
-                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-                onClick={() => setShowAddBulkSNModal(false)}
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="submit"
-                className="btn btn-success px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)' }}
-              >
-                <i className="bi bi-plus-square me-1"></i> เพิ่มทั้งหมด
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <ReturnModal
+        show={showReturnModal}
+        onHide={() => {
+          setShowReturnModal(false);
+          setReturnSN(null);
+          setReturnForm(INITIAL_RETURN_FORM);
+        }}
+        onSubmit={handleReturnSubmit}
+        formData={returnForm}
+        onChange={handleReturnChange}
+        sn={returnSN}
+      />
+
+      <HistoryModal
+        show={showHistoryModal}
+        onHide={() => {
+          setShowHistoryModal(false);
+          setHistorySN(null);
+        }}
+        sn={historySN}
+        historyLogs={historySNLogs}
+      />
     </div>
   );
-};
-// Helper functions for status badges
-const getStatusBadgeClass = (status) => {
-  switch (status) {
-    case 'Available': return 'badge-success';
-    case 'Withdrawn': return 'badge-warning';
-    case 'Repair': return 'badge-danger';
-    default: return 'badge-secondary';
-  }
-};
-
-const getStatusText = (status) => {
-  switch (status) {
-    case 'Available': return 'พร้อมใช้งาน';
-    case 'Withdrawn': return 'เบิกออกแล้ว';
-    case 'Repair': return 'อยู่ระหว่างซ่อม';
-    default: return status;
-  }
 };
 
 export default Details;

@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import WithdrawModal from './WithdrawModal';
+import { useItems, useDashboardStats, useWithdrawReturn, useReferenceData } from '../hooks/useSupabase';
+import { operationToast } from '../utils/toast';
 
-const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, departments, buildings, floors, onWithdraw, onReturn, withdrawalLogs }) => {
+const DashboardContent = () => {
+  const { items } = useItems();
+  const { totalItems, totalAvailable, totalWithdrawn, totalRepair, lowStockItems } = useDashboardStats();
+  const { onWithdraw, serialNumbers } = useWithdrawReturn();
+  const { departments, buildings, floors } = useReferenceData();
+
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [availableSerialNumbers, setAvailableSerialNumbers] = useState([]);
@@ -16,13 +23,13 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
   });
 
   // Handle item change to fetch available serial numbers
-  const handleItemChange = async (e) => {
+  const handleItemChange = (e) => {
     const itemId = e.target.value;
     setSelectedItemId(itemId);
     setFormData(prev => ({ ...prev, item_id: itemId }));
 
     if (itemId) {
-      // Filter serial numbers for the selected item that are available (status: 'Available')
+      // Filter serial numbers directly (can't use hook inside handler)
       const available = serialNumbers.filter(
         sn => sn.item_id === parseInt(itemId) && sn.status === 'Available'
       );
@@ -50,7 +57,7 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
 
     // Validate
     if (!item_id || !serial_number || !job_number || !withdrawer || !dept_info) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      operationToast.validationError();
       return;
     }
 
@@ -86,16 +93,16 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
           setSelectedItemId('');
           setAvailableSerialNumbers([]);
           setShowWithdrawModal(false);
-          alert('บันทึกการเบิกอุปกรณ์สำเร็จ');
+          operationToast.withdrawn();
         } else {
-          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+          operationToast.withdrawError(result.error?.message);
         }
       } catch (error) {
         console.error('Error withdrawing:', error);
-        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        operationToast.withdrawError();
       }
     } else {
-      alert('ไม่พบข้อมูลหมายเลขเครื่อง');
+      operationToast.validationError('ไม่พบข้อมูลหมายเลขเครื่อง');
     }
   };
 
@@ -118,14 +125,6 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
       sn => sn.item_id === itemId && sn.status === 'Repair'
     ).length;
   };
-
-  // Stats cards
-  const totalItems = items.length;
-  const totalSNs = serialNumbers.length;
-  const totalAvailable = serialNumbers.filter(sn => sn.status === 'Available').length;
-  const totalWithdrawn = serialNumbers.filter(sn => sn.status === 'Withdrawn').length;
-  const totalRepair = serialNumbers.filter(sn => sn.status === 'Repair').length;
-  const lowStockItems = items.filter(item => getRemainingCount(item) < 3 && getRemainingCount(item) >= 0).length;
 
   const statsCards = [
     { label: 'รายการอุปกรณ์', value: totalItems, icon: 'bi-boxes', iconColor: 'primary', iconBg: 'primary-light' },
@@ -171,7 +170,7 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
       <div className="card">
         <div className="card-header d-flex justify-content-between align-items-center">
           <h5 className="mb-0">รายการอุปกรณ์ทั้งหมด</h5>
-          <span className="badge badge-secondary">{items.length} รายการ</span>
+          <span className="badge badge-secondary">{totalItems} รายการ</span>
         </div>
         <div className="card-body p-0">
           <div className="table-container">

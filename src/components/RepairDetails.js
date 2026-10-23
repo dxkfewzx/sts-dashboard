@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { useRepairs } from '../hooks/useSupabase';
+import { operationToast } from '../utils/toast';
 
-const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair }) => {
+const RepairDetails = () => {
+  const { repairs, addRepair, updateRepair, deleteRepair } = useRepairs();
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editRepair, setEditRepair] = useState(null);
@@ -37,12 +41,12 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
     const { device_name, symptom, status } = addForm;
 
     if (!device_name || !symptom) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      operationToast.validationError();
       return;
     }
 
     try {
-      await onAddRepair({
+      await addRepair({
         device_name,
         symptom,
         status: status || 'Pending',
@@ -54,10 +58,10 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
         status: 'Pending'
       });
       setShowAddModal(false);
-      alert('เพิ่มสำเร็จ!');
+      operationToast.created('รายการซ่อม');
     } catch (error) {
       console.error('Error adding repair:', error);
-      alert('เกิดข้อผิดพลาดในการเพิ่มรายการซ่อม');
+      operationToast.createError('รายการซ่อม', error.message);
     }
   };
 
@@ -69,33 +73,39 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
     const { id, device_name, symptom, status } = editRepair;
 
     if (!device_name || !symptom) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      operationToast.validationError();
       return;
     }
 
     try {
-      await onUpdateRepair(id, {
+      await updateRepair(id, {
         device_name,
         symptom,
         status
       });
       setShowEditModal(false);
-      alert('แก้ไขสำเร็จ!');
+      operationToast.updated('รายการซ่อม');
     } catch (error) {
       console.error('Error updating repair:', error);
-      alert('เกิดข้อผิดพลาดในการแก้ไขรายการซ่อม');
+      operationToast.updateError('รายการซ่อม', error.message);
     }
   };
 
   // Handle delete repair
   const handleDeleteRepair = async (id, name) => {
-    if (window.confirm(`คุณต้องการลบรายการซ่อม "${name}" หรือไม่?`)) {
+    const confirmed = await operationToast.confirm({
+      title: 'ยืนยันการลบ?',
+      text: `คุณต้องการลบรายการซ่อม "${name}" หรือไม่?`,
+      icon: 'warning',
+    });
+
+    if (confirmed) {
       try {
-        await onDeleteRepair(id);
-        alert('ลบสำเร็จ!');
+        await deleteRepair(id);
+        operationToast.deleted('รายการซ่อม');
       } catch (error) {
         console.error('Error deleting repair:', error);
-        alert('เกิดข้อผิดพลาดในการลบรายการซ่อม');
+        operationToast.deleteError('รายการซ่อม', error.message);
       }
     }
   };

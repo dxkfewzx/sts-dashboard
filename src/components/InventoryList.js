@@ -1,19 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useItems, useSerialNumbers, useWithdrawReturn, useReferenceData } from '../hooks/useSupabase';
+import { operationToast } from '../utils/toast';
 
-const InventoryList = ({
-  items,
-  serialNumbers,
-  withdrawalLogs,
-  onAddItem,
-  onUpdateItem,
-  onDeleteItem,
-  onAddSerialNumber,
-  onUpdateSerialNumber,
-  onDeleteSerialNumber,
-  onWithdraw,
-  onReturn,
-  loading = false
-}) => {
+const InventoryList = () => {
+  const { items, addItem, updateItem, deleteItem, refetch } = useItems();
+  const { serialNumbers } = useSerialNumbers();
+  const { onWithdraw, onReturn } = useWithdrawReturn();
+  const { departments, buildings, floors } = useReferenceData();
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -107,12 +101,12 @@ const InventoryList = ({
     const { item_name, total_qty, unit, responsible } = addForm;
 
     if (!item_name || !total_qty || !unit || !responsible) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      operationToast.validationError();
       return;
     }
 
     try {
-      await onAddItem({
+      await addItem({
         item_name,
         total_qty: parseInt(total_qty),
         unit,
@@ -126,10 +120,10 @@ const InventoryList = ({
         responsible: 'ธีรภัทร์'
       });
       setShowAddModal(false);
-      alert('เพิ่มสำเร็จ!');
+      operationToast.created('รายการ');
     } catch (error) {
       console.error('Error adding item:', error);
-      alert('เกิดข้อผิดพลาดในการเพิ่มรายการ');
+      operationToast.createError('รายการ', error.message);
     }
   };
 
@@ -141,34 +135,40 @@ const InventoryList = ({
     const { id, item_name, total_qty, unit, responsible } = editItem;
 
     if (!item_name || !total_qty || !unit || !responsible) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      operationToast.validationError();
       return;
     }
 
     try {
-      await onUpdateItem(id, {
+      await updateItem(id, {
         item_name,
         total_qty: parseInt(total_qty),
         unit,
         responsible
       });
       setShowEditModal(false);
-      alert('แก้ไขสำเร็จ!');
+      operationToast.updated('รายการ');
     } catch (error) {
       console.error('Error updating item:', error);
-      alert('เกิดข้อผิดพลาดในการแก้ไขรายการ');
+      operationToast.updateError('รายการ', error.message);
     }
   };
 
   // Handle delete item
   const handleDeleteItem = async (id, name) => {
-    if (window.confirm(`คุณต้องการลบรายการ "${name}" หรือไม่?`)) {
+    const confirmed = await operationToast.confirm({
+      title: 'ยืนยันการลบ?',
+      text: `คุณต้องการลบรายการ "${name}" หรือไม่?`,
+      icon: 'warning',
+    });
+
+    if (confirmed) {
       try {
-        await onDeleteItem(id);
-        alert('ลบสำเร็จ!');
+        await deleteItem(id);
+        operationToast.deleted('รายการ');
       } catch (error) {
         console.error('Error deleting item:', error);
-        alert('เกิดข้อผิดพลาดในการลบรายการ');
+        operationToast.deleteError('รายการ', error.message);
       }
     }
   };
@@ -188,7 +188,7 @@ const InventoryList = ({
     { key: 'created_at', label: 'วันที่ลงระบบ' },
   ];
 
-  if (loading) {
+  if (items.length === 0 && serialNumbers.length === 0) {
     return (
       <div>
         <div className="page-header">
