@@ -794,6 +794,191 @@ body {
 }
 
 /* ============================================
+   SKELETON LOADERS
+   ============================================ */
+.skeleton-loader {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-row td {
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* ============================================
+   SORT INDICATORS
+   ============================================ */
+.sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  transition: color var(--transition-fast);
+}
+
+th:hover .sort-indicator {
+  color: var(--color-primary);
+}
+
+th[style*="cursor: pointer"]:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state {
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.empty-state i {
+  opacity: 0.5;
+}
+
+.empty-state h5 {
+  font-weight: var(--font-semibold);
+}
+
+.empty-state p {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================
+   ROW HOVER ENHANCEMENT
+   ============================================ */
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover td {
+  background-color: var(--bg-secondary);
+}
+
+/* Active row highlight */
+.table tbody tr[style*="background-color"] {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* ============================================
+   SEARCH INPUT ENHANCEMENT
+   ============================================ */
+.form-control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  outline: none;
+  background: var(--bg-primary);
+}
+
+/* ============================================
+   TOOLTIP IMPROVEMENTS
+   ============================================ */
+[title] {
+  cursor: help;
+}
+
+/* ============================================
+   RESPONSIVE TABLE IMPROVEMENTS
+   ============================================ */
+@media (max-width: 768px) {
+  .table-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    margin-left: calc(-1 * var(--space-md));
+    margin-right: calc(-1 * var(--space-md));
+    width: calc(100% + 2 * var(--space-md));
+  }
+
+  .table {
+    min-width: 600px;
+  }
+}
+
+/* ============================================
+   ANIMATION IMPROVEMENTS
+   ============================================ */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal.fade.show .modal-dialog {
+  animation: fadeInScale var(--transition-base) ease-out;
+}
+
+.card {
+  animation: fadeIn var(--transition-base) ease-out;
+}
+
+/* ============================================
+   BUTTON IMPROVEMENTS
+   ============================================ */
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-action:active {
+  transform: scale(0.9);
+}
+
+/* ============================================
+   FOCUS VISIBLE FOR ACCESSIBILITY
+   ============================================ */
+.btn:focus-visible,
+.btn-action:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible,
+.tab-trigger:focus-visible,
+.nav-link-custom:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
    LEGACY SUPPORT
    ============================================ */
 .content-card {

@@ -113,6 +113,7 @@ function AppContent({
                   onDeleteSerialNumber={onDeleteSerialNumber}
                   onWithdraw={onWithdraw}
                   onReturn={onReturn}
+                  loading={loading}
                 />
               </ProtectedRoute>
             }
@@ -210,7 +211,7 @@ function App() {
         const { data: itemsData, error: itemsError } = await supabase
           .from('inventory_items')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: true });
 
         if (itemsError) throw itemsError;
 
@@ -218,7 +219,7 @@ function App() {
         const { data: snData, error: snError } = await supabase
           .from('serial_numbers')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: true });
 
         if (snError) throw snError;
 
@@ -226,7 +227,7 @@ function App() {
         const { data: repairsData, error: repairsError } = await supabase
           .from('repair_records')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: true });
 
         if (repairsError) throw repairsError;
 
@@ -234,7 +235,7 @@ function App() {
         const { data: logsData, error: logsError } = await supabase
           .from('withdrawal_logs')
           .select('*')
-          .order('performed_at', { ascending: false });
+          .order('performed_at', { ascending: true });
 
         if (logsError) throw logsError;
 
@@ -536,7 +537,7 @@ function App() {
 
       // 3. Update local state
       setSerialNumbers(prev => prev.map(sn => sn.id === serialNumberId ? snData[0] : sn));
-      setWithdrawalLogs(prev => [logData[0], ...prev]);
+      setWithdrawalLogs(prev => [...prev, logData[0]]);
 
       return { success: true, data: snData[0] };
     } catch (error) {
@@ -590,7 +591,7 @@ function App() {
 
       // 4. Update local state
       setSerialNumbers(prev => prev.map(s => s.id === serialNumberId ? snData[0] : s));
-      setWithdrawalLogs(prev => [logData[0], ...prev]);
+      setWithdrawalLogs(prev => [...prev, logData[0]]);
 
       return { success: true, data: snData[0] };
     } catch (error) {

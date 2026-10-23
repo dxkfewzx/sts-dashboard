@@ -1172,6 +1172,329 @@ const Details = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem
           </form>
         </div>
       </div>
+
+      {/* Add SN Modal */}
+      <div
+        className={'modal fade ' + (showAddSNModal ? 'show' : '')}
+        tabIndex="-1"
+        aria-hidden={!showAddSNModal}
+        style={{ display: showAddSNModal ? 'block' : 'none' }}
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <form onSubmit={handleAddSNSubmit} className="modal-content border-0 shadow-lg rounded-4">
+            <div className="modal-header border-0 p-4 pb-0">
+              <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่อง</h5>
+              <button type="button" className="btn-close" onClick={() => setShowAddSNModal(false)}></button>
+            </div>
+            <div className="modal-body p-4">
+              <div className="mb-3">
+                <label className="form-label small fw-bold">หมายเลขเครื่อง</label>
+                <input
+                  type="text"
+                  name="serial_number"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  placeholder="ระบุหมายเลขเครื่อง..."
+                  value={addSNForm.serial_number}
+                  onChange={handleAddSNChange}
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">ยี่ห้อ</label>
+                <input
+                  type="text"
+                  name="brand"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  placeholder="ระบุยี่ห้อ (ถ้ามี)..."
+                  value={addSNForm.brand}
+                  onChange={handleAddSNChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">สถานะ</label>
+                <select
+                  name="status"
+                  className="form-select border-0 bg-light p-3 rounded-3"
+                  value={addSNForm.status}
+                  onChange={handleAddSNChange}
+                >
+                  <option value="Available">พร้อมใช้งาน</option>
+                  <option value="Withdrawn">เบิกออกแล้ว</option>
+                  <option value="Repair">อยู่ระหว่างซ่อม</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">เลข Job</label>
+                <input
+                  type="text"
+                  name="job_number"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={addSNForm.job_number}
+                  onChange={handleAddSNChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">ชื่อผู้เบิก</label>
+                <input
+                  type="text"
+                  name="withdrawer_name"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={addSNForm.withdrawer_name}
+                  onChange={handleAddSNChange}
+                />
+              </div>
+              <div className="row g-2">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">แผนก</label>
+                  <select
+                    name="dept_used"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={addSNForm.dept_used}
+                    onChange={handleAddSNChange}
+                  >
+                    <option value="">-- เลือกแผนก --</option>
+                    {filteredDepartmentsAdd.map(dept => (
+                      <option key={dept.id} value={dept.name}>{dept.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">อาคาร</label>
+                  <select
+                    name="building"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={addSNForm.building}
+                    onChange={handleAddSNChange}
+                  >
+                    <option value="">-- เลือกอาคาร --</option>
+                    {buildings.map(building => (
+                      <option key={building.id} value={building.name}>{building.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="row g-2">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">ชั้น</label>
+                  <select
+                    name="floor"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={addSNForm.floor}
+                    onChange={handleAddSNChange}
+                  >
+                    <option value="">-- เลือกชั้น --</option>
+                    {filteredFloorsAdd.map(floor => (
+                      <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">วันที่รับ</label>
+                  <input
+                    type="date"
+                    name="receive_date"
+                    className="form-control border-0 bg-light p-3 rounded-3"
+                    value={addSNForm.receive_date}
+                    onChange={handleAddSNChange}
+                  />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">วันที่เบิก</label>
+                <input
+                  type="date"
+                  name="withdraw_date"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={addSNForm.withdraw_date}
+                  onChange={handleAddSNChange}
+                />
+              </div>
+            </div>
+            <div className="modal-footer border-0 p-4 pt-0">
+              <button
+                type="button"
+                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
+                onClick={() => setShowAddSNModal(false)}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
+                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
+              >
+                บันทึกข้อมูล
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Add Bulk SN Modal */}
+      <div
+        className={'modal fade ' + (showAddBulkSNModal ? 'show' : '')}
+        tabIndex="-1"
+        aria-hidden={!showAddBulkSNModal}
+        style={{ display: showAddBulkSNModal ? 'block' : 'none' }}
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <form onSubmit={handleAddBulkSNSubmit} className="modal-content border-0 shadow-lg rounded-4">
+            <div className="modal-header border-0 p-4 pb-0">
+              <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่องหลายรายการ</h5>
+              <button type="button" className="btn-close" onClick={() => setShowAddBulkSNModal(false)}></button>
+            </div>
+            <div className="modal-body p-4">
+              <div className="mb-3">
+                <label className="form-label small fw-bold">หมายเลขเครื่อง <span className="text-danger">*</span></label>
+                <textarea
+                  name="serial_numbers"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  rows="6"
+                  placeholder="กรอกหมายเลขเครื่องทีละบรรทัด เช่น:
+SN001
+SN002
+SN003"
+                  value={bulkForm.serial_numbers}
+                  onChange={handleBulkChange}
+                  required
+                />
+                <div className="form-text">แต่ละบรรทัด = 1 หมายเลขเครื่อง (ขั้นต่ำ 1 รายการ)</div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">ยี่ห้อ (ใช้ร่วมกันทั้งหมด)</label>
+                <input
+                  type="text"
+                  name="brand"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  placeholder="ระบุยี่ห้อ (ถ้ามี)..."
+                  value={bulkForm.brand}
+                  onChange={handleBulkChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">สถานะ (ใช้ร่วมกันทั้งหมด)</label>
+                <select
+                  name="status"
+                  className="form-select border-0 bg-light p-3 rounded-3"
+                  value={bulkForm.status}
+                  onChange={handleBulkChange}
+                >
+                  <option value="Available">พร้อมใช้งาน</option>
+                  <option value="Withdrawn">เบิกออกแล้ว</option>
+                  <option value="Repair">อยู่ระหว่างซ่อม</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">เลข Job (ใช้ร่วมกันทั้งหมด)</label>
+                <input
+                  type="text"
+                  name="job_number"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={bulkForm.job_number}
+                  onChange={handleBulkChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">ชื่อผู้เบิก (ใช้ร่วมกันทั้งหมด)</label>
+                <input
+                  type="text"
+                  name="withdrawer_name"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={bulkForm.withdrawer_name}
+                  onChange={handleBulkChange}
+                />
+              </div>
+              <div className="row g-2">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">แผนก (ใช้ร่วมกันทั้งหมด)</label>
+                  <select
+                    name="dept_used"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={bulkForm.dept_used}
+                    onChange={handleBulkChange}
+                  >
+                    <option value="">-- เลือกแผนก --</option>
+                    {filteredDepartments.map(dept => (
+                      <option key={dept.id} value={dept.name}>{dept.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">อาคาร (ใช้ร่วมกันทั้งหมด)</label>
+                  <select
+                    name="building"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={bulkForm.building}
+                    onChange={handleBulkChange}
+                  >
+                    <option value="">-- เลือกอาคาร --</option>
+                    {buildings.map(building => (
+                      <option key={building.id} value={building.name}>{building.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="row g-2">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">ชั้น (ใช้ร่วมกันทั้งหมด)</label>
+                  <select
+                    name="floor"
+                    className="form-select border-0 bg-light p-3 rounded-3"
+                    value={bulkForm.floor}
+                    onChange={handleBulkChange}
+                  >
+                    <option value="">-- เลือกชั้น --</option>
+                    {filteredFloors.map(floor => (
+                      <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label small fw-bold">วันที่รับ (ใช้ร่วมกันทั้งหมด)</label>
+                  <input
+                    type="date"
+                    name="receive_date"
+                    className="form-control border-0 bg-light p-3 rounded-3"
+                    value={bulkForm.receive_date}
+                    onChange={handleBulkChange}
+                  />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">วันที่เบิก (ใช้ร่วมกันทั้งหมด)</label>
+                <input
+                  type="date"
+                  name="withdraw_date"
+                  className="form-control border-0 bg-light p-3 rounded-3"
+                  value={bulkForm.withdraw_date}
+                  onChange={handleBulkChange}
+                />
+              </div>
+              <div className="alert alert-info small mb-0">
+                <i className="bi bi-info-circle me-1"></i>
+                จะเพิ่มหมายเลขเครื่องจำนวน {bulkForm.serial_numbers.split('\n').map(s => s.trim()).filter(s => s.length > 0).length} รายการ
+              </div>
+            </div>
+            <div className="modal-footer border-0 p-4 pt-0">
+              <button
+                type="button"
+                className="btn btn-light px-4 py-2 rounded-3 fw-bold"
+                onClick={() => setShowAddBulkSNModal(false)}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                className="btn btn-success px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
+                style={{ background: 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)' }}
+              >
+                <i className="bi bi-plus-square me-1"></i> เพิ่มทั้งหมด
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
