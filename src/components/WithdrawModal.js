@@ -77,20 +77,20 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
     <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" aria-hidden={!show} style={{ display: 'block' }}>
       <div className="modal-dialog modal-dialog-centered">
         <form onSubmit={onSubmit} className="modal-content border-0 shadow-lg rounded-4">
-          <div className="modal-header border-0 pb-0 pt-4">
-            <h5 className="fw-bold text-dark">บันทึกการเบิกอุปกรณ์</h5>
+          <div className="modal-header border-0 p-4 pb-0">
+            <h5 className="modal-title fw-bold">บันทึกการเบิกอุปกรณ์</h5>
             <button type="button" className="btn-close" onClick={onHide}></button>
           </div>
-          <div className="modal-body p-3">
+          <div className="modal-body p-4">
             <input type="hidden" name="action" value="withdraw" />
 
             <div className="row g-4 mb-4">
               <div className="col-md-6">
-                <label className="form-label fw-bold">เลือกอุปกรณ์</label>
+                <label className="form-label small fw-bold">เลือกอุปกรณ์</label>
                 <select
                   name="item_id"
                   id="item_select"
-                  className="form-select"
+                  className="form-select border-0 bg-light p-3 rounded-3"
                   required
                   value={formData.item_id}
                   onChange={onItemChange}
@@ -100,11 +100,11 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
                 </select>
               </div>
               <div className="col-md-6">
-                <label className="form-label fw-bold text-primary">เลข Job</label>
+                <label className="form-label small fw-bold text-primary">เลข Job</label>
                 <input
                   type="text"
                   name="job_number"
-                  className="form-control"
+                  className="form-control border-0 bg-light p-3 rounded-3"
                   placeholder="JOB6904001"
                   value={formData.job_number}
                   onChange={onChange}
@@ -115,22 +115,22 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
 
             <div className="row g-4 mb-4">
               <div className="col-md-6">
-                <label className="form-label fw-bold">ชื่อผู้เบิก</label>
+                <label className="form-label small fw-bold">ชื่อผู้เบิก</label>
                 <input
                   type="text"
                   name="withdrawer"
-                  className="form-control"
+                  className="form-control border-0 bg-light p-3 rounded-3"
                   value={formData.withdrawer}
                   onChange={onChange}
                   required
                 />
               </div>
               <div className="col-md-6">
-                <label className="form-label fw-bold">Serial Number</label>
+                <label className="form-label small fw-bold">Serial Number</label>
                 <select
                   name="serial_number"
                   id="sn_select"
-                  className="form-select"
+                  className="form-select border-0 bg-light p-3 rounded-3"
                   required
                   value={formData.serial_number}
                   onChange={onSNChange}
@@ -152,10 +152,10 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
 
             <div className="row g-4 mb-4">
               <div className="col-md-4">
-                <label className="form-label fw-bold">หน่วยงาน / แผนก</label>
+                <label className="form-label small fw-bold">หน่วยงาน / แผนก</label>
                 <select
                   name="dept_info"
-                  className="form-select"
+                  className="form-select border-0 bg-light p-3 rounded-3"
                   value={formData.dept_info}
                   onChange={onChange}
                   required
@@ -167,10 +167,10 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
                 </select>
               </div>
               <div className="col-md-4">
-                <label className="form-label fw-bold">อาคาร</label>
+                <label className="form-label small fw-bold">อาคาร</label>
                 <select
                   name="building_info"
-                  className="form-select"
+                  className="form-select border-0 bg-light p-3 rounded-3"
                   value={formData.building_info}
                   onChange={onChange}
                 >
@@ -181,10 +181,10 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
                 </select>
               </div>
               <div className="col-md-4">
-                <label className="form-label fw-bold">ชั้น</label>
+                <label className="form-label small fw-bold">ชั้น</label>
                 <select
                   name="floor_info"
-                  className="form-select"
+                  className="form-select border-0 bg-light p-3 rounded-3"
                   value={formData.floor_info}
                   onChange={onChange}
                 >
@@ -196,11 +196,17 @@ const WithdrawModal = ({ show, onHide, items, serialNumbers, onItemChange, onSNC
               </div>
             </div>
           </div>
-          <div className="modal-footer border-0 pt-4 px-4 d-flex justify-content-end">
+          <div className="modal-footer border-0 p-4 pt-0">
+            <button
+              type="button"
+              className="btn btn-light px-4 py-2 rounded-3 fw-bold"
+              onClick={onHide}
+            >
+              ยกเลิก
+            </button>
             <button
               type="submit"
-              className="btn btn-primary fw-bold py-1 px-3 rounded-2"
-              style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)', border: 'none' }}
+              className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
             >
               ยืนยันการเบิกอุปกรณ์
             </button>

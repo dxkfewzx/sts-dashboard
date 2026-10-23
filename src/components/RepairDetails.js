@@ -12,6 +12,13 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
     status: 'Pending'
   });
 
+  // Calculate repair statistics
+  const totalRepairs = repairs.length;
+  const pendingRepairs = repairs.filter(r => r.status === 'Pending').length;
+  const repairingRepairs = repairs.filter(r => r.status === 'Repairing').length;
+  const fixedRepairs = repairs.filter(r => r.status === 'Fixed').length;
+  const returnedRepairs = repairs.filter(r => r.status === 'Returned').length;
+
   // Handle input changes for add form
   const handleAddChange = (e) => {
     const { name, value } = e.target;
@@ -71,7 +78,6 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
         device_name,
         symptom,
         status
-        // Keep original created_at
       });
       setShowEditModal(false);
       alert('แก้ไขสำเร็จ!');
@@ -94,91 +100,110 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
     }
   };
 
+  const statsCards = [
+    { label: 'การแจ้งซ่อม', value: totalRepairs, icon: 'bi-tools', iconColor: 'info', iconBg: 'info-light' },
+    { label: 'รอซ่อม', value: pendingRepairs, icon: 'bi-clock-history', iconColor: 'secondary', iconBg: 'secondary-light' },
+    { label: 'กำลังซ่อม', value: repairingRepairs, icon: 'bi-tools', iconColor: 'warning', iconBg: 'warning-light' },
+    { label: 'ซ่อมเสร็จ', value: fixedRepairs, icon: 'bi-check-circle-fill', iconColor: 'success', iconBg: 'success-light' },
+  ];
+
   return (
     <div>
-      <div className="inventory-card">
-        <div className="page-header">
+      {/* Overview Cards */}
+      <div className="row g-3 mb-4">
+        {statsCards.map((stat, index) => (
+          <div key={index} className="col-6 col-md-3">
+            <div className="stat-card">
+              <div className={`stat-card-icon bg-${stat.iconBg} text-${stat.iconColor}`}>
+                <i className={`bi ${stat.icon}`}></i>
+              </div>
+              <div className={`stat-card-value text-${stat.iconColor}`}>{stat.value}</div>
+              <div className="stat-card-label">{stat.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-header d-flex justify-content-between align-items-center">
           <div className="header-title">
             <h4>ประวัติแจ้งซ่อม</h4>
             <p>บันทึกและติดตามการแจ้งซ่อมอุปกรณ์</p>
           </div>
           <button
-            className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-3 shadow-sm border-0"
-            style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
+            className="btn btn-primary"
             onClick={() => setShowAddModal(true)}
           >
-            <i className="bi bi-plus-lg"></i>
+            <i className="bi bi-plus-lg me-2"></i>
             <span className="fw-medium">เพิ่มการแจ้งซ่อม</span>
           </button>
         </div>
-      </div>
-
-      {repairs.length === 0 ? (
-        <p className="text-center text-muted py-5">ยังไม่มีข้อมูลการแจ้งซ่อมในระบบ</p>
-      ) : (
-        <div className="table-responsive">
-          <table className="table align-middle">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>ชื่ออุปกรณ์ / SN</th>
-                <th>อาการเสีย</th>
-                <th>สถานะ</th>
-                <th>วันที่แจ้ง</th>
-                <th>การจัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {repairs.map((repair, index) => (
-                <tr key={repair.id}>
-                  <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
-                  <td>{repair.device_name}</td>
-                  <td>{repair.symptom || '-'}</td>
-                  <td>
-                    <span className={`badge-soft ${getStatusBadgeClass(repair.status)}`}>
-                      {getStatusText(repair.status)}
-                    </span>
-                  </td>
-                  <td className="text-muted small">
-                    {new Date(repair.created_at).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <div className="d-flex justify-content-center gap-2">
-                      <button
-                        className="btn-action btn-edit"
-                        data-id={repair.id}
-                        data-name={repair.device_name}
-                        data-symptom={repair.symptom || ''}
-                        data-status={repair.status}
-                        onClick={() => {
-                          setEditRepair({
-                            id: repair.id,
-                            device_name: repair.device_name,
-                            symptom: repair.symptom,
-                            status: repair.status
-                          });
-                          setShowEditModal(true);
-                        }}
-                      >
-                        <i className="bi bi-pencil-fill"></i>
-                      </button>
-                      <button
-                        className="btn-action btn-del"
-                        data-id={repair.id}
-                        data-name={repair.device_name}
-                        onClick={() => handleDeleteRepair(repair.id, repair.device_name)}
-                      >
-                        <i className="bi bi-trash3-fill"></i>
-                      </button>
-                    </div>
-                  </td>
+        <div className="card-body p-0">
+          {repairs.length === 0 ? (
+            <div className="text-center text-muted py-4">
+              ยังไม่มีข้อมูลการแจ้งซ่อมในระบบ
+            </div>
+          ) : (
+            <div className="table-container">
+              <table className="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th style={{ width: '50px', minWidth: '50px' }}>#</th>
+                    <th>ชื่ออุปกรณ์ / SN</th>
+                    <th>อาการเสีย</th>
+                    <th style={{ width: '140px', minWidth: '120px' }}>สถานะ</th>
+                    <th style={{ width: '140px', minWidth: '120px' }}>วันที่แจ้ง</th>
+                    <th style={{ width: '120px', minWidth: '110px' }}>การจัดการ</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      }
+                </thead>
+                <tbody>
+                  {repairs.map((repair, index) => (
+                    <tr key={repair.id}>
+                      <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
+                      <td>{repair.device_name}</td>
+                      <td>{repair.symptom || '-'}</td>
+                      <td>
+                        <span className={`badge ${getStatusBadgeClass(repair.status)}`} style={{ whiteSpace: 'nowrap' }}>
+                          {getStatusText(repair.status)}
+                        </span>
+                      </td>
+                      <td className="text-muted small">
+                        {new Date(repair.created_at).toLocaleDateString()}
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-center gap-1">
+                          <button
+                            className="btn-action btn-edit"
+                            onClick={() => {
+                              setEditRepair({
+                                id: repair.id,
+                                device_name: repair.device_name,
+                                symptom: repair.symptom,
+                                status: repair.status
+                              });
+                              setShowEditModal(true);
+                            }}
+                            title="แก้ไข"
+                          >
+                            <i className="bi bi-pencil-fill"></i>
+                          </button>
+                          <button
+                            className="btn-action btn-delete"
+                            onClick={() => handleDeleteRepair(repair.id, repair.device_name)}
+                            title="ลบ"
+                          >
+                            <i className="bi bi-trash3-fill"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Add Repair Modal */}
       <div
@@ -245,7 +270,6 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
               <button
                 type="submit"
                 className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
               >
                 บันทึกข้อมูล
               </button>
@@ -321,7 +345,6 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
               <button
                 type="submit"
                 className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
               >
                 บันทึกการแก้ไข
               </button>
@@ -336,11 +359,11 @@ const RepairDetails = ({ repairs, onAddRepair, onUpdateRepair, onDeleteRepair })
 // Helper functions for status badges
 const getStatusBadgeClass = (status) => {
   switch (status) {
-    case 'Pending': return 'bg-secondary';
-    case 'Repairing': return 'bg-warning';
-    case 'Fixed': return 'bg-success';
-    case 'Returned': return 'bg-info';
-    default: return 'bg-light';
+    case 'Pending': return 'badge-secondary';
+    case 'Repairing': return 'badge-warning';
+    case 'Fixed': return 'badge-success';
+    case 'Returned': return 'badge-info';
+    default: return 'badge-light';
   }
 };
 

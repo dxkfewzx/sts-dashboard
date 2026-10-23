@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-// We'll use Bootstrap Icons via CDN
 
-const InventoryList = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber }) => {
+const InventoryList = ({ items, serialNumbers, withdrawalLogs, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, onWithdraw, onReturn }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -76,7 +75,6 @@ const InventoryList = ({ items, serialNumbers, onAddItem, onUpdateItem, onDelete
         total_qty: parseInt(total_qty),
         unit,
         responsible
-        // Keep original created_at
       });
       setShowEditModal(false);
       alert('แก้ไขสำเร็จ!');
@@ -101,96 +99,95 @@ const InventoryList = ({ items, serialNumbers, onAddItem, onUpdateItem, onDelete
 
   return (
     <div>
-      <div className="inventory-card">
-        <div className="table-responsive">
-          <table className="table align-middle" id="inventoryTable">
-            <thead>
-              <tr className="text-center">
-                <th>#</th>
-                <th className="text-start">ชื่อรายการอุปกรณ์</th>
-                <th>จำนวนรวม</th>
-                <th>หน่วย</th>
-                <th>ผู้ดูแลรับผิดชอบ</th>
-                <th>วันที่ลงระบบ</th>
-                <th>การจัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center">
-                    ยังไม่มีข้อมูลวัสดุในระบบ
-                  </td>
-                </tr>
-              ) : (
-                items.map((item, index) => (
-                  <tr key={item.id} className="text-center">
-                    <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
-                    <td className="text-start fw-600">{item.item_name}</td>
-                    <td className="fw-bold text-primary">{item.total_qty}</td>
-                    <td><span className="text-muted small">{item.unit || '-'}</span></td>
-                    <td>
-                      <span className="badge-soft" style={{ background: '#e0e8ff', color: '#4e73df' }}>
-                        <i className="bi bi-person me-1"></i>{item.responsible || '-'}
-                      </span>
-                    </td>
-                    <td className="text-muted small">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</td>
-                    <td>
-                      <div className="d-flex justify-content-center gap-2">
-                        <button
-                          className="btn-action btn-edit btn-edit-trigger"
-                          data-id={item.id}
-                          data-name={item.item_name}
-                          data-qty={item.total_qty}
-                          data-unit={item.unit}
-                          data-resp={item.responsible}
-                          onClick={() => {
-                            setEditItem({
-                              id: item.id,
-                              item_name: item.item_name,
-                              total_qty: item.total_qty,
-                              unit: item.unit,
-                              responsible: item.responsible
-                            });
-                            setShowEditModal(true);
-                          }}
-                        >
-                          <i className="bi bi-pencil-fill"></i>
-                        </button>
-                        <button
-                          className="btn-action btn-del btn-delete"
-                          data-id={item.id}
-                          data-name={item.item_name}
-                          onClick={() => handleDeleteItem(item.id, item.item_name)}
-                        >
-                          <i className="bi bi-trash3-fill"></i>
-                        </button>
-                        <a
-                          href={`/details/${item.id}`}
-                          className="btn-action btn-details"
-                        >
-                          <i className="bi bi-eye"></i>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      <div className="page-header">
+        <div className="header-title">
+          <h4>รายการอุปกรณ์</h4>
+          <p>จัดการข้อมูลรายการอุปกรณ์ในคลัง</p>
         </div>
-      </div>
-
-      {/* Add Item Button */}
-      <div className="d-flex justify-content-end mb-4">
         <button
-          className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-3 shadow-sm border-0"
-          style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
+          className="btn btn-primary"
           onClick={() => setShowAddModal(true)}
         >
-          <i className="bi bi-plus-lg"></i>
+          <i className="bi bi-plus-lg me-2"></i>
           <span className="fw-medium">เพิ่มรายการใหม่</span>
         </button>
+      </div>
+      <div className="card">
+        <div className="card-body p-0">
+          <div className="table-container">
+            <table className="table table-striped mb-0" id="inventoryTable">
+              <thead>
+                <tr className="text-center">
+                  <th style={{ width: '50px', minWidth: '50px' }}>#</th>
+                  <th>ชื่อรายการอุปกรณ์</th>
+                  <th style={{ width: '100px', minWidth: '90px' }}>จำนวนรวม</th>
+                  <th style={{ width: '100px', minWidth: '90px' }}>หน่วย</th>
+                  <th style={{ width: '180px', minWidth: '160px' }}>ผู้ดูแลรับผิดชอบ</th>
+                  <th style={{ width: '140px', minWidth: '120px' }}>วันที่ลงระบบ</th>
+                  <th style={{ width: '120px', minWidth: '110px' }}>การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center text-muted py-4">
+                      ยังไม่มีข้อมูลวัสดุในระบบ
+                    </td>
+                  </tr>
+                ) : (
+                  items.map((item, index) => (
+                    <tr key={item.id} className="text-center">
+                      <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
+                      <td className="text-start fw-medium">{item.item_name}</td>
+                      <td className="fw-bold text-primary">{item.total_qty}</td>
+                      <td><span className="text-muted small">{item.unit || '-'}</span></td>
+                      <td>
+                        <span className="badge badge-secondary">
+                          <i className="bi bi-person me-1"></i>{item.responsible || '-'}
+                        </span>
+                      </td>
+                      <td className="text-muted small">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</td>
+                      <td>
+                        <div className="d-flex justify-content-center gap-1">
+                          <button
+                            className="btn-action btn-edit"
+                            onClick={() => {
+                              setEditItem({
+                                id: item.id,
+                                item_name: item.item_name,
+                                total_qty: item.total_qty,
+                                unit: item.unit,
+                                responsible: item.responsible
+                              });
+                              setShowEditModal(true);
+                            }}
+                            title="แก้ไข"
+                          >
+                            <i className="bi bi-pencil-fill"></i>
+                          </button>
+                          <button
+                            className="btn-action btn-delete"
+                            onClick={() => handleDeleteItem(item.id, item.item_name)}
+                            title="ลบ"
+                          >
+                            <i className="bi bi-trash3-fill"></i>
+                          </button>
+                          <a
+                            href={`/details/${item.id}`}
+                            className="btn-action"
+                            title="ดูรายละเอียด"
+                          >
+                            <i className="bi bi-eye"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* Add Item Modal */}
@@ -268,7 +265,6 @@ const InventoryList = ({ items, serialNumbers, onAddItem, onUpdateItem, onDelete
               <button
                 type="submit"
                 className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
               >
                 บันทึกข้อมูล
               </button>
@@ -356,7 +352,6 @@ const InventoryList = ({ items, serialNumbers, onAddItem, onUpdateItem, onDelete
               <button
                 type="submit"
                 className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-                style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
               >
                 บันทึกการแก้ไข
               </button>

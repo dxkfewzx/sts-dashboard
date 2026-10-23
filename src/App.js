@@ -20,10 +20,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function AppContent({
-  items, serialNumbers, repairs, departments, buildings, floors, loading,
+  items, serialNumbers, repairs, withdrawalLogs, departments, buildings, floors, loading,
   onAddItem, onUpdateItem, onDeleteItem,
   onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber,
-  onAddRepair, onUpdateRepair, onDeleteRepair
+  onAddRepair, onUpdateRepair, onDeleteRepair,
+  onWithdraw, onReturn
 }) {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
@@ -77,6 +78,7 @@ function AppContent({
                   items={items}
                   serialNumbers={serialNumbers}
                   repairs={repairs}
+                  withdrawalLogs={withdrawalLogs}
                   departments={departments}
                   buildings={buildings}
                   floors={floors}
@@ -89,6 +91,8 @@ function AppContent({
                   onAddRepair={onAddRepair}
                   onUpdateRepair={onUpdateRepair}
                   onDeleteRepair={onDeleteRepair}
+                  onWithdraw={onWithdraw}
+                  onReturn={onReturn}
                 />
               </ProtectedRoute>
             }
@@ -100,12 +104,15 @@ function AppContent({
                 <InventoryList
                   items={items}
                   serialNumbers={serialNumbers}
+                  withdrawalLogs={withdrawalLogs}
                   onAddItem={onAddItem}
                   onUpdateItem={onUpdateItem}
                   onDeleteItem={onDeleteItem}
                   onAddSerialNumber={onAddSerialNumber}
                   onUpdateSerialNumber={onUpdateSerialNumber}
                   onDeleteSerialNumber={onDeleteSerialNumber}
+                  onWithdraw={onWithdraw}
+                  onReturn={onReturn}
                 />
               </ProtectedRoute>
             }
@@ -118,6 +125,7 @@ function AppContent({
                   items={items}
                   serialNumbers={serialNumbers}
                   repairs={repairs}
+                  withdrawalLogs={withdrawalLogs}
                   onAddItem={onAddItem}
                   onUpdateItem={onUpdateItem}
                   onDeleteItem={onDeleteItem}
@@ -127,6 +135,8 @@ function AppContent({
                   onAddRepair={onAddRepair}
                   onUpdateRepair={onUpdateRepair}
                   onDeleteRepair={onDeleteRepair}
+                  onWithdraw={onWithdraw}
+                  onReturn={onReturn}
                 />
               </ProtectedRoute>
             }
@@ -151,6 +161,7 @@ function AppContent({
                 <Details
                   items={items}
                   serialNumbers={serialNumbers}
+                  withdrawalLogs={withdrawalLogs}
                   departments={departments}
                   buildings={buildings}
                   floors={floors}
@@ -160,6 +171,8 @@ function AppContent({
                   onAddSerialNumber={onAddSerialNumber}
                   onUpdateSerialNumber={onUpdateSerialNumber}
                   onDeleteSerialNumber={onDeleteSerialNumber}
+                  onWithdraw={onWithdraw}
+                  onReturn={onReturn}
                 />
               </ProtectedRoute>
             }
@@ -183,6 +196,7 @@ function App() {
   const [items, setItems] = useState([]);
   const [serialNumbers, setSerialNumbers] = useState([]);
   const [repairs, setRepairs] = useState([]);
+  const [withdrawalLogs, setWithdrawalLogs] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [floors, setFloors] = useState([]);
@@ -215,6 +229,14 @@ function App() {
           .order('created_at', { ascending: false });
 
         if (repairsError) throw repairsError;
+
+        // Fetch withdrawal logs
+        const { data: logsData, error: logsError } = await supabase
+          .from('withdrawal_logs')
+          .select('*')
+          .order('performed_at', { ascending: false });
+
+        if (logsError) throw logsError;
 
         // Fetch all data from 'departments' table (single source of truth)
         let deptData = [];
@@ -308,6 +330,7 @@ function App() {
         setItems(itemsData || []);
         setSerialNumbers(snData || []);
         setRepairs(repairsData || []);
+        setWithdrawalLogs(logsData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
         Swal.fire({
@@ -469,6 +492,113 @@ function App() {
     }
   };
 
+  // ==========================================
+  // Withdraw / Return Functions with Logging
+  // ==========================================
+  const onWithdraw = async (serialNumberId, withdrawData) => {
+    const { item_id, serial_number, job_number, withdrawer_name, dept_used, building, floor, withdraw_date } = withdrawData;
+
+    try {
+      // 1. Update serial_number status to Withdrawn
+      const { data: snData, error: snError } = await supabase
+        .from('serial_numbers')
+        .update({
+          status: 'Withdrawn',
+          job_number,
+          withdrawer_name,
+          dept_used,
+          building: building || '',
+          floor: floor || '',
+          withdraw_date: withdraw_date || new Date().toISOString()
+        })
+        .eq('id', serialNumberId)
+        .select();
+
+      if (snError) throw snError;
+
+      // 2. Insert withdrawal log
+      const { data: logData, error: logError } = await supabase
+        .from('withdrawal_logs')
+        .insert([{
+          serial_number_id: serialNumberId,
+          item_id,
+          action: 'withdraw',
+          job_number,
+          withdrawer_name,
+          dept_used,
+          building: building || '',
+          floor: floor || '',
+          performed_by: 'current_user' // TODO: get from auth
+        }])
+        .select();
+
+      if (logError) throw logError;
+
+      // 3. Update local state
+      setSerialNumbers(prev => prev.map(sn => sn.id === serialNumberId ? snData[0] : sn));
+      setWithdrawalLogs(prev => [logData[0], ...prev]);
+
+      return { success: true, data: snData[0] };
+    } catch (error) {
+      console.error('Error withdrawing:', error);
+      return { success: false, error };
+    }
+  };
+
+  const onReturn = async (serialNumberId, returnData) => {
+    const { receiver_name, return_condition, return_note, job_number, dept_used, building, floor, performed_by } = returnData;
+
+    try {
+      // 1. Update serial_number status to Available + return info
+      const { data: snData, error: snError } = await supabase
+        .from('serial_numbers')
+        .update({
+          status: 'Available',
+          receiver_name,
+          return_condition,
+          return_note,
+          return_date: new Date().toISOString()
+        })
+        .eq('id', serialNumberId)
+        .select();
+
+      if (snError) throw snError;
+
+      // 2. Get the serial number for item_id
+      const sn = serialNumbers.find(s => s.id === serialNumberId);
+      const item_id = sn?.item_id;
+
+      // 3. Insert return log
+      const { data: logData, error: logError } = await supabase
+        .from('withdrawal_logs')
+        .insert([{
+          serial_number_id: serialNumberId,
+          item_id,
+          action: 'return',
+          receiver_name,
+          condition: return_condition,
+          note: return_note,
+          job_number: job_number || '',
+          dept_used: dept_used || '',
+          building: building || '',
+          floor: floor || '',
+          performed_by: performed_by || 'current_user'
+        }])
+        .select();
+
+      if (logError) throw logError;
+
+      // 4. Update local state
+      setSerialNumbers(prev => prev.map(s => s.id === serialNumberId ? snData[0] : s));
+      setWithdrawalLogs(prev => [logData[0], ...prev]);
+
+      return { success: true, data: snData[0] };
+    } catch (error) {
+      console.error('Error returning:', error);
+      return { success: false, error };
+    }
+  };
+
   return (
     <AuthProvider supabase={supabase}>
       <Router>
@@ -476,6 +606,7 @@ function App() {
           items={items}
           serialNumbers={serialNumbers}
           repairs={repairs}
+          withdrawalLogs={withdrawalLogs}
           departments={departments}
           buildings={buildings}
           floors={floors}
@@ -489,6 +620,8 @@ function App() {
           onAddRepair={addRepair}
           onUpdateRepair={updateRepair}
           onDeleteRepair={deleteRepair}
+          onWithdraw={onWithdraw}
+          onReturn={onReturn}
         />
       </Router>
     </AuthProvider>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import WithdrawModal from './WithdrawModal';
 
-const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, departments, buildings, floors }) => {
+const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, departments, buildings, floors, onWithdraw, onReturn, withdrawalLogs }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [availableSerialNumbers, setAvailableSerialNumbers] = useState([]);
@@ -43,7 +43,7 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submit
+  // Handle form submit - uses new onWithdraw function with logging
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { item_id, serial_number, job_number, withdrawer, dept_info, building_info, floor_info } = formData;
@@ -61,31 +61,37 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
 
     if (snRecord) {
       try {
-        await onUpdateSerialNumber(snRecord.id, {
-          status: 'Withdrawn',
+        const result = await onWithdraw(snRecord.id, {
+          item_id: parseInt(item_id),
+          serial_number,
           job_number,
           withdrawer_name: withdrawer,
           dept_used: dept_info,
           building: building_info || '',
           floor: floor_info || '',
-          withdraw_date: new Date().toISOString() // Full timestamp
+          withdraw_date: new Date().toISOString()
         });
-        // Reset form and close modal
-        setFormData({
-          item_id: '',
-          serial_number: '',
-          job_number: '',
-          withdrawer: '',
-          dept_info: '',
-          building_info: '',
-          floor_info: ''
-        });
-        setSelectedItemId('');
-        setAvailableSerialNumbers([]);
-        setShowWithdrawModal(false);
-        alert('บันทึกการเบิกอุปกรณ์สำเร็จ');
+
+        if (result.success) {
+          // Reset form and close modal
+          setFormData({
+            item_id: '',
+            serial_number: '',
+            job_number: '',
+            withdrawer: '',
+            dept_info: '',
+            building_info: '',
+            floor_info: ''
+          });
+          setSelectedItemId('');
+          setAvailableSerialNumbers([]);
+          setShowWithdrawModal(false);
+          alert('บันทึกการเบิกอุปกรณ์สำเร็จ');
+        } else {
+          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        }
       } catch (error) {
-        console.error('Error updating serial number:', error);
+        console.error('Error withdrawing:', error);
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
       }
     } else {
@@ -106,8 +112,31 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
     return item.total_qty - withdrawn;
   };
 
+  // Calculate repair count for an item
+  const getRepairCount = (itemId) => {
+    return serialNumbers.filter(
+      sn => sn.item_id === itemId && sn.status === 'Repair'
+    ).length;
+  };
+
+  // Stats cards
+  const totalItems = items.length;
+  const totalSNs = serialNumbers.length;
+  const totalAvailable = serialNumbers.filter(sn => sn.status === 'Available').length;
+  const totalWithdrawn = serialNumbers.filter(sn => sn.status === 'Withdrawn').length;
+  const totalRepair = serialNumbers.filter(sn => sn.status === 'Repair').length;
+  const lowStockItems = items.filter(item => getRemainingCount(item) < 3 && getRemainingCount(item) >= 0).length;
+
+  const statsCards = [
+    { label: 'รายการอุปกรณ์', value: totalItems, icon: 'bi-boxes', iconColor: 'primary', iconBg: 'primary-light' },
+    { label: 'พร้อมใช้งาน', value: totalAvailable, icon: 'bi-check-circle-fill', iconColor: 'success', iconBg: 'success-light' },
+    { label: 'เบิกออกแล้ว', value: totalWithdrawn, icon: 'bi-box-arrow-right', iconColor: 'warning', iconBg: 'warning-light' },
+    { label: 'อยู่ระหว่างซ่อม', value: totalRepair, icon: 'bi-tools', iconColor: 'danger', iconBg: 'danger-light' },
+  ];
+
   return (
-    <div className="main-content">
+    <div>
+      {/* Page Header */}
       <div className="page-header">
         <div className="header-title">
           <h4>ภาพรวมคลังอุปกรณ์</h4>
@@ -115,7 +144,7 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
         </div>
         <div className="d-flex gap-2">
           <button
-            className="btn btn-primary fw-600 rounded-3 px-4 shadow-sm"
+            className="btn btn-primary"
             onClick={() => setShowWithdrawModal(true)}
           >
             <i className="bi bi-box-arrow-right me-2"></i>เบิกอุปกรณ์
@@ -123,60 +152,91 @@ const DashboardContent = ({ items, serialNumbers, onAddItem, onUpdateItem, onDel
         </div>
       </div>
 
-      <div className="content-card">
-        <div className="table-responsive">
-          <table className="table align-middle text-center">
-            <thead>
-              <tr>
-                <th>ลำดับ</th>
-                <th className="text-start">รายการ</th>
-                <th>ผู้ดูแล</th>
-                <th>ทั้งหมด</th>
-                <th>เบิกออก</th>
-                <th>คงเหลือ</th>
-                <th>จัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
+      {/* Stats Cards */}
+      <div className="row g-3 mb-4">
+        {statsCards.map((stat, index) => (
+          <div key={index} className="col-6 col-md-3">
+            <div className="stat-card">
+              <div className={`stat-card-icon bg-${stat.iconBg} text-${stat.iconColor}`}>
+                <i className={`bi ${stat.icon}`}></i>
+              </div>
+              <div className={`stat-card-value text-${stat.iconColor}`}>{stat.value}</div>
+              <div className="stat-card-label">{stat.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Items Table */}
+      <div className="card">
+        <div className="card-header d-flex justify-content-between align-items-center">
+          <h5 className="mb-0">รายการอุปกรณ์ทั้งหมด</h5>
+          <span className="badge badge-secondary">{items.length} รายการ</span>
+        </div>
+        <div className="card-body p-0">
+          <div className="table-container">
+            <table className="table table-striped mb-0">
+              <thead>
                 <tr>
-                  <td colSpan="7" className="text-center">
-                    ยังไม่มีข้อมูลวัสดุในระบบ
-                  </td>
+                  <th style={{ width: '50px', minWidth: '50px' }}>#</th>
+                  <th>รายการ</th>
+                  <th style={{ width: '130px', minWidth: '120px' }}>ผู้ดูแล</th>
+                  <th style={{ width: '80px', minWidth: '70px' }}>ทั้งหมด</th>
+                  <th style={{ width: '80px', minWidth: '70px' }}>พร้อมใช้</th>
+                  <th style={{ width: '80px', minWidth: '70px' }}>เบิกออก</th>
+                  <th style={{ width: '80px', minWidth: '70px' }}>ซ่อม</th>
+                  <th style={{ width: '80px', minWidth: '70px' }}>คงเหลือ</th>
+                  <th style={{ width: '120px', minWidth: '110px' }}>การจัดการ</th>
                 </tr>
-              ) : (
-                items.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
-                    <td className="text-start fw-600">{item.item_name}</td>
-                    <td>
-                      <span className="badge-soft" style={{ background: '#e0e8ff', color: '#4e73df' }}>
-                        {item.responsible || '-'}
-                      </span>
-                    </td>
-                    <td className="fw-bold">{item.total_qty}</td>
-                    <td className="text-warning fw-bold">{getWithdrawnCount(item.id)}</td>
-                    <td className="fw-bold">{getRemainingCount(item)}</td>
-                    <td>
-                      <a
-            href={`/details/${item.id}`}
-            className="btn-action me-1"
-          >
-            <i className="bi bi-search"></i>
-          </a>
-                      <button
-            className="btn-action btn-withdraw"
-            data-item-id={item.id}
-            data-item-name={item.item_name}
-          >
-            <i className="bi bi-box-arrow-right"></i>
-          </button>
+              </thead>
+              <tbody>
+                {items.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="text-center text-muted py-4">
+                      ยังไม่มีข้อมูลวัสดุในระบบ
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  items.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
+                      <td className="fw-medium">{item.item_name}</td>
+                      <td>
+                        <span className="badge badge-secondary">
+                          <i className="bi bi-person me-1"></i>{item.responsible || '-'}
+                        </span>
+                      </td>
+                      <td className="fw-bold text-primary">{item.total_qty}</td>
+                      <td className="fw-bold text-success">{item.total_qty - getWithdrawnCount(item.id) - getRepairCount(item.id)}</td>
+                      <td className="fw-bold text-warning">{getWithdrawnCount(item.id)}</td>
+                      <td className="fw-bold text-danger">{getRepairCount(item.id)}</td>
+                      <td className="fw-bold">{getRemainingCount(item)}</td>
+                      <td>
+                        <div className="d-flex justify-content-center gap-1">
+                          <a
+                            href={`/details/${item.id}`}
+                            className="btn-action"
+                            title="ดูรายละเอียด"
+                          >
+                            <i className="bi bi-eye"></i>
+                          </a>
+                          <button
+                            className="btn-action btn-withdraw"
+                            data-item-id={item.id}
+                            data-item-name={item.item_name}
+                            onClick={() => setShowWithdrawModal(true)}
+                            title="เบิกอุปกรณ์"
+                          >
+                            <i className="bi bi-box-arrow-right"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

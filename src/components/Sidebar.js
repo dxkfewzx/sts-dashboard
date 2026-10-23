@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Swal from 'sweetalert2';
 
 const Sidebar = ({ items, serialNumbers, repairs, onAddItem, onUpdateItem, onDeleteItem, onAddSerialNumber, onUpdateSerialNumber, onDeleteSerialNumber, onAddRepair, onUpdateRepair, onDeleteRepair }) => {
   const { user, logout } = useAuth();
+  const location = useLocation();
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -31,16 +32,16 @@ const Sidebar = ({ items, serialNumbers, repairs, onAddItem, onUpdateItem, onDel
         <span>SYSTEMS IT</span>
       </div>
       <nav className="flex-grow-1">
-        <Link to="/" className="nav-link-custom active">
+        <Link to="/" className={`nav-link-custom ${location.pathname === '/' ? 'active' : ''}`}>
           <i className="bi bi-grid-fill"></i> แดชบอร์ด
         </Link>
-        <Link to="/inventory" className="nav-link-custom">
+        <Link to="/inventory" className={`nav-link-custom ${location.pathname === '/inventory' ? 'active' : ''}`}>
           <i className="bi bi-laptop"></i> รายการอุปกรณ์
         </Link>
-        <Link to="/report" className="nav-link-custom">
+        <Link to="/report" className={`nav-link-custom ${location.pathname === '/report' ? 'active' : ''}`}>
           <i className="bi bi-file-earmark-bar-graph-fill"></i> รายงาน
         </Link>
-        <Link to="/repair" className="nav-link-custom">
+        <Link to="/repair" className={`nav-link-custom ${location.pathname === '/repair' ? 'active' : ''}`}>
           <i className="bi bi-wrench-adjustable-circle-fill"></i> ประวัติแจ้งซ่อม
         </Link>
       </nav>
