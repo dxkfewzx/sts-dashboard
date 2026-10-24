@@ -305,7 +305,8 @@ body {
    ============================================ */
 .table-container {
     border-radius: var(--radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     border: 1px solid var(--border-light);
     background: var(--bg-primary);
 }
@@ -669,6 +670,18 @@ body {
     display: block;
 }
 
+/* Mobile tabs improvements */
+@media (max-width: 768px) {
+    .tab-trigger {
+        padding: var(--space-md) var(--space-md);
+        font-size: var(--text-sm);
+        min-height: 44px; /* Touch target size */
+    }
+    .tabs-list {
+        gap: var(--space-xs);
+    }
+}
+
 /* ============================================
    STATUS INDICATORS
    ============================================ */
@@ -734,11 +747,11 @@ body {
 @media (max-width: 768px) {
     .main-content {
         padding: var(--space-md);
-        padding-top: calc(var(--header-height) + var(--space-md));
     }
     .page-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-md);
     }
     .header-title h4 {
         font-size: var(--text-xl);
@@ -767,12 +780,22 @@ body {
         font-size: var(--text-xs);
     }
     .btn-action {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
+    }
+    .btn-action:active {
+      transform: scale(0.95);
     }
     .modal-content {
         margin: var(--space-md);
         max-height: calc(100vh - 2 * var(--space-md));
+    }
+    .page-header .d-flex {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .page-header .d-flex.gap-2 {
+        flex-wrap: wrap;
     }
 }
 
@@ -791,6 +814,41 @@ body {
         white-space: nowrap;
         flex-shrink: 0;
     }
+}
+
+/* ============================================
+   MOBILE MENU TOGGLE & SIDEBAR BACKDROP
+   ============================================ */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-sticky);
+  }
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: calc(var(--z-sticky) - 1);
+  animation: fadeIn var(--transition-fast);
+}
+
+/* Ensure sidebar is above backdrop on mobile */
+@media (max-width: 1024px) {
+  .sidebar {
+    z-index: var(--z-sticky);
+  }
+  .sidebar.open {
+    box-shadow: var(--shadow-xl);
+  }
 }
 
 /* ============================================

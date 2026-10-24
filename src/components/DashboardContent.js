@@ -2,8 +2,25 @@ import React, { useState, useMemo } from 'react';
 import WithdrawModal from './WithdrawModal';
 import { useItems, useDashboardStats, useWithdrawReturn, useReferenceData } from '../hooks/useSupabase';
 import { operationToast } from '../utils/toast';
+import { useSidebar } from '../context/SidebarContext';
 
 const DashboardContent = () => {
+  const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
+
+  const MobileMenuToggle = () => {
+    if (!isMobile) return null;
+    return (
+      <button
+        className="btn btn-ghost btn-icon mobile-menu-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
+        aria-expanded={isSidebarOpen}
+      >
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
+      </button>
+    );
+  };
+
   const { items } = useItems();
   const { totalItems, totalAvailable, totalWithdrawn, totalRepair, lowStockItems } = useDashboardStats();
   const { onWithdraw, serialNumbers } = useWithdrawReturn();
@@ -141,7 +158,8 @@ const DashboardContent = () => {
           <h4>ภาพรวมคลังอุปกรณ์</h4>
           <p>สถานะอุปกรณ์คงเหลือและการเบิกจ่ายล่าสุด</p>
         </div>
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 align-items-center">
+          <MobileMenuToggle />
           <button
             className="btn btn-primary"
             onClick={() => setShowWithdrawModal(true)}

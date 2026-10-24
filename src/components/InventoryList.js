@@ -1,8 +1,25 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useItems, useSerialNumbers, useWithdrawReturn, useReferenceData } from '../hooks/useSupabase';
 import { operationToast } from '../utils/toast';
+import { useSidebar } from '../context/SidebarContext';
 
 const InventoryList = () => {
+  const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
+
+  const MobileMenuToggle = () => {
+    if (!isMobile) return null;
+    return (
+      <button
+        className="btn btn-ghost btn-icon mobile-menu-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
+        aria-expanded={isSidebarOpen}
+      >
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
+      </button>
+    );
+  };
+
   const { items, addItem, updateItem, deleteItem, refetch } = useItems();
   const { serialNumbers } = useSerialNumbers();
   const { onWithdraw, onReturn } = useWithdrawReturn();
@@ -196,6 +213,16 @@ const InventoryList = () => {
             <h4>รายการอุปกรณ์</h4>
             <p>จัดการข้อมูลรายการอุปกรณ์ในคลัง</p>
           </div>
+          <div className="d-flex gap-2 align-items-center">
+            <MobileMenuToggle />
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowAddModal(true)}
+            >
+              <i className="bi bi-plus-lg me-2"></i>
+              <span className="fw-medium">เพิ่มรายการใหม่</span>
+            </button>
+          </div>
         </div>
         <div className="card">
           <div className="card-body p-0">
@@ -258,13 +285,16 @@ const InventoryList = () => {
           <h4>รายการอุปกรณ์</h4>
           <p>จัดการข้อมูลรายการอุปกรณ์ในคลัง</p>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowAddModal(true)}
-        >
-          <i className="bi bi-plus-lg me-2"></i>
-          <span className="fw-medium">เพิ่มรายการใหม่</span>
-        </button>
+        <div className="d-flex gap-2 align-items-center">
+          <MobileMenuToggle />
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowAddModal(true)}
+          >
+            <i className="bi bi-plus-lg me-2"></i>
+            <span className="fw-medium">เพิ่มรายการใหม่</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filter Bar */}

@@ -1,7 +1,24 @@
 import React from 'react';
 import { useItems, useSerialNumbers, useRepairs, useWithdrawalLogs } from '../hooks/useSupabase';
+import { useSidebar } from '../context/SidebarContext';
 
 const Report = () => {
+  const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
+
+  const MobileMenuToggle = () => {
+    if (!isMobile) return null;
+    return (
+      <button
+        className="btn btn-ghost btn-icon mobile-menu-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
+        aria-expanded={isSidebarOpen}
+      >
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
+      </button>
+    );
+  };
+
   const { items } = useItems();
   const { serialNumbers } = useSerialNumbers();
   const { repairs } = useRepairs();
@@ -43,6 +60,9 @@ const Report = () => {
         <div className="header-title">
           <h4>รายงานสรุป</h4>
           <p>ภาพรวมสถานะคลังอุปกรณ์และการเบิกจ่าย</p>
+        </div>
+        <div className="d-flex gap-2 align-items-center">
+          <MobileMenuToggle />
         </div>
       </div>
 

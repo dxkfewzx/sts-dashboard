@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { createClient } from '@supabase/supabase-js';
 import { AuthProvider } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
+import { SidebarProvider, useSidebar } from './context/SidebarContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import DashboardContent from './components/DashboardContent';
@@ -19,68 +20,86 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Backdrop overlay for mobile sidebar
+const SidebarBackdrop = () => {
+  const { isMobile, isSidebarOpen, closeSidebar } = useSidebar();
+
+  if (!isMobile || !isSidebarOpen) return null;
+
+  return (
+    <div
+      className="sidebar-backdrop"
+      onClick={closeSidebar}
+      aria-hidden="true"
+    />
+  );
+};
+
 function AppContent() {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
 
   return (
-    <div className="App">
-      {!isLoginPage && <Sidebar />}
-      <main className="main-content">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardContent />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/inventory"
-            element={
-              <ProtectedRoute>
-                <InventoryList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/report"
-            element={
-              <ProtectedRoute>
-                <Report />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/repair"
-            element={
-              <ProtectedRoute>
-                <RepairDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/details/:id"
-            element={
-              <ProtectedRoute>
-                <Details />
-              </ProtectedRoute>
-            }
-          />
-          {/* Redirect authenticated users away from login */}
-          <Route
-            path="/login"
-            element={
-              <ProtectedRoute>
-                <Navigate to="/" replace />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="App">
+        {!isLoginPage && <Sidebar />}
+        <SidebarBackdrop />
+        <main className="main-content">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <DashboardContent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute>
+                  <InventoryList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/report"
+              element={
+                <ProtectedRoute>
+                  <Report />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/repair"
+              element={
+                <ProtectedRoute>
+                  <RepairDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/details/:id"
+              element={
+                <ProtectedRoute>
+                  <Details />
+                </ProtectedRoute>
+              }
+            />
+            {/* Redirect authenticated users away from login */}
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute>
+                  <Navigate to="/" replace />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
 

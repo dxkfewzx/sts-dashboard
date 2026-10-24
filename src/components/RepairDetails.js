@@ -1,8 +1,25 @@
 import React, { useState } from 'react';
 import { useRepairs } from '../hooks/useSupabase';
 import { operationToast } from '../utils/toast';
+import { useSidebar } from '../context/SidebarContext';
 
 const RepairDetails = () => {
+  const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
+
+  const MobileMenuToggle = () => {
+    if (!isMobile) return null;
+    return (
+      <button
+        className="btn btn-ghost btn-icon mobile-menu-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
+        aria-expanded={isSidebarOpen}
+      >
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
+      </button>
+    );
+  };
+
   const { repairs, addRepair, updateRepair, deleteRepair } = useRepairs();
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -119,6 +136,24 @@ const RepairDetails = () => {
 
   return (
     <div>
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="header-title">
+          <h4>ประวัติแจ้งซ่อม</h4>
+          <p>บันทึกและติดตามการแจ้งซ่อมอุปกรณ์</p>
+        </div>
+        <div className="d-flex gap-2 align-items-center">
+          <MobileMenuToggle />
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowAddModal(true)}
+          >
+            <i className="bi bi-plus-lg me-2"></i>
+            <span className="fw-medium">เพิ่มการแจ้งซ่อม</span>
+          </button>
+        </div>
+      </div>
+
       {/* Overview Cards */}
       <div className="row g-3 mb-4">
         {statsCards.map((stat, index) => (
@@ -135,18 +170,10 @@ const RepairDetails = () => {
       </div>
 
       <div className="card">
-        <div className="card-header d-flex justify-content-between align-items-center">
+        <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
           <div className="header-title">
-            <h4>ประวัติแจ้งซ่อม</h4>
-            <p>บันทึกและติดตามการแจ้งซ่อมอุปกรณ์</p>
+            <h5 className="mb-0">รายการแจ้งซ่อมทั้งหมด</h5>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowAddModal(true)}
-          >
-            <i className="bi bi-plus-lg me-2"></i>
-            <span className="fw-medium">เพิ่มการแจ้งซ่อม</span>
-          </button>
         </div>
         <div className="card-body p-0">
           {repairs.length === 0 ? (

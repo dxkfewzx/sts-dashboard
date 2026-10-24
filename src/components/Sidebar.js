@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useSidebar } from '../context/SidebarContext';
 import Swal from 'sweetalert2';
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const { isSidebarOpen, closeSidebar } = useSidebar();
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -22,26 +24,48 @@ const Sidebar = () => {
 
     if (result.isConfirmed) {
       await logout();
+      closeSidebar(); // Close sidebar on mobile after logout
     }
   };
 
+  // Close sidebar on mobile when a nav link is clicked
+  const handleNavClick = () => {
+    closeSidebar();
+  };
+
   return (
-    <aside className="sidebar d-flex flex-column" id="sidebar">
+    <aside className={`sidebar d-flex flex-column ${isSidebarOpen ? 'open' : ''}`} id="sidebar" role="navigation" aria-label="เมนูหลัก">
       <div className="sidebar-brand">
         <i className="bi bi-shield-lock-fill fs-3"></i>
         <span>SYSTEMS IT</span>
       </div>
       <nav className="flex-grow-1">
-        <Link to="/" className={`nav-link-custom ${location.pathname === '/' ? 'active' : ''}`}>
+        <Link
+          to="/"
+          className={`nav-link-custom ${location.pathname === '/' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
           <i className="bi bi-grid-fill"></i> แดชบอร์ด
         </Link>
-        <Link to="/inventory" className={`nav-link-custom ${location.pathname === '/inventory' ? 'active' : ''}`}>
+        <Link
+          to="/inventory"
+          className={`nav-link-custom ${location.pathname === '/inventory' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
           <i className="bi bi-laptop"></i> รายการอุปกรณ์
         </Link>
-        <Link to="/report" className={`nav-link-custom ${location.pathname === '/report' ? 'active' : ''}`}>
+        <Link
+          to="/report"
+          className={`nav-link-custom ${location.pathname === '/report' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
           <i className="bi bi-file-earmark-bar-graph-fill"></i> รายงาน
         </Link>
-        <Link to="/repair" className={`nav-link-custom ${location.pathname === '/repair' ? 'active' : ''}`}>
+        <Link
+          to="/repair"
+          className={`nav-link-custom ${location.pathname === '/repair' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
           <i className="bi bi-wrench-adjustable-circle-fill"></i> ประวัติแจ้งซ่อม
         </Link>
       </nav>

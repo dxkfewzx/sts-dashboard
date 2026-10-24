@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { useCascadingDropdowns, useItemSerialNumbers, useItemHistory, useSNHistory } from '../hooks/useCascadingDropdowns';
+import { useSidebar } from '../context/SidebarContext';
 import {
   INITIAL_SN_FORM,
   INITIAL_BULK_FORM,
@@ -24,6 +25,22 @@ import ReturnModal from './modals/ReturnModal';
 import HistoryModal from './modals/HistoryModal';
 
 const Details = () => {
+  const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
+
+  const MobileMenuToggle = () => {
+    if (!isMobile) return null;
+    return (
+      <button
+        className="btn btn-ghost btn-icon mobile-menu-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
+        aria-expanded={isSidebarOpen}
+      >
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
+      </button>
+    );
+  };
+
   const { id } = useParams();
   const navigate = useNavigate();
   const itemId = parseInt(id);
@@ -274,7 +291,8 @@ const Details = () => {
           <h4>รายละเอียดอุปกรณ์: {item.item_name}</h4>
           <p>รหัสรายการ: {item.id}</p>
         </div>
-        <div className="d-flex gap-2 flex-wrap">
+        <div className="d-flex gap-2 flex-wrap align-items-center">
+          <MobileMenuToggle />
           <button
             className="btn btn-primary btn-sm"
             onClick={() => setShowAddSNModal(true)}
