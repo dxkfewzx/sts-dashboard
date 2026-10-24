@@ -1,17 +1,18 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
 import { AuthProvider } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import { SidebarProvider, useSidebar } from './context/SidebarContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/ui/Sidebar';
 import DashboardContent from './components/DashboardContent';
 import InventoryList from './components/InventoryList';
 import Report from './components/Report';
 import RepairDetails from './components/RepairDetails';
 import Details from './components/Details';
 import Login from './components/Login';
+import { useAuth } from './hooks/useAuth';
 import './App.css';
 
 // Supabase configuration
@@ -20,86 +21,104 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Backdrop overlay for mobile sidebar
-const SidebarBackdrop = () => {
-  const { isMobile, isSidebarOpen, closeSidebar } = useSidebar();
-
-  if (!isMobile || !isSidebarOpen) return null;
-
-  return (
-    <div
-      className="sidebar-backdrop"
-      onClick={closeSidebar}
-      aria-hidden="true"
-    />
-  );
-};
+// Navigation items for Sidebar
+const NAV_ITEMS = [
+  { id: '/', label: 'แดชบอร์ด', icon: <i className="bi bi-grid-fill" aria-hidden="true"></i> },
+  { id: '/inventory', label: 'รายการอุปกรณ์', icon: <i className="bi bi-laptop" aria-hidden="true"></i> },
+  { id: '/report', label: 'รายงาน', icon: <i className="bi bi-file-earmark-bar-graph-fill" aria-hidden="true"></i> },
+  { id: '/repair', label: 'ประวัติแจ้งซ่อม', icon: <i className="bi bi-wrench-adjustable-circle-fill" aria-hidden="true"></i> },
+];
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const isLoginPage = location.pathname === '/login';
+  const [collapsed, setCollapsed] = useState(false);
+
+  // Use SidebarContext for mobile state (for page header toggle buttons)
+  const { isMobile, isSidebarOpen, closeSidebar } = useSidebar();
+
+  const handleNavClick = (id) => {
+    if (id && id !== '__close__') {
+      navigate(id);
+      // Close sidebar on mobile after navigation
+      if (isMobile) {
+        closeSidebar();
+      }
+    }
+  };
 
   return (
-    <SidebarProvider>
-      <div className="App">
-        {!isLoginPage && <Sidebar />}
-        <SidebarBackdrop />
-        <main className="main-content">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <DashboardContent />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/inventory"
-              element={
-                <ProtectedRoute>
-                  <InventoryList />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/report"
-              element={
-                <ProtectedRoute>
-                  <Report />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/repair"
-              element={
-                <ProtectedRoute>
-                  <RepairDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/details/:id"
-              element={
-                <ProtectedRoute>
-                  <Details />
-                </ProtectedRoute>
-              }
-            />
-            {/* Redirect authenticated users away from login */}
-            <Route
-              path="/login"
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/" replace />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="App">
+      {!isLoginPage && (
+        <Sidebar
+          items={NAV_ITEMS}
+          activeItem={location.pathname}
+          onItemClick={handleNavClick}
+          user={user ? { name: user.email, email: user.email, role: 'ผู้ดูแลระบบ' } : null}
+          onLogout={logout}
+          collapsed={collapsed}
+          onCollapseChange={setCollapsed}
+          isOpen={isSidebarOpen}
+          onClose={closeSidebar}
+        />
+      )}
+      <main className="main-content">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardContent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute>
+                <InventoryList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/report"
+            element={
+              <ProtectedRoute>
+                <Report />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/repair"
+            element={
+              <ProtectedRoute>
+                <RepairDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/details/:id"
+            element={
+              <ProtectedRoute>
+                <Details />
+              </ProtectedRoute>
+            }
+          />
+          {/* Redirect authenticated users away from login */}
+          <Route
+            path="/login"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/" replace />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </main>
+    </div>
   );
 }
 
@@ -108,7 +127,9 @@ function App() {
     <AuthProvider supabase={supabase}>
       <DataProvider supabase={supabase}>
         <Router>
-          <AppContent />
+          <SidebarProvider>
+            <AppContent />
+          </SidebarProvider>
         </Router>
       </DataProvider>
     </AuthProvider>

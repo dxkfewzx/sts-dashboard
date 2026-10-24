@@ -64,4 +64,57 @@ const Card = ({
 
 Card.displayName = 'Card';
 
+/**
+ * Card.Header - Header section of the card
+ */
+const CardHeader = ({ children, className = '', ...rest }) => (
+  <div className={`ui-card__header ${className}`} {...rest}>
+    {children}
+  </div>
+);
+CardHeader.displayName = 'Card.Header';
+
+/**
+ * Card.Body - Body/content section of the card
+ */
+const CardBody = ({ children, className = '', padding = 'md', ...rest }) => {
+  const paddingClasses = {
+    none: 'ui-card--no-padding',
+    sm: 'ui-card--padding-sm',
+    md: 'ui-card--padding-md',
+    lg: 'ui-card--padding-lg',
+  };
+  return (
+    <div className={`ui-card__body ${paddingClasses[padding] || ''} ${className}`} {...rest}>
+      {children}
+    </div>
+  );
+};
+CardBody.displayName = 'Card.Body';
+
+/**
+ * Card.Footer - Footer section of the card
+ */
+const CardFooter = ({ children, className = '', ...rest }) => (
+  <div className={`ui-card__footer ${className}`} {...rest}>
+    {children}
+  </div>
+);
+CardFooter.displayName = 'Card.Footer';
+
+/**
+ * Card.Title - Title element for card header
+ */
+const CardTitle = ({ children, className = '', level = 3, ...rest }) => {
+  const Tag = `h${level}`;
+  return <Tag className={`ui-card__title ${className}`} {...rest}>{children}</Tag>;
+};
+CardTitle.displayName = 'Card.Title';
+
+// Attach sub-components to Card
+Card.Header = CardHeader;
+Card.Body = CardBody;
+Card.Footer = CardFooter;
+Card.Title = CardTitle;
+
 export default Card;

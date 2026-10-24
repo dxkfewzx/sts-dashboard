@@ -14,6 +14,8 @@ import './Sidebar.css';
  * @param {Function} [props.onLogout] - Logout handler
  * @param {boolean} [props.collapsed] - Collapsed state (desktop)
  * @param {Function} [props.onCollapseChange] - Collapse toggle handler
+ * @param {boolean} [props.isOpen] - Mobile open state (controlled)
+ * @param {Function} [props.onClose] - Mobile close handler
  * @param {string} [props.className] - Additional CSS classes
  * @returns {JSX.Element}
  */
@@ -25,6 +27,8 @@ const Sidebar = ({
   onLogout,
   collapsed = false,
   onCollapseChange,
+  isOpen = false,
+  onClose,
   className = '',
   ...rest
 }) => {
@@ -34,7 +38,7 @@ const Sidebar = ({
 
   // Mobile: trap focus, prevent body scroll
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile || !isOpen) return;
 
     previousActiveElement.current = document.activeElement;
     document.body.style.overflow = 'hidden';
@@ -49,21 +53,21 @@ const Sidebar = ({
       document.body.style.overflow = '';
       previousActiveElement.current?.focus();
     };
-  }, [isMobile]);
+  }, [isMobile, isOpen]);
 
   // Handle escape key on mobile
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile || !isOpen) return;
 
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
-        onItemClick?.('__close__');
+        onClose?.();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isMobile, onItemClick]);
+  }, [isMobile, isOpen, onClose]);
 
   const sidebarContent = (
     <aside
@@ -166,16 +170,108 @@ const Sidebar = ({
     </aside>
   );
 
-  // Mobile: render to portal with backdrop
+  // Mobile: render to portal with backdrop (only when open)
   if (isMobile) {
+    if (!isOpen) return null;
+
     return createPortal(
       <div className="ui-sidebar-mobile">
         <div
           className="ui-sidebar-mobile__backdrop"
-          onClick={() => onItemClick?.('__close__')}
+          onClick={onClose}
           aria-hidden="true"
         />
-        {sidebarContent}
+        <aside
+          ref={sidebarRef}
+          className={`ui-sidebar ${collapsed ? 'ui-sidebar--collapsed' : ''} ui-sidebar--mobile ui-sidebar--open ${className}`}
+          role="navigation"
+          aria-label="เมนูหลัก"
+          {...rest}
+        >
+          {/* Brand/Logo */}
+          <div className="ui-sidebar__brand">
+            {!collapsed && (
+              <>
+                <div className="ui-sidebar__logo" aria-hidden="true">
+                  <i className="bi bi-box-seam"></i>
+                </div>
+                <span className="ui-sidebar__title">STS Dashboard</span>
+              </>
+            )}
+            {collapsed && (
+              <div className="ui-sidebar__logo-compact" aria-hidden="true">
+                <i className="bi bi-box-seam"></i>
+              </div>
+            )}
+          </div>
+
+          {/* Navigation */}
+          <nav className="ui-sidebar__nav" aria-label="นำทางหลัก">
+            <ul className="ui-sidebar__list" role="list">
+              {items.map((item) => (
+                <li key={item.id} className="ui-sidebar__item">
+                  <button
+                    type="button"
+                    className={`ui-sidebar__link ${item.active ? 'ui-sidebar__link--active' : ''}`}
+                    onClick={() => {
+                      onItemClick?.(item.id);
+                      onClose?.();
+                    }}
+                    aria-current={item.active ? 'page' : undefined}
+                    disabled={item.disabled}
+                  >
+                    <span className="ui-sidebar__icon" aria-hidden="true">
+                      {item.icon || <i className="bi bi-circle" aria-hidden="true"></i>}
+                    </span>
+                    {!collapsed && (
+                      <>
+                        <span className="ui-sidebar__label">{item.label}</span>
+                        {item.badge && (
+                          <span className="ui-sidebar__badge" aria-label={`${item.badge} รายการ`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* User section */}
+          {user && !collapsed && (
+            <div className="ui-sidebar__user">
+              <div className="ui-sidebar__user-info">
+                <div className="ui-sidebar__user-avatar" aria-hidden="true">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="" />
+                  ) : (
+                    <i className="bi bi-person-fill"></i>
+                  )}
+                </div>
+                <div className="ui-sidebar__user-details">
+                  <div className="ui-sidebar__user-name">{user.name}</div>
+                  <div className="ui-sidebar__user-role">{user.role || user.email}</div>
+                </div>
+              </div>
+              {onLogout && (
+                <button
+                  type="button"
+                  className="ui-sidebar__logout"
+                  onClick={() => {
+                    onLogout();
+                    onClose?.();
+                  }}
+                  aria-label="ออกจากระบบ"
+                >
+                  <i className="bi bi-box-arrow-right" aria-hidden="true"></i>
+                  <span>ออกจากระบบ</span>
+                </button>
+              )}
+            </div>
+          )}
+        </aside>
       </div>,
       document.body
     );

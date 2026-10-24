@@ -43,7 +43,11 @@ const StatCard = ({
           {action && <div className="ui-stat-card__action">{action}</div>}
         </div>
         <div className="ui-stat-card__main">
-          {icon && <div className="ui-stat-card__icon" aria-hidden="true">{icon}</div>}
+          {icon && (
+            <div className="ui-stat-card__icon" aria-hidden="true">
+              {typeof icon === 'string' ? <i className={`bi ${icon}`} /> : icon}
+            </div>
+          )}
           <div className="ui-stat-card__value">{value}</div>
         </div>
         {trend && (

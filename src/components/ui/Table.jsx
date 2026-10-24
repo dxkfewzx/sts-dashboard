@@ -119,7 +119,7 @@ const Table = ({
               <tr key={row[rowKey]} className={rowClassName ? rowClassName(row) : ''}>
                 {columns.map((column) => (
                   <td key={column.key} className={column.className || ''}>
-                    {column.render ? column.render(row[column.key], row) : row[column.key]}
+                    {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}
               </tr>

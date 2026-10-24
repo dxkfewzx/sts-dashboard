@@ -23,6 +23,15 @@ import BulkAddSNModal from './modals/BulkAddSNModal';
 import EditSNModal from './modals/EditSNModal';
 import ReturnModal from './modals/ReturnModal';
 import HistoryModal from './modals/HistoryModal';
+import {
+  PageHeader,
+  Tabs,
+  Table,
+  Card,
+  StatCard,
+  Badge,
+  Button,
+} from '../components/ui';
 
 const Details = () => {
   const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
@@ -30,14 +39,16 @@ const Details = () => {
   const MobileMenuToggle = () => {
     if (!isMobile) return null;
     return (
-      <button
-        className="btn btn-ghost btn-icon mobile-menu-toggle"
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
         aria-expanded={isSidebarOpen}
+        className="mobile-menu-toggle"
       >
-        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }}></i>
-      </button>
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }} />
+      </Button>
     );
   };
 
@@ -267,56 +278,156 @@ const Details = () => {
 
   // Stats
   const stats = [
-    { label: 'ทั้งหมด', value: itemSerialNumbers.length, icon: 'bi-boxes', iconColor: 'primary', iconBg: 'primary-light' },
-    { label: 'พร้อมใช้งาน', value: itemSerialNumbers.filter(sn => sn.status === 'Available').length, icon: 'bi-check-circle-fill', iconColor: 'success', iconBg: 'success-light' },
-    { label: 'เบิกออกแล้ว', value: itemSerialNumbers.filter(sn => sn.status === 'Withdrawn').length, icon: 'bi-box-arrow-right', iconColor: 'warning', iconBg: 'warning-light' },
-    { label: 'อยู่ระหว่างซ่อม', value: itemSerialNumbers.filter(sn => sn.status === 'Repair').length, icon: 'bi-tools', iconColor: 'danger', iconBg: 'danger-light' },
+    { label: 'ทั้งหมด', value: itemSerialNumbers.length, icon: 'bi-boxes', variant: 'primary' },
+    { label: 'พร้อมใช้งาน', value: itemSerialNumbers.filter(sn => sn.status === 'Available').length, icon: 'bi-check-circle-fill', variant: 'success' },
+    { label: 'เบิกออกแล้ว', value: itemSerialNumbers.filter(sn => sn.status === 'Withdrawn').length, icon: 'bi-box-arrow-right', variant: 'warning' },
+    { label: 'อยู่ระหว่างซ่อม', value: itemSerialNumbers.filter(sn => sn.status === 'Repair').length, icon: 'bi-tools', variant: 'danger' },
   ];
 
   if (!item) {
     return (
-      <div className="card">
-        <div className="card-body text-center py-5">
+      <Card>
+        <Card.Body className="text-center py-5">
           <p className="text-muted">กำลังโหลดข้อมูล...</p>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     );
   }
+
+  // Tab 1: Serial Numbers Table
+  const serialColumns = [
+    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center' },
+    { key: 'serial_number', header: 'หมายเลขเครื่อง', width: '130px', minWidth: '110px', render: (sn) => <span className="text-truncate fw-medium" title={sn.serial_number}>{sn.serial_number}</span> },
+    { key: 'brand', header: 'ยี่ห้อ', width: '80px', minWidth: '70px', render: (sn) => <span className="text-truncate" title={sn.brand || ''}>{sn.brand || '-'}</span> },
+    { key: 'status', header: 'สถานะ', width: '90px', minWidth: '80px', className: 'text-center', render: (sn) => <Badge variant={getSNStatusBadgeClass(sn.status).replace('badge-', '')}>{getSNStatusText(sn.status)}</Badge> },
+    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.job_number || ''}>{sn.job_number || '-'}</span> },
+    { key: 'withdrawer_name', header: 'ผู้เบิก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.withdrawer_name || ''}>{sn.withdrawer_name || '-'}</span> },
+    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.dept_used || ''}>{sn.dept_used || '-'}</span> },
+    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.building + (sn.floor ? ' (ชั้น ' + sn.floor + ')' : '')}>{sn.building || '-'} {sn.floor && <span className="text-muted"> (ชั้น {sn.floor})</span>}</span> },
+    { key: 'receive_date', header: 'วันที่รับ', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.receive_date ? new Date(sn.receive_date).toLocaleDateString() : '-'}</span>, className: 'text-center' },
+    { key: 'withdraw_date', header: 'วันที่เบิก', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.withdraw_date ? new Date(sn.withdraw_date).toLocaleDateString() : '-'}</span>, className: 'text-center' },
+    {
+      key: 'actions',
+      header: 'การจัดการ',
+      width: '90px',
+      minWidth: '90px',
+      className: 'text-center',
+      render: (sn) => (
+        <div className="d-flex justify-content-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setEditSN({
+                id: sn.id,
+                serial_number: sn.serial_number,
+                brand: sn.brand || '',
+                status: sn.status,
+                job_number: sn.job_number || '',
+                withdrawer_name: sn.withdrawer_name || '',
+                dept_used: sn.dept_used || '',
+                building: sn.building || '',
+                floor: sn.floor || '',
+                receive_date: sn.receive_date || '',
+                withdraw_date: sn.withdraw_date || '',
+              });
+              setShowEditSNModal(true);
+            }}
+            title="แก้ไข"
+            aria-label={`แก้ไข ${sn.serial_number}`}
+          >
+            <i className="bi bi-pencil-fill" />
+          </Button>
+          {sn.status === 'Withdrawn' && (
+            <Button
+              variant="outline-success"
+              size="sm"
+              onClick={() => handleOpenReturnModal(sn)}
+              title="รับคืนอุปกรณ์"
+            >
+              <i className="bi bi-box-arrow-left" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleOpenHistoryModal(sn)}
+            title="ดูประวัติ"
+          >
+            <i className="bi bi-clock-history" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            color="danger"
+            onClick={() => handleDeleteSN(sn.id)}
+            title="ลบ"
+          >
+            <i className="bi bi-trash3-fill" />
+          </Button>
+        </div>
+      )
+    },
+  ];
+
+  // Tab 2: History Table
+  const historyColumns = [
+    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => index + 1, className: 'text-muted fw-bold text-center' },
+    { key: 'serial_number', header: 'หมายเลขเครื่อง', width: '130px', minWidth: '110px', render: (log) => {
+      const sn = itemSerialNumbers.find(s => s.id === log.serial_number_id);
+      return <span className="fw-medium">{sn?.serial_number || '-'}</span>;
+    }},
+    { key: 'action', header: 'การกระทำ', width: '90px', minWidth: '80px', className: 'text-center', render: (log) => <Badge variant={getWithdrawalActionBadgeClass(log.action).replace('badge-', '')}>{getWithdrawalActionText(log.action)}</Badge> },
+    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (log) => log.job_number || '-' },
+    { key: 'person', header: 'ผู้เบิก / ผู้คืน', width: '100px', minWidth: '90px', render: (log) => log.action === 'withdraw' ? log.withdrawer_name : log.receiver_name },
+    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (log) => log.dept_used || '-' },
+    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (log) => `${log.building || '-'} ${log.floor ? ' (ชั้น ' + log.floor + ')' : ''}` },
+    { key: 'condition', header: 'สภาพ', width: '80px', minWidth: '70px', render: (log) => log.condition || '-' },
+    { key: 'note', header: 'หมายเหตุ', width: '150px', minWidth: '120px', render: (log) => <span className="text-truncate" title={log.note || ''} style={{ maxWidth: '200px', display: 'inline-block' }}>{log.note || '-'}</span> },
+    { key: 'performed_by', header: 'ผู้บันทึก', width: '90px', minWidth: '80px', render: (log) => log.performed_by || '-' },
+    { key: 'performed_at', header: 'วันที่/เวลา', width: '140px', minWidth: '130px', render: (log) => <span className="text-muted small">{log.performed_at ? new Date(log.performed_at).toLocaleString() : '-'}</span>, className: 'text-center' },
+  ];
 
   return (
     <div>
       {/* Page Header */}
-      <div className="page-header">
-        <div className="header-title">
-          <h4>รายละเอียดอุปกรณ์: {item.item_name}</h4>
-          <p>รหัสรายการ: {item.id}</p>
-        </div>
-        <div className="d-flex gap-2 flex-wrap align-items-center">
-          <MobileMenuToggle />
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowAddSNModal(true)}
-          >
-            <i className="bi bi-plus-lg"></i> เพิ่มหมายเลขเครื่อง
-          </button>
-          <button
-            className="btn btn-outline-success btn-sm"
-            onClick={() => setShowAddBulkSNModal(true)}
-          >
-            <i className="bi bi-plus-square"></i> เพิ่มหลายรายการ
-          </button>
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => navigate('/inventory')}
-          >
-            <i className="bi bi-arrow-left"></i> กลับไปรายการ
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title={`รายละเอียดอุปกรณ์: ${item.item_name}`}
+        subtitle={`รหัสรายการ: ${item.id}`}
+        actions={
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            <MobileMenuToggle />
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<i className="bi bi-plus-lg" />}
+              onClick={() => setShowAddSNModal(true)}
+            >
+              เพิ่มหมายเลขเครื่อง
+            </Button>
+            <Button
+              variant="outline-success"
+              size="sm"
+              leftIcon={<i className="bi bi-plus-square" />}
+              onClick={() => setShowAddBulkSNModal(true)}
+            >
+              เพิ่มหลายรายการ
+            </Button>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              leftIcon={<i className="bi bi-arrow-left" />}
+              onClick={() => navigate('/inventory')}
+            >
+              กลับไปรายการ
+            </Button>
+          </div>
+        }
+      />
 
       {/* General Info Card */}
-      <div className="card mb-4">
-        <div className="card-body py-3">
+      <Card variant="outlined" className="mb-4">
+        <Card.Body className="py-3">
           <div className="d-flex flex-wrap gap-4 align-items-center">
             <span className="fw-bold text-primary small">ข้อมูลทั่วไป</span>
             <div className="d-flex flex-wrap gap-4 text-sm">
@@ -326,218 +437,79 @@ const Details = () => {
               <span><strong>วันที่ลงระบบ:</strong> {item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</span>
             </div>
           </div>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
 
       {/* Tabs */}
-      <div className="card">
-        <div className="tabs">
-          <div className="tabs-list" role="tablist">
-            <button
-              role="tab"
-              className={`tab-trigger ${activeTab === 'serials' ? 'active' : ''}`}
-              onClick={() => setActiveTab('serials')}
-              aria-selected={activeTab === 'serials'}
-            >
-              <i className="bi bi-list-ul me-1"></i> หมายเลขเครื่อง ({itemSerialNumbers.length})
-            </button>
-            <button
-              role="tab"
-              className={`tab-trigger ${activeTab === 'history' ? 'active' : ''}`}
-              onClick={() => setActiveTab('history')}
-              aria-selected={activeTab === 'history'}
-            >
-              <i className="bi bi-clock-history me-1"></i> ประวัติเบิก-คืน ({itemHistoryLogs.length})
-            </button>
-            <button
-              role="tab"
-              className={`tab-trigger ${activeTab === 'stats' ? 'active' : ''}`}
-              onClick={() => setActiveTab('stats')}
-              aria-selected={activeTab === 'stats'}
-            >
-              <i className="bi bi-graph-up me-1"></i> สถิติ
-            </button>
-          </div>
+      <Card variant="outlined">
+        <Tabs
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          variant="line"
+          fullWidth
+          tabs={[
+            { id: 'serials', label: <><i className="bi bi-list-ul me-1" /> หมายเลขเครื่อง ({itemSerialNumbers.length})</> },
+            { id: 'history', label: <><i className="bi bi-clock-history me-1" /> ประวัติเบิก-คืน ({itemHistoryLogs.length})</> },
+            { id: 'stats', label: <><i className="bi bi-graph-up me-1" /> สถิติ</> },
+          ]}
+        />
+
+        {/* Tab Panel: Serial Numbers */}
+        <div role="tabpanel" hidden={activeTab !== 'serials'} style={{ display: activeTab === 'serials' ? 'block' : 'none' }}>
+          <Card.Body padding="none" className="p-0">
+            <Table
+              columns={serialColumns}
+              data={itemSerialNumbers}
+              emptyState={
+                <div className="text-center text-muted py-4">
+                  ยังไม่มีหมายเลขเครื่องสำหรับรายการนี้
+                </div>
+              }
+              striped
+              hoverable
+              responsive
+              minWidth={1000}
+            />
+          </Card.Body>
         </div>
 
-        <div className="card-body p-0">
-          {/* Tab Panel: Serial Numbers */}
-          <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'serials'} style={{ display: activeTab === 'serials' ? 'block' : 'none' }}>
-            <div className="table-responsive" style={{ overflowX: 'auto', maxWidth: '100%' }}>
-              <table className="table table-striped mb-0" style={{ minWidth: '1000px', whiteSpace: 'nowrap' }}>
-                <thead>
-                  <tr>
-                    <th style={{ width: '40px', minWidth: '40px' }}>#</th>
-                    <th style={{ width: '130px', minWidth: '110px' }}>หมายเลขเครื่อง</th>
-                    <th style={{ width: '80px', minWidth: '70px' }}>ยี่ห้อ</th>
-                    <th style={{ width: '90px', minWidth: '80px' }}>สถานะ</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>เลข Job</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>ผู้เบิก</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>แผนก</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>อาคาร/ชั้น</th>
-                    <th style={{ width: '90px', minWidth: '80px' }}>วันที่รับ</th>
-                    <th style={{ width: '90px', minWidth: '80px' }}>วันที่เบิก</th>
-                    <th style={{ width: '90px', minWidth: '90px' }}>การจัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {itemSerialNumbers.length === 0 ? (
-                    <tr>
-                      <td colSpan="11" className="text-center text-muted py-4">
-                        ยังไม่มีหมายเลขเครื่องสำหรับรายการนี้
-                      </td>
-                    </tr>
-                  ) : (
-                    itemSerialNumbers.map((sn, index) => (
-                      <tr key={sn.id}>
-                        <td className="text-muted fw-bold">{String(index + 1).padStart(2, '0')}</td>
-                        <td className="text-truncate fw-medium" title={sn.serial_number}>{sn.serial_number}</td>
-                        <td className="text-truncate" title={sn.brand || ''}>{sn.brand || '-'}</td>
-                        <td style={{ textAlign: 'center' }}>
-                          <span className={getSNStatusBadgeClass(sn.status)}>
-                            {getSNStatusText(sn.status)}
-                          </span>
-                        </td>
-                        <td className="text-truncate" title={sn.job_number || ''}>{sn.job_number || '-'}</td>
-                        <td className="text-truncate" title={sn.withdrawer_name || ''}>{sn.withdrawer_name || '-'}</td>
-                        <td className="text-truncate" title={sn.dept_used || ''}>{sn.dept_used || '-'}</td>
-                        <td className="text-truncate" title={sn.building + (sn.floor ? ' (ชั้น ' + sn.floor + ')' : '')}>
-                          {sn.building || '-'} {sn.floor && <span className="text-muted"> (ชั้น {sn.floor})</span>}
-                        </td>
-                        <td className="text-muted small">{sn.receive_date ? new Date(sn.receive_date).toLocaleDateString() : '-'}</td>
-                        <td className="text-muted small">{sn.withdraw_date ? new Date(sn.withdraw_date).toLocaleDateString() : '-'}</td>
-                        <td>
-                          <div className="d-flex justify-content-center gap-1">
-                            <button
-                              className="btn-action btn-edit"
-                              onClick={() => {
-                                setEditSN({
-                                  id: sn.id,
-                                  serial_number: sn.serial_number,
-                                  brand: sn.brand || '',
-                                  status: sn.status,
-                                  job_number: sn.job_number || '',
-                                  withdrawer_name: sn.withdrawer_name || '',
-                                  dept_used: sn.dept_used || '',
-                                  building: sn.building || '',
-                                  floor: sn.floor || '',
-                                  receive_date: sn.receive_date || '',
-                                  withdraw_date: sn.withdraw_date || '',
-                                });
-                                setShowEditSNModal(true);
-                              }}
-                              title="แก้ไข"
-                            >
-                              <i className="bi bi-pencil-fill"></i>
-                            </button>
-                            {sn.status === 'Withdrawn' && (
-                              <button
-                                className="btn-action btn-return"
-                                onClick={() => handleOpenReturnModal(sn)}
-                                title="รับคืนอุปกรณ์"
-                              >
-                                <i className="bi bi-box-arrow-left"></i>
-                              </button>
-                            )}
-                            <button
-                              className="btn-action btn-history"
-                              onClick={() => handleOpenHistoryModal(sn)}
-                              title="ดูประวัติ"
-                            >
-                              <i className="bi bi-clock-history"></i>
-                            </button>
-                            <button
-                              className="btn-action btn-del"
-                              onClick={() => handleDeleteSN(sn.id)}
-                              title="ลบ"
-                            >
-                              <i className="bi bi-trash3-fill"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Tab Panel: History */}
-          <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'history'} style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
-            <div className="table-responsive" style={{ overflowX: 'auto', maxWidth: '100%' }}>
-              <table className="table table-striped mb-0" style={{ minWidth: '1100px', whiteSpace: 'nowrap' }}>
-                <thead>
-                  <tr>
-                    <th style={{ width: '40px', minWidth: '40px' }}>#</th>
-                    <th style={{ width: '130px', minWidth: '110px' }}>หมายเลขเครื่อง</th>
-                    <th style={{ width: '90px', minWidth: '80px' }}>การกระทำ</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>เลข Job</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>ผู้เบิก / ผู้คืน</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>แผนก</th>
-                    <th style={{ width: '100px', minWidth: '90px' }}>อาคาร/ชั้น</th>
-                    <th style={{ width: '80px', minWidth: '70px' }}>สภาพ</th>
-                    <th style={{ width: '150px', minWidth: '120px' }}>หมายเหตุ</th>
-                    <th style={{ width: '90px', minWidth: '80px' }}>ผู้บันทึก</th>
-                    <th style={{ width: '140px', minWidth: '130px' }}>วันที่/เวลา</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {itemHistoryLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan="11" className="text-center text-muted py-4">
-                        ยังไม่มีประวัติการเบิก-คืน
-                      </td>
-                    </tr>
-                  ) : (
-                    itemHistoryLogs.map((log, index) => {
-                      const sn = itemSerialNumbers.find(s => s.id === log.serial_number_id);
-                      return (
-                        <tr key={log.id}>
-                          <td className="text-muted fw-bold">{index + 1}</td>
-                          <td className="fw-medium">{sn?.serial_number || '-'}</td>
-                          <td style={{ textAlign: 'center' }}>
-                            <span className={'badge ' + getWithdrawalActionBadgeClass(log.action)}>
-                              {getWithdrawalActionText(log.action)}
-                            </span>
-                          </td>
-                          <td>{log.job_number || '-'}</td>
-                          <td>{log.action === 'withdraw' ? log.withdrawer_name : log.receiver_name}</td>
-                          <td>{log.dept_used || '-'}</td>
-                          <td>{log.building || '-'} {log.floor ? ' (ชั้น ' + log.floor + ')' : ''}</td>
-                          <td>{log.condition || '-'}</td>
-                          <td className="text-truncate" title={log.note || ''} style={{ maxWidth: '200px' }}>{log.note || '-'}</td>
-                          <td>{log.performed_by || '-'}</td>
-                          <td className="text-muted small">{log.performed_at ? new Date(log.performed_at).toLocaleString() : '-'}</td>
-                        </tr>
-                      )
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Tab Panel: Stats */}
-          <div className="tab-panel" role="tabpanel" hidden={activeTab !== 'stats'} style={{ display: activeTab === 'stats' ? 'block' : 'none' }}>
-            <div className="card-body">
-              <div className="row g-3">
-                {stats.map((stat, index) => (
-                  <div key={index} className="col-6 col-md-3">
-                    <div className="stat-card">
-                      <div className={'stat-card-icon bg-' + stat.iconBg + ' text-' + stat.iconColor}>
-                        <i className={'bi ' + stat.icon}></i>
-                      </div>
-                      <div className={'stat-card-value text-' + stat.iconColor}>{stat.value}</div>
-                      <div className="stat-card-label">{stat.label}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        {/* Tab Panel: History */}
+        <div role="tabpanel" hidden={activeTab !== 'history'} style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
+          <Card.Body padding="none" className="p-0">
+            <Table
+              columns={historyColumns}
+              data={itemHistoryLogs}
+              emptyState={
+                <div className="text-center text-muted py-4">
+                  ยังไม่มีประวัติการเบิก-คืน
+                </div>
+              }
+              striped
+              hoverable
+              responsive
+              minWidth={1100}
+            />
+          </Card.Body>
         </div>
-      </div>
+
+        {/* Tab Panel: Stats */}
+        <div role="tabpanel" hidden={activeTab !== 'stats'} style={{ display: activeTab === 'stats' ? 'block' : 'none' }}>
+          <Card.Body>
+            <div className="row g-3">
+              {stats.map((stat, index) => (
+                <div key={index} className="col-6 col-md-3">
+                  <StatCard
+                    label={stat.label}
+                    value={stat.value}
+                    icon={stat.icon}
+                    variant={stat.variant}
+                  />
+                </div>
+              ))}
+            </div>
+          </Card.Body>
+        </div>
+      </Card>
 
       {/* Modals */}
       <AddSNModal
