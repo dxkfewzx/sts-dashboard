@@ -1,0 +1,39 @@
+/**
+ * Z-Index Scale Tokens
+ * Layering hierarchy per DESIGN_PLAN.md
+ */
+
+:root {
+  /* Base layers */
+  --z-base:        0;      /* Default content */
+  --z-raised:      10;     /* Slightly raised (table headers) */
+
+  /* Navigation & Overlays */
+  --z-dropdown:    100;    /* Dropdown menus */
+  --z-sticky:      200;    /* Sticky headers, sidebar */
+  --z-sticky-top:  250;    /* Sticky elements above sidebar */
+
+  /* Modals & Dialogs */
+  --z-modal-backdrop: 300; /* Modal backdrop */
+  --z-modal:         400;  /* Modal content */
+  --z-modal-top:     450;  /* Nested modals */
+
+  /* Popovers & Tooltips */
+  --z-popover:     500;    /* Popovers */
+  --z-tooltip:     600;    /* Tooltips */
+
+  /* Notifications */
+  --z-toast:       700;    /* Toast notifications */
+  --z-toast-top:   750;    /* Stacked toasts */
+
+  /* Highest priority */
+  --z-max:         9999;   /* Escape hatch */
+
+  /* Legacy aliases */
+  --z-dropdown-legacy:  var(--z-dropdown);
+  --z-sticky-legacy:    var(--z-sticky);
+  --z-modal-legacy:     var(--z-modal);
+  --z-popover-legacy:   var(--z-popover);
+  --z-tooltip-legacy:   var(--z-tooltip);
+  --z-toast-legacy:     var(--z-toast);
+}

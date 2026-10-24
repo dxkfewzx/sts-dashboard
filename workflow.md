@@ -323,3 +323,100 @@ ON DELETE CASCADE;
 - **Anti-Patterns** - 14 รูปแบบที่ต้องหลีกเลี่ยง (per frontend-design skill)
 - **Implementation Order** - 6 ขั้นตอน
 - **Review Against Brief** - ตรงตาม requirements ทุกข้อ
+
+---
+
+## 🎨 Design Tokens + Component Library Implementation (2026-10-24 - ครั้งที่ 2)
+
+### เป้าหมาย: สร้าง Design System แบบครบถ้วน (Tokens + Component Library) เพื่อลดโค้ดซ้ำและทำให้ UI สอดคล้องกัน
+
+### Phase 1: Design Tokens (Foundation) ✅ เสร็จสิ้น
+
+**ไฟล์ที่สร้างใหม่ (10 ไฟล์):**
+
+| ไฟล์ | หน้าที่ |
+|------|--------|
+| `src/styles/tokens/colors.css` | Color palette (core + semantic aliases + legacy) |
+| `src/styles/tokens/spacing.css` | Spacing scale (4px base unit) |
+| `src/styles/tokens/typography.css` | Font families, type scale, line heights (Prompt font) |
+| `src/styles/tokens/shadows.css` | Shadow tokens (component-specific) |
+| `src/styles/tokens/borders.css` | Border radius, border widths |
+| `src/styles/tokens/z-index.css` | Z-index scale |
+| `src/styles/tokens/transitions.css` | Duration/easing tokens |
+| `src/styles/tokens/breakpoints.css` | Media query breakpoints |
+| `src/styles/tokens/layout.css` | Layout tokens (sidebar, header, container) |
+| `src/styles/tokens/index.css` | Imports all token files |
+| `src/styles/tokens/tokens.js` | JS/TS version for programmatic access |
+
+**การเปลี่ยนแปลง App.css:**
+- ลบ `:root` block 123 บรรทัด (ย้ายไป token files)
+- เพิ่ม `@import './styles/tokens/index.css';` ที่บนสุด
+- เหลือเฉพาะ component styles, utilities, responsive overrides
+- **ขนาด CSS bundle:** ลดจาก 5.37 kB → 5.35 kB (gzip)
+
+**Typography:** ผู้ใช้ขอ revert กลับเป็น **Prompt font** (font เดิม) - เสร็จสิ้นแล้ว
+
+### Phase 2: Component Library (Core Components) ✅ สร้าง 13 Components
+
+**Components ที่สร้างแล้ว (13 ไฟล์ JSX + 13 ไฟล์ CSS):**
+
+| Component | ไฟล์ | คุณสมบัติหลัก |
+|-----------|------|--------------|
+| `Button` | `Button.jsx`, `Button.css` | variant (primary/secondary/success/danger/outline/ghost), size (sm/md/lg/icon), loading, disabled, leftIcon/rightIcon |
+| `IconButton` | `IconButton.jsx`, `IconButton.css` | 36×36px (desktop), 40×40px (mobile), 44×44px (active), variant, aria-label |
+| `Input` | `Input.jsx`, `Input.css` | label, error, helperText, required, type, leftIcon/rightIcon, fullWidth |
+| `Select` | `Select.jsx`, `Select.css` | options (value/label), placeholder, label, error, helperText, custom arrow icon |
+| `Modal` | `Modal.jsx`, `Modal.css` | Portal-based, focus trap, ESC close, backdrop click, sizes (sm/md/lg/xl/full), footer |
+| `Table` | `Table.jsx`, `Table.css` | Sortable columns, loading skeleton, striped/hoverable, responsive scroll, empty state, rowClassName |
+| `Card` | `Card.jsx`, `Card.css` | Variants (default/elevated/outlined), padding (none/sm/md/lg), hoverable, header/footer/body |
+| `Badge` | `Badge.jsx`, `Badge.css` | Variants (success/warning/danger/info/secondary/primary), sizes (sm/md/lg), dot variant, icon support |
+| `Tabs` | `Tabs.jsx`, `Tabs.css` | Keyboard nav (arrows, home/end), mobile scroll-snap, variants (line/enclosed), fullWidth, count badge |
+| `PageHeader` | `PageHeader.jsx`, `PageHeader.css` | Title, subtitle, backLink, breadcrumb, actions, responsive stack on mobile |
+| `StatCard` | `StatCard.jsx`, `StatCard.css` | Value/label/icon, variant colored border, trend badge (positive/negative), action slot |
+| `Sidebar` | `Sidebar.jsx`, `Sidebar.css` | Mobile drawer + backdrop, desktop collapse, user section, auto-close on nav, ARIA |
+| `Skeleton` | `Skeleton.jsx`, `Skeleton.css` | Variants (text/card/table/stat/avatar/button), shimmer animation, reduced motion |
+
+**Barrel Export:**
+- `src/components/ui/index.js` - Export ทุก component
+
+### ความคืบหน้าโดยรวม
+
+| Phase | สถานะ | รายละเอียด |
+|-------|--------|------------|
+| Phase 1: Design Tokens | ✅ **100%** | 10 token files + tokens.js, App.css cleaned up |
+| Phase 2: Component Library | ✅ **100%** | 13 components created with CSS |
+| Phase 3: Refactor Existing Components | ⏳ **0%** | Modals → Modal, Pages → PageHeader/Table/Card/StatCard/Table, Forms → Input/Select/Button, Badges → Badge |
+| Phase 4: Cleanup & Polish | ⏳ **0%** | Remove unused App.css, verify accessibility, update workflow |
+
+### ไฟล์ที่สร้างใหม่ใน Phase 2 (26 ไฟล์ + 1 index):
+
+```
+src/components/ui/
+├── Button.jsx, Button.css
+├── IconButton.jsx, IconButton.css
+├── Input.jsx, Input.css
+├── Select.jsx, Select.css
+├── Modal.jsx, Modal.css
+├── Table.jsx, Table.css
+├── Card.jsx, Card.css
+├── Badge.jsx, Badge.css
+├── Tabs.jsx, Tabs.css
+├── PageHeader.jsx, PageHeader.css
+├── StatCard.jsx, StatCard.css
+├── Sidebar.jsx, Sidebar.css
+├── Skeleton.jsx, Skeleton.css
+└── index.js (barrel export)
+```
+
+### การทดสอบ
+1. **Build:** `npm run build` - ✅ ผ่าน (มีแค่ ESLint warnings เดิม)
+2. **CSS Bundle Size:** 5.35 kB (gzip) - ลดลงเล็กน้อยจากเดิม
+3. **Components:** ทุก component ใช้ design tokens อย่างเต็มที่, รองรับ reduced motion, มี ARIA attributes
+
+### ขั้นตอนต่อไป (Phase 3)
+- [ ] Refactor 5 Modals (AddSNModal, BulkAddSNModal, EditSNModal, ReturnModal, HistoryModal) ใช้ `Modal` + `Form` components
+- [ ] Refactor 5 Pages (DashboardContent, InventoryList, Details, Report, RepairDetails) ใช้ `PageHeader`, `StatCard`, `Table`, `Card`, `Tabs`
+- [ ] Refactor Sidebar ใช้ `Sidebar` component ใหม่
+- [ ] Refactor Forms ทั้งหมด ใช้ `Input`, `Select`, `Button`
+- [ ] Refactor Status Badges ใช้ `Badge` + `status.js` config
+- [ ] Cleanup App.css (ลบ unused styles)

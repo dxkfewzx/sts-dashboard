@@ -1,0 +1,51 @@
+/**
+ * Layout Tokens
+ * Component-specific dimensions per DESIGN_PLAN.md
+ */
+
+:root {
+  /* Sidebar */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 72px;
+
+  /* Header */
+  --header-height: 64px;
+
+  /* Container */
+  --container-max-width: 1440px;  /* Updated from 1400px per DESIGN_PLAN.md */
+
+  /* Modal max widths */
+  --modal-sm: 400px;
+  --modal-md: 520px;
+  --modal-lg: 720px;
+  --modal-xl: 900px;
+
+  /* Card radius (matches --radius-lg = 12px) */
+  --card-radius: var(--radius-lg);
+
+  /* Button dimensions */
+  --btn-height: 40px;
+  --btn-height-sm: 36px;
+  --btn-height-lg: 48px;
+  --btn-icon-size: 36px;
+  --btn-icon-size-sm: 30px;
+  --btn-icon-size-mobile: 40px;
+
+  /* Input dimensions */
+  --input-height: 40px;
+  --input-height-sm: 36px;
+  --input-height-lg: 48px;
+
+  /* Table */
+  --table-min-width: 600px;
+
+  /* Touch targets */
+  --touch-target-min: 44px;
+  --touch-target-icon: 40px;
+
+  /* Z-index specific values */
+  --z-sidebar: var(--z-sticky);
+  --z-sidebar-open: var(--z-sticky);
+  --z-sidebar-backdrop: calc(var(--z-sticky) - 1);
+  --z-mobile-menu-toggle: var(--z-sticky);
+}

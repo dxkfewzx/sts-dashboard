@@ -1,0 +1,127 @@
+/**
+ * Table Component Styles
+ * Uses design tokens
+ */
+
+.ui-table-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.ui-table-wrapper--responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.ui-table__th {
+  text-align: left;
+  padding: var(--space-md) var(--space-md);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  background: var(--bg-page);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ui-table__th--sortable {
+  cursor: pointer;
+}
+
+.ui-table__th--sortable:hover {
+  background: var(--bg-hover);
+}
+
+.ui-table__th-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.ui-table__th .bi {
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+.ui-table td {
+  padding: var(--space-md) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.ui-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ui-table--striped tbody tr:nth-child(even) td {
+  background: var(--bg-page);
+}
+
+.ui-table--hoverable tbody tr:hover td {
+  background: var(--bg-hover);
+}
+
+.ui-table__empty {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-md) !important;
+  color: var(--text-muted);
+  font-size: var(--text-base);
+}
+
+/* Skeleton */
+.ui-table__skeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-table__skeleton-row {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-table__skeleton-cell {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-page) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-page) 75%
+  );
+  background-size: 200% 100%;
+  animation: ui-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+  flex: 1;
+}
+
+@keyframes ui-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-table__skeleton-cell {
+    animation: none;
+    background: var(--bg-hover);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 639px) {
+  .ui-table__th,
+  .ui-table td {
+    padding: var(--space-sm) var(--space-md);
+  }
+}

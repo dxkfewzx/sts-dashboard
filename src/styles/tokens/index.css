@@ -1,0 +1,27 @@
+/**
+ * Design Tokens Index
+ * Imports all token files in dependency order
+ * Import this file once in App.css or global styles
+ */
+
+/* Core tokens (no dependencies) */
+@import './colors.css';
+@import './spacing.css';
+@import './typography.css';
+@import './borders.css';
+@import './shadows.css';
+@import './z-index.css';
+@import './transitions.css';
+@import './breakpoints.css';
+@import './layout.css';
+
+/*
+ * Token loading complete.
+ * All CSS custom properties are now available globally.
+ * Use them in component styles like:
+ *   color: var(--text-primary);
+ *   background: var(--bg-surface);
+ *   padding: var(--space-md);
+ *   border-radius: var(--radius-card);
+ *   box-shadow: var(--shadow-card);
+ */

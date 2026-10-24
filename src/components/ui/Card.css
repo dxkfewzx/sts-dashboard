@@ -1,0 +1,89 @@
+/**
+ * Card Component Styles
+ * Uses design tokens
+ */
+
+.ui-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-card);
+  transition: all var(--transition-base);
+}
+
+/* Variants */
+.ui-card--default {
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.ui-card--elevated {
+  border: none;
+  box-shadow: var(--shadow-card-elevated);
+}
+
+.ui-card--outlined {
+  border: 1px solid var(--border-default);
+  box-shadow: none;
+}
+
+/* Hoverable */
+.ui-card--hoverable:hover {
+  box-shadow: var(--shadow-card-elevated-hover);
+  transform: translateY(-2px);
+}
+
+.ui-card--outlined.ui-card--hoverable:hover {
+  border-color: var(--text-muted);
+  box-shadow: var(--shadow-card-elevated);
+}
+
+/* Padding */
+.ui-card--no-padding > * {
+  padding: 0;
+}
+
+.ui-card--padding-sm > .ui-card__header,
+.ui-card--padding-sm > .ui-card__body,
+.ui-card--padding-sm > .ui-card__footer {
+  padding: var(--space-md);
+}
+
+.ui-card--padding-md > .ui-card__header,
+.ui-card--padding-md > .ui-card__body,
+.ui-card--padding-md > .ui-card__footer {
+  padding: var(--space-lg);
+}
+
+.ui-card--padding-lg > .ui-card__header,
+.ui-card--padding-lg > .ui-card__body,
+.ui-card--padding-lg > .ui-card__footer {
+  padding: var(--space-xl);
+}
+
+/* Sections */
+.ui-card__header {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-card__footer {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+}
+
+.ui-card__body {
+  flex: 1;
+}
+
+/* When no header/footer, body takes full space */
+.ui-card:not(:has(.ui-card__header)) > .ui-card__body:first-child,
+.ui-card:not(:has(.ui-card__footer)) > .ui-card__body:last-child {
+  border-radius: var(--radius-card);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,106 @@
+/**
+ * Modal Component Styles
+ * Uses design tokens
+ */
+
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  animation: ui-modal-fade-in var(--transition-fast);
+}
+
+.ui-modal {
+  background: var(--bg-surface);
+  border-radius: var(--radius-modal);
+  border: none;
+  box-shadow: var(--shadow-modal);
+  max-width: 100%;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: ui-modal-slide-up var(--transition-base);
+}
+
+.ui-modal--sm { max-width: var(--modal-sm); }
+.ui-modal--md { max-width: var(--modal-md); }
+.ui-modal--lg { max-width: var(--modal-lg); }
+.ui-modal--xl { max-width: var(--modal-xl); }
+.ui-modal--full { max-width: 95vw; }
+
+.ui-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-modal__title {
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.ui-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  line-height: 1;
+  transition: all var(--transition-fast);
+}
+
+.ui-modal__close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.ui-modal__close:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.ui-modal__body {
+  padding: var(--space-lg);
+}
+
+.ui-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+@keyframes ui-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ui-modal-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-modal-overlay,
+  .ui-modal {
+    animation: none;
+  }
+}

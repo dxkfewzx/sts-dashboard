@@ -1,0 +1,103 @@
+/**
+ * Badge Component Styles
+ * Uses design tokens
+ */
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-badge);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Sizes */
+.ui-badge--sm {
+  padding: 2px var(--space-xs);
+  font-size: var(--text-xs);
+}
+
+.ui-badge--md {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+}
+
+.ui-badge--lg {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-sm);
+}
+
+/* Variants - using status colors from tokens */
+.ui-badge--success {
+  background: var(--status-available-bg);
+  color: var(--status-available-text);
+  border: 1px solid var(--status-available-border);
+}
+
+.ui-badge--warning {
+  background: var(--status-withdrawn-bg);
+  color: var(--status-withdrawn-text);
+  border: 1px solid var(--status-withdrawn-border);
+}
+
+.ui-badge--danger {
+  background: var(--status-repair-bg);
+  color: var(--status-repair-text);
+  border: 1px solid var(--status-repair-border);
+}
+
+.ui-badge--info {
+  background: var(--info-light);
+  color: var(--info);
+  border: 1px solid var(--info);
+}
+
+.ui-badge--secondary {
+  background: var(--status-pending-bg);
+  color: var(--status-pending-text);
+  border: 1px solid var(--status-pending-border);
+}
+
+.ui-badge--primary {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+/* Dot variant */
+.ui-badge--dot {
+  padding: 0;
+  width: auto;
+}
+
+.ui-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.ui-badge--sm .ui-badge__dot {
+  width: 6px;
+  height: 6px;
+}
+
+.ui-badge--lg .ui-badge__dot {
+  width: 10px;
+  height: 10px;
+}
+
+/* Icon */
+.ui-badge__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85em;
+}
+
+.ui-badge__text {
+  display: inline-block;
+}

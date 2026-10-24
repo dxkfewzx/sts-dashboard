@@ -1,0 +1,88 @@
+/**
+ * Select Component Styles
+ * Uses design tokens
+ */
+
+.ui-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.ui-select__label {
+  display: block;
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.ui-select__required {
+  color: var(--color-danger);
+  margin-left: var(--space-xs);
+}
+
+.ui-select {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-input);
+  transition: all var(--transition-focus);
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239A9AAB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  background-size: 16px;
+  padding-right: calc(var(--space-md) + 20px);
+}
+
+.ui-select:hover:not(.ui-select--disabled) {
+  border-color: var(--text-muted);
+}
+
+.ui-select:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+  background-color: var(--bg-surface);
+}
+
+.ui-select--error {
+  border-color: var(--border-error);
+}
+
+.ui-select--error:focus {
+  box-shadow: var(--shadow-focus-error);
+}
+
+.ui-select--disabled,
+.ui-select[disabled] {
+  background: var(--bg-disabled);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ui-select__error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  margin-top: var(--space-xs);
+}
+
+.ui-select__helper {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-select {
+    transition: none;
+  }
+}

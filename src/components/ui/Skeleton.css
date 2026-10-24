@@ -1,0 +1,147 @@
+/**
+ * Skeleton Component Styles
+ * Uses design tokens
+ */
+
+.ui-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Animation */
+.ui-skeleton--animate .ui-skeleton__line,
+.ui-skeleton--animate .ui-skeleton__card-header,
+.ui-skeleton--animate .ui-skeleton__card-body > *,
+.ui-skeleton--animate .ui-skeleton__table-cell,
+.ui-skeleton--animate .ui-skeleton__stat-label,
+.ui-skeleton--animate .ui-skeleton__stat-value,
+.ui-skeleton--animate .ui-skeleton__avatar,
+.ui-skeleton--animate .ui-skeleton__button {
+  background: linear-gradient(
+    90deg,
+    var(--bg-page) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-page) 75%
+  );
+  background-size: 200% 100%;
+  animation: ui-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes ui-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Text variant */
+.ui-skeleton--text .ui-skeleton__line {
+  height: 16px;
+  border-radius: var(--radius-sm);
+}
+
+.ui-skeleton__text-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* Card variant */
+.ui-skeleton__card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.ui-skeleton__card-header {
+  height: 48px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-skeleton__card-body {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ui-skeleton__card-body .ui-skeleton__line {
+  height: 16px;
+}
+
+/* Table variant */
+.ui-skeleton__table {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-skeleton__table-header {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-page);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-skeleton__table-row {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ui-skeleton__table-cell {
+  height: 16px;
+  flex: 1;
+  min-width: 80px;
+}
+
+/* Stat variant */
+.ui-skeleton__stat {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  border-left: 4px solid var(--border-subtle);
+}
+
+.ui-skeleton__stat-label {
+  height: 16px;
+  width: 40%;
+}
+
+.ui-skeleton__stat-value {
+  height: 36px;
+  width: 60%;
+  border-radius: var(--radius-md);
+}
+
+/* Avatar variant */
+.ui-skeleton__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+}
+
+/* Button variant */
+.ui-skeleton__button {
+  height: 40px;
+  width: 120px;
+  border-radius: var(--radius-button);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton--animate .ui-skeleton__line,
+  .ui-skeleton--animate .ui-skeleton__card-header,
+  .ui-skeleton--animate .ui-skeleton__card-body > *,
+  .ui-skeleton--animate .ui-skeleton__table-cell,
+  .ui-skeleton--animate .ui-skeleton__stat-label,
+  .ui-skeleton--animate .ui-skeleton__stat-value,
+  .ui-skeleton--animate .ui-skeleton__avatar,
+  .ui-skeleton--animate .ui-skeleton__button {
+    animation: none;
+    background: var(--bg-hover);
+  }
+}

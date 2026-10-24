@@ -1,0 +1,42 @@
+/**
+ * Border Tokens
+ * Radius scale + border widths per DESIGN_PLAN.md
+ */
+
+:root {
+  /* Border Widths */
+  --border-width-hairline: 1px;
+  --border-width-thin:     1px;
+  --border-width-normal:   1px;
+  --border-width-thick:    2px;
+
+  /* Border Radius Scale */
+  --radius-none:   0;
+  --radius-sm:     4px;    /* Small elements, badges */
+  --radius-md:     8px;    /* Default - inputs, buttons, cards */
+  --radius-lg:     12px;   /* Cards, modals - technical but approachable */
+  --radius-xl:     16px;   /* Large cards, modals */
+  --radius-2xl:    24px;   /* Hero elements */
+  --radius-pill:   9999px; /* Pills, badges, round buttons */
+
+  /* Semantic aliases */
+  --radius-input:    var(--radius-md);
+  --radius-button:   var(--radius-md);
+  --radius-badge:    var(--radius-pill);
+  --radius-card:     var(--radius-lg);
+  --radius-modal:    var(--radius-xl);
+  --radius-tooltip:  var(--radius-sm);
+
+  /* Border Colors (from colors.css) */
+  --border-subtle:   var(--border-subtle);
+  --border-default:  var(--border-default);
+  --border-focus:    var(--border-focus);
+  --border-error:    var(--border-error);
+
+  /* Legacy aliases */
+  --radius-sm-legacy:  var(--radius-sm);
+  --radius-md-legacy:  var(--radius-md);
+  --radius-lg-legacy:  var(--radius-lg);
+  --radius-xl-legacy:  var(--radius-xl);
+  --radius-pill-legacy: var(--radius-pill);
+}

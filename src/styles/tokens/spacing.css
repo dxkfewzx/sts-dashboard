@@ -1,0 +1,35 @@
+/**
+ * Spacing Tokens
+ * 16px base grid - all spacing multiples of 4px (1 unit = 4px)
+ */
+
+:root {
+  /* Base unit: 4px */
+  --space-0:   0;
+  --space-1:   4px;   /* 1 unit */
+  --space-2:   8px;   /* 2 units */
+  --space-3:   12px;  /* 3 units */
+  --space-4:   16px;  /* 4 units = 1rem base */
+  --space-5:   20px;  /* 5 units */
+  --space-6:   24px;  /* 6 units */
+  --space-8:   32px;  /* 8 units */
+  --space-10:  40px;  /* 10 units */
+  --space-12:  48px;  /* 12 units */
+  --space-16:  64px;  /* 16 units */
+
+  /* Semantic aliases (matching existing App.css) */
+  --space-xs:  var(--space-1);
+  --space-sm:  var(--space-2);
+  --space-md:  var(--space-4);
+  --space-lg:  var(--space-6);
+  --space-xl:  var(--space-8);
+  --space-2xl: var(--space-12);
+  --space-3xl: var(--space-16);
+
+  /* Component-specific */
+  --space-card-padding: var(--space-6);
+  --space-card-padding-sm: var(--space-4);
+  --space-modal-padding: var(--space-6);
+  --space-page-padding: var(--space-8);
+  --space-section-gap: var(--space-6);
+}

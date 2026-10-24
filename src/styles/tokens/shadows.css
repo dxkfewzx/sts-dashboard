@@ -1,0 +1,37 @@
+/**
+ * Shadow Tokens
+ * Layered elevation system per DESIGN_PLAN.md
+ * Cards: no shadow by default, only hairline border
+ * Shadows only on: modals, dropdowns, elevated states
+ */
+
+:root {
+  /* Shadow color uses --shadow-color from colors.css */
+  /* Base shadows */
+  --shadow-xs: 0 1px 2px var(--shadow-color), 0 1px 1px var(--shadow-color);
+  --shadow-sm: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  --shadow-md: 0 4px 8px rgba(13,13,18,0.06), 0 2px 4px rgba(13,13,18,0.04);
+  --shadow-lg: 0 12px 24px rgba(13,13,18,0.08), 0 4px 8px rgba(13,13,18,0.05);
+  --shadow-xl: 0 20px 25px rgba(13,13,18,0.1), 0 10px 10px rgba(13,13,18,0.04);
+
+  /* Special shadows */
+  --shadow-inner: inset 0 2px 4px rgba(13,13,18,0.04);
+  --shadow-focus: 0 0 0 3px var(--color-accent-light);
+  --shadow-focus-error: 0 0 0 3px var(--color-danger-light);
+
+  /* Component-specific semantic aliases */
+  --shadow-card:           var(--shadow-sm);
+  --shadow-card-hover:     var(--shadow-md);
+  --shadow-card-elevated:  var(--shadow-md);
+  --shadow-card-elevated-hover: var(--shadow-lg);
+
+  --shadow-modal:          var(--shadow-xl);
+  --shadow-dropdown:       var(--shadow-lg);
+  --shadow-tooltip:        var(--shadow-md);
+  --shadow-toast:          var(--shadow-lg);
+  --shadow-sidebar:        var(--shadow-lg);
+  --shadow-sidebar-open:   var(--shadow-xl);
+
+  /* Legacy aliases */
+  --soft-shadow: var(--shadow-md);
+}

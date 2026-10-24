@@ -1,0 +1,42 @@
+/**
+ * Breakpoint Tokens
+ * Responsive breakpoints per DESIGN_PLAN.md
+ * Mobile-first approach
+ */
+
+:root {
+  /* Breakpoint values (min-width) */
+  --bp-mobile:     320px;  /* Small phones */
+  --bp-mobile-lg:  480px;  /* Large phones */
+  --bp-tablet:     640px;  /* Tablets portrait */
+  --bp-tablet-lg:  768px;  /* Tablets landscape */
+  --bp-desktop:    1024px; /* Desktop / sidebar breakpoint */
+  --bp-desktop-lg: 1280px; /* Large desktop */
+  --bp-wide:       1440px; /* Wide screens - max content width */
+  --bp-ultrawide:  1920px; /* Ultra-wide */
+
+  /* Semantic breakpoint names */
+  --bp-sm:  var(--bp-mobile);
+  --bp-md:  var(--bp-tablet);
+  --bp-lg:  var(--bp-desktop);
+  --bp-xl:  var(--bp-desktop-lg);
+  --bp-2xl: var(--bp-wide);
+
+  /* Container max widths */
+  --container-sm:   100%;
+  --container-md:   var(--bp-tablet);
+  --container-lg:   var(--bp-desktop);
+  --container-xl:   var(--bp-desktop-lg);
+  --container-2xl:  var(--bp-wide);
+  --container-full: 100%;
+
+  /* Sidebar breakpoint */
+  --bp-sidebar-collapse: var(--bp-desktop);  /* 1024px - sidebar becomes drawer */
+
+  /* Media query helpers (for use in CSS) */
+  --mq-mobile:     "(max-width: 639px)";
+  --mq-tablet:     "(min-width: 640px) and (max-width: 1023px)";
+  --mq-desktop:    "(min-width: 1024px) and (max-width: 1439px)";
+  --mq-wide:       "(min-width: 1440px)";
+  --mq-mobile-lg:  "(max-width: 1023px)";   /* Mobile + tablet = sidebar drawer */
+}

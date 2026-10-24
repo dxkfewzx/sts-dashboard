@@ -1,0 +1,105 @@
+/**
+ * Typography Tokens
+ * IBM Plex Sans Thai + IBM Plex Mono per DESIGN_PLAN.md
+ * Type scale with Thai-appropriate line heights
+ */
+
+:root {
+  /* Font Families - Original Prompt font per user preference */
+  --font-sans: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* Type Scale - Original values from old App.css */
+  --text-xs:     0.7rem;      /* 11.2px - metadata, timestamps */
+  --text-sm:     0.8rem;      /* 12.8px - table cells, form labels */
+  --text-base:   0.9rem;      /* 14.4px - body copy */
+  --text-lg:     1rem;        /* 16px - emphasized body */
+  --text-xl:     1.125rem;    /* 18px - section headers */
+  --text-2xl:    1.25rem;     /* 20px - page titles */
+  --text-3xl:    1.5rem;      /* 24px - hero numbers (KPIs) */
+  --text-4xl:    3rem;        /* 48px - rarely used, empty states */
+
+  /* Line Heights */
+  --leading-tight:   1.2;   /* Headlines, numbers */
+  --leading-snug:    1.4;   /* Thai body text needs more room for vowel stacking */
+  --leading-normal:  1.6;   /* Latin body text */
+  --leading-relaxed: 1.75;  /* Long-form reading */
+
+  /* Font Weights */
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* Letter Spacing (tracking) */
+  --tracking-tight:  -0.02em;  /* Headlines */
+  --tracking-normal: 0;        /* Body */
+  --tracking-wide:   0.02em;   /* Labels, all-caps (rare for Thai) */
+
+  /* Legacy aliases (kept for reference) */
+  --font-sans-legacy: var(--font-sans);
+  --font-mono-legacy: var(--font-mono);
+
+  --text-xs-legacy:  var(--text-xs);
+  --text-sm-legacy:  var(--text-sm);
+  --text-base-legacy: var(--text-base);
+  --text-lg-legacy:  var(--text-lg);
+  --text-xl-legacy:  var(--text-xl);
+  --text-2xl-legacy: var(--text-2xl);
+  --text-3xl-legacy: var(--text-3xl);
+
+  --font-normal-legacy:   var(--font-normal);
+  --font-medium-legacy:   var(--font-medium);
+  --font-semibold-legacy: var(--font-semibold);
+  --font-bold-legacy:     var(--font-bold);
+}
+
+/* Base typography reset - apply to root elements */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);  /* Thai-appropriate default */
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Monospace for code, serial numbers, IDs */
+code, kbd, samp, pre,
+.font-mono,
+[data-mono] {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* Thai-specific adjustments */
+:lang(th) {
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+/* No all-caps for Thai (meaningless) */
+.thai-no-caps {
+  text-transform: none !important;
+}
+
+/* Focus visible outline */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
