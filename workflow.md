@@ -385,7 +385,7 @@ ON DELETE CASCADE;
 |-------|--------|------------|
 | Phase 1: Design Tokens | ✅ **100%** | 10 token files + tokens.js, App.css cleaned up |
 | Phase 2: Component Library | ✅ **100%** | 13 components created with CSS |
-| Phase 3: Refactor Existing Components | ⏳ **0%** | Modals → Modal, Pages → PageHeader/Table/Card/StatCard/Table, Forms → Input/Select/Button, Badges → Badge |
+| Phase 3: Refactor Existing Components | 🟡 **~30%** | **Modals done** (5/5), Pages → PageHeader/Table/Card/StatCard/Table, Forms → Input/Select/Button, Badges → Badge |
 | Phase 4: Cleanup & Polish | ⏳ **0%** | Remove unused App.css, verify accessibility, update workflow |
 
 ### ไฟล์ที่สร้างใหม่ใน Phase 2 (26 ไฟล์ + 1 index):
@@ -413,8 +413,29 @@ src/components/ui/
 2. **CSS Bundle Size:** 5.35 kB (gzip) - ลดลงเล็กน้อยจากเดิม
 3. **Components:** ทุก component ใช้ design tokens อย่างเต็มที่, รองรับ reduced motion, มี ARIA attributes
 
-### ขั้นตอนต่อไป (Phase 3)
-- [ ] Refactor 5 Modals (AddSNModal, BulkAddSNModal, EditSNModal, ReturnModal, HistoryModal) ใช้ `Modal` + `Form` components
+### Phase 3 Progress: Modal Refactor Complete ✅
+
+**Modals refactored to use new component library (5/5):**
+
+| Modal | Before | After | Components Used |
+|-------|--------|-------|-----------------|
+| `AddSNModal.jsx` | Bootstrap modal + form | `Modal` + `Input` + `Select` + `Button` | 4 |
+| `BulkAddSNModal.jsx` | Bootstrap modal + form | `Modal` + `Input` + `Select` + `Button` + `Badge` | 5 |
+| `EditSNModal.jsx` | Bootstrap modal + form | `Modal` + `Input` + `Select` + `Button` | 4 |
+| `ReturnModal.jsx` | Bootstrap modal + form | `Modal` + `Input` + `Select` + `Button` | 4 |
+| `HistoryModal.jsx` | Bootstrap modal + table | `Modal` + `Table` + `Button` + `Badge` | 4 |
+
+**Details.js** - Updated to use new prop names (`isOpen`/`onClose` instead of `show`/`onHide`)
+
+**Key improvements:**
+- Replaced ~700 lines of Bootstrap modal markup with reusable `Modal` component
+- Replaced form fields with `Input`/`Select` components (consistent validation, error handling, accessibility)
+- Replaced buttons with `Button` component (loading states, variants, icons)
+- `HistoryModal` uses new `Table` component with sorting, responsive scroll, empty state
+- All modals: Portal-based, focus trap, ESC close, backdrop click, ARIA attributes
+- Mobile responsive: proper touch targets, no horizontal overflow
+
+### ขั้นตอนต่อไป (Phase 3 - Remaining)
 - [ ] Refactor 5 Pages (DashboardContent, InventoryList, Details, Report, RepairDetails) ใช้ `PageHeader`, `StatCard`, `Table`, `Card`, `Tabs`
 - [ ] Refactor Sidebar ใช้ `Sidebar` component ใหม่
 - [ ] Refactor Forms ทั้งหมด ใช้ `Input`, `Select`, `Button`

@@ -1,9 +1,13 @@
-import React from 'react';
-import { INITIAL_BULK_FORM, SN_STATUS_OPTIONS } from '../../constants/snForms';
+import React, { useMemo } from 'react';
+import { Modal, Input, Select, Button, Badge } from '../../components/ui';
+import { SN_STATUS_OPTIONS } from '../../constants/snForms';
 
+/**
+ * Bulk Add SN Modal - Form for adding multiple serial numbers
+ */
 const BulkAddSNModal = ({
-  show,
-  onHide,
+  isOpen,
+  onClose,
   onSubmit,
   formData,
   onChange,
@@ -12,182 +16,144 @@ const BulkAddSNModal = ({
   buildings,
   isSubmitting = false,
 }) => {
-  if (!show) return null;
+  const snCount = useMemo(() =>
+    formData.serial_numbers
+      .split('\n')
+      .map(s => s.trim())
+      .filter(s => s.length > 0).length,
+    [formData.serial_numbers]
+  );
 
-  const snCount = formData.serial_numbers
-    .split('\n')
-    .map(s => s.trim())
-    .filter(s => s.length > 0).length;
+  if (!isOpen) return null;
 
   return (
-    <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-hidden="false">
-      <div className="modal-dialog modal-dialog-centered modal-lg">
-        <form onSubmit={onSubmit} className="modal-content border-0 shadow-lg rounded-4">
-          <div className="modal-header border-0 p-4 pb-0">
-            <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่องหลายรายการ</h5>
-            <button type="button" className="btn-close" onClick={onHide}></button>
-          </div>
-          <div className="modal-body p-4">
-            <div className="mb-3">
-              <label className="form-label small fw-bold">หมายเลขเครื่อง <span className="text-danger">*</span></label>
-              <textarea
-                name="serial_numbers"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                rows="6"
-                placeholder="กรอกหมายเลขเครื่องทีละบรรทัด เช่น:
-SN001
-SN002
-SN003"
-                value={formData.serial_numbers}
-                onChange={onChange}
-                required
-              />
-              <div className="form-text">แต่ละบรรทัด = 1 หมายเลขเครื่อง (ขั้นต่ำ 1 รายการ)</div>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">ยี่ห้อ (ใช้ร่วมกันทั้งหมด)</label>
-              <input
-                type="text"
-                name="brand"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                placeholder="ระบุยี่ห้อ (ถ้ามี)..."
-                value={formData.brand}
-                onChange={onChange}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">สถานะ (ใช้ร่วมกันทั้งหมด)</label>
-              <select
-                name="status"
-                className="form-select border-0 bg-light p-3 rounded-3"
-                value={formData.status}
-                onChange={onChange}
-              >
-                {SN_STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">เลข Job (ใช้ร่วมกันทั้งหมด)</label>
-              <input
-                type="text"
-                name="job_number"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.job_number}
-                onChange={onChange}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">ชื่อผู้เบิก (ใช้ร่วมกันทั้งหมด)</label>
-              <input
-                type="text"
-                name="withdrawer_name"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.withdrawer_name}
-                onChange={onChange}
-              />
-            </div>
-            <div className="row g-2">
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">แผนก (ใช้ร่วมกันทั้งหมด)</label>
-                <select
-                  name="dept_used"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.dept_used}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกแผนก --</option>
-                  {filteredDepartments.map(dept => (
-                    <option key={dept.id} value={dept.name}>{dept.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">อาคาร (ใช้ร่วมกันทั้งหมด)</label>
-                <select
-                  name="building"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.building}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกอาคาร --</option>
-                  {buildings.map(building => (
-                    <option key={building.id} value={building.name}>{building.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="row g-2">
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">ชั้น (ใช้ร่วมกันทั้งหมด)</label>
-                <select
-                  name="floor"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.floor}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกชั้น --</option>
-                  {filteredFloors.map(floor => (
-                    <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">วันที่รับ (ใช้ร่วมกันทั้งหมด)</label>
-                <input
-                  type="date"
-                  name="receive_date"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={formData.receive_date}
-                  onChange={onChange}
-                />
-              </div>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">วันที่เบิก (ใช้ร่วมกันทั้งหมด)</label>
-              <input
-                type="date"
-                name="withdraw_date"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.withdraw_date}
-                onChange={onChange}
-              />
-            </div>
-            <div className="alert alert-info small mb-0">
-              <i className="bi bi-info-circle me-1"></i>
-              จะเพิ่มหมายเลขเครื่องจำนวน {snCount} รายการ
-            </div>
-          </div>
-          <div className="modal-footer border-0 p-4 pt-0">
-            <button
-              type="button"
-              className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-              onClick={onHide}
-              disabled={isSubmitting}
-            >
-              ยกเลิก
-            </button>
-            <button
-              type="submit"
-              className="btn btn-success px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-              style={{ background: 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)' }}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="d-flex align-items-center gap-2">
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  กำลังเพิ่ม...
-                </span>
-              ) : (
-                <><i className="bi bi-plus-square me-1"></i> เพิ่มทั้งหมด</>
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="เพิ่มหมายเลขเครื่องหลายรายการ"
+      size="lg"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+            ยกเลิก
+          </Button>
+          <Button variant="success" type="submit" disabled={isSubmitting} loading={isSubmitting} leftIcon={<i className="bi bi-plus-square me-1"></i>}>
+            เพิ่มทั้งหมด
+          </Button>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit}>
+        <Input
+          name="serial_numbers"
+          label="หมายเลขเครื่อง"
+          placeholder="กรอกหมายเลขเครื่องทีละบรรทัด เช่น:\nSN001\nSN002\nSN003"
+          value={formData.serial_numbers}
+          onChange={onChange}
+          required
+          as="textarea"
+          rows={6}
+          helperText="แต่ละบรรทัด = 1 หมายเลขเครื่อง (ขั้นต่ำ 1 รายการ)"
+        />
+
+        <Input
+          name="brand"
+          label="ยี่ห้อ (ใช้ร่วมกันทั้งหมด)"
+          placeholder="ระบุยี่ห้อ (ถ้ามี)..."
+          value={formData.brand}
+          onChange={onChange}
+        />
+
+        <Select
+          name="status"
+          label="สถานะ (ใช้ร่วมกันทั้งหมด)"
+          value={formData.status}
+          onChange={onChange}
+          options={SN_STATUS_OPTIONS}
+        />
+
+        <Input
+          name="job_number"
+          label="เลข Job (ใช้ร่วมกันทั้งหมด)"
+          value={formData.job_number}
+          onChange={onChange}
+        />
+
+        <Input
+          name="withdrawer_name"
+          label="ชื่อผู้เบิก (ใช้ร่วมกันทั้งหมด)"
+          value={formData.withdrawer_name}
+          onChange={onChange}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+          <Select
+            name="dept_used"
+            label="แผนก (ใช้ร่วมกันทั้งหมด)"
+            placeholder="-- เลือกแผนก --"
+            value={formData.dept_used}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกแผนก --' }, ...filteredDepartments.map(d => ({ value: d.name, label: d.name }))]}
+          />
+          <Select
+            name="building"
+            label="อาคาร (ใช้ร่วมกันทั้งหมด)"
+            placeholder="-- เลือกอาคาร --"
+            value={formData.building}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกอาคาร --' }, ...buildings.map(b => ({ value: b.name, label: b.name }))]}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+          <Select
+            name="floor"
+            label="ชั้น (ใช้ร่วมกันทั้งหมด)"
+            placeholder="-- เลือกชั้น --"
+            value={formData.floor}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกชั้น --' }, ...filteredFloors.map(f => ({ value: f.floor_name, label: f.floor_name }))]}
+          />
+          <Input
+            name="receive_date"
+            label="วันที่รับ (ใช้ร่วมกันทั้งหมด)"
+            type="date"
+            value={formData.receive_date}
+            onChange={onChange}
+          />
+        </div>
+
+        <Input
+          name="withdraw_date"
+          label="วันที่เบิก (ใช้ร่วมกันทั้งหมด)"
+          type="date"
+          value={formData.withdraw_date}
+          onChange={onChange}
+        />
+
+        <div style={{
+          marginTop: 'var(--space-md)',
+          padding: 'var(--space-md)',
+          background: 'var(--info-light)',
+          border: '1px solid var(--info)',
+          borderRadius: 'var(--radius-md)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-sm)'
+        }}>
+          <i className="bi bi-info-circle" style={{ color: 'var(--info)', fontSize: '1rem' }} aria-hidden="true"></i>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--info)' }}>
+            จะเพิ่มหมายเลขเครื่องจำนวน
+            <Badge variant="info" size="md" style={{ marginLeft: 'var(--space-xs)' }}>
+              {snCount}
+            </Badge> รายการ
+          </span>
+        </div>
+      </form>
+    </Modal>
   );
 };
+
+BulkAddSNModal.displayName = 'BulkAddSNModal';
 
 export default BulkAddSNModal;

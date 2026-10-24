@@ -541,8 +541,8 @@ const Details = () => {
 
       {/* Modals */}
       <AddSNModal
-        show={showAddSNModal}
-        onHide={() => setShowAddSNModal(false)}
+        isOpen={showAddSNModal}
+        onClose={() => setShowAddSNModal(false)}
         onSubmit={handleAddSNSubmit}
         formData={addSNForm}
         onChange={handleAddSNChange}
@@ -554,8 +554,8 @@ const Details = () => {
       />
 
       <BulkAddSNModal
-        show={showAddBulkSNModal}
-        onHide={() => setShowAddBulkSNModal(false)}
+        isOpen={showAddBulkSNModal}
+        onClose={() => setShowAddBulkSNModal(false)}
         onSubmit={handleAddBulkSNSubmit}
         formData={bulkForm}
         onChange={handleBulkChange}
@@ -565,8 +565,8 @@ const Details = () => {
       />
 
       <EditSNModal
-        show={showEditSNModal}
-        onHide={() => {
+        isOpen={showEditSNModal}
+        onClose={() => {
           setShowEditSNModal(false);
           setEditSN(null);
         }}
@@ -579,8 +579,8 @@ const Details = () => {
       />
 
       <ReturnModal
-        show={showReturnModal}
-        onHide={() => {
+        isOpen={showReturnModal}
+        onClose={() => {
           setShowReturnModal(false);
           setReturnSN(null);
           setReturnForm(INITIAL_RETURN_FORM);
@@ -592,8 +592,8 @@ const Details = () => {
       />
 
       <HistoryModal
-        show={showHistoryModal}
-        onHide={() => {
+        isOpen={showHistoryModal}
+        onClose={() => {
           setShowHistoryModal(false);
           setHistorySN(null);
         }}

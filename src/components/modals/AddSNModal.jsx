@@ -1,9 +1,13 @@
 import React from 'react';
-import { INITIAL_SN_FORM, SN_STATUS_OPTIONS } from '../../constants/snForms';
+import { Modal, Input, Select, Button } from '../../components/ui';
+import { SN_STATUS_OPTIONS } from '../../constants/snForms';
 
+/**
+ * Add SN Modal - Form for adding single serial number
+ */
 const AddSNModal = ({
-  show,
-  onHide,
+  isOpen,
+  onClose,
   onSubmit,
   formData,
   onChange,
@@ -14,170 +18,115 @@ const AddSNModal = ({
   floors,
   isSubmitting = false,
 }) => {
-  if (!show) return null;
+  if (!isOpen) return null;
 
   return (
-    <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-hidden="false">
-      <div className="modal-dialog modal-dialog-centered">
-        <form onSubmit={onSubmit} className="modal-content border-0 shadow-lg rounded-4">
-          <div className="modal-header border-0 p-4 pb-0">
-            <h5 className="modal-title fw-bold">เพิ่มหมายเลขเครื่อง</h5>
-            <button type="button" className="btn-close" onClick={onHide}></button>
-          </div>
-          <div className="modal-body p-4">
-            <div className="mb-3">
-              <label className="form-label small fw-bold">หมายเลขเครื่อง <span className="text-danger">*</span></label>
-              <input
-                type="text"
-                name="serial_number"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                placeholder="ระบุหมายเลขเครื่อง..."
-                value={formData.serial_number}
-                onChange={onChange}
-                required
-                autoFocus
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">ยี่ห้อ</label>
-              <input
-                type="text"
-                name="brand"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                placeholder="ระบุยี่ห้อ (ถ้ามี)..."
-                value={formData.brand}
-                onChange={onChange}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">สถานะ</label>
-              <select
-                name="status"
-                className="form-select border-0 bg-light p-3 rounded-3"
-                value={formData.status}
-                onChange={onChange}
-              >
-                {SN_STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">เลข Job</label>
-              <input
-                type="text"
-                name="job_number"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.job_number}
-                onChange={onChange}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">ชื่อผู้เบิก</label>
-              <input
-                type="text"
-                name="withdrawer_name"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.withdrawer_name}
-                onChange={onChange}
-              />
-            </div>
-            <div className="row g-2">
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">แผนก</label>
-                <select
-                  name="dept_used"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.dept_used}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกแผนก --</option>
-                  {filteredDepartments.map(dept => (
-                    <option key={dept.id} value={dept.name}>{dept.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">อาคาร</label>
-                <select
-                  name="building"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.building}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกอาคาร --</option>
-                  {buildings.map(building => (
-                    <option key={building.id} value={building.name}>{building.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="row g-2">
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">ชั้น</label>
-                <select
-                  name="floor"
-                  className="form-select border-0 bg-light p-3 rounded-3"
-                  value={formData.floor}
-                  onChange={onChange}
-                >
-                  <option value="">-- เลือกชั้น --</option>
-                  {filteredFloors.map(floor => (
-                    <option key={floor.id} value={floor.floor_name}>{floor.floor_name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label small fw-bold">วันที่รับ</label>
-                <input
-                  type="date"
-                  name="receive_date"
-                  className="form-control border-0 bg-light p-3 rounded-3"
-                  value={formData.receive_date}
-                  onChange={onChange}
-                />
-              </div>
-            </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">วันที่เบิก</label>
-              <input
-                type="date"
-                name="withdraw_date"
-                className="form-control border-0 bg-light p-3 rounded-3"
-                value={formData.withdraw_date}
-                onChange={onChange}
-              />
-            </div>
-          </div>
-          <div className="modal-footer border-0 p-4 pt-0">
-            <button
-              type="button"
-              className="btn btn-light px-4 py-2 rounded-3 fw-bold"
-              onClick={onHide}
-              disabled={isSubmitting}
-            >
-              ยกเลิก
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm border-0"
-              style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="d-flex align-items-center gap-2">
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  กำลังบันทึก...
-                </span>
-              ) : (
-                'บันทึกข้อมูล'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="เพิ่มหมายเลขเครื่อง"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+            ยกเลิก
+          </Button>
+          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
+            บันทึกข้อมูล
+          </Button>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit}>
+        <Input
+          name="serial_number"
+          label="หมายเลขเครื่อง"
+          placeholder="ระบุหมายเลขเครื่อง..."
+          value={formData.serial_number}
+          onChange={onChange}
+          required
+          error={formData.serial_number_error}
+          autoFocus
+        />
+
+        <Input
+          name="brand"
+          label="ยี่ห้อ"
+          placeholder="ระบุยี่ห้อ (ถ้ามี)..."
+          value={formData.brand}
+          onChange={onChange}
+        />
+
+        <Select
+          name="status"
+          label="สถานะ"
+          value={formData.status}
+          onChange={onChange}
+          options={SN_STATUS_OPTIONS}
+        />
+
+        <Input
+          name="job_number"
+          label="เลข Job"
+          value={formData.job_number}
+          onChange={onChange}
+        />
+
+        <Input
+          name="withdrawer_name"
+          label="ชื่อผู้เบิก"
+          value={formData.withdrawer_name}
+          onChange={onChange}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+          <Select
+            name="dept_used"
+            label="แผนก"
+            placeholder="-- เลือกแผนก --"
+            value={formData.dept_used}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกแผนก --' }, ...filteredDepartments.map(d => ({ value: d.name, label: d.name }))]}
+          />
+          <Select
+            name="building"
+            label="อาคาร"
+            placeholder="-- เลือกอาคาร --"
+            value={formData.building}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกอาคาร --' }, ...buildings.map(b => ({ value: b.name, label: b.name }))]}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+          <Select
+            name="floor"
+            label="ชั้น"
+            placeholder="-- เลือกชั้น --"
+            value={formData.floor}
+            onChange={onChange}
+            options={[{ value: '', label: '-- เลือกชั้น --' }, ...filteredFloors.map(f => ({ value: f.floor_name, label: f.floor_name }))]}
+          />
+          <Input
+            name="receive_date"
+            label="วันที่รับ"
+            type="date"
+            value={formData.receive_date}
+            onChange={onChange}
+          />
+        </div>
+
+        <Input
+          name="withdraw_date"
+          label="วันที่เบิก"
+          type="date"
+          value={formData.withdraw_date}
+          onChange={onChange}
+        />
+      </form>
+    </Modal>
   );
 };
+
+AddSNModal.displayName = 'AddSNModal';
 
 export default AddSNModal;

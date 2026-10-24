@@ -37,7 +37,8 @@ const Select = React.forwardRef(({
   className = '',
   ...rest
 }, ref) => {
-  const selectId = id || `select-${React.useId()}`;
+  const generatedId = React.useId();
+  const selectId = id || `select-${generatedId}`;
   const errorId = error ? `${selectId}-error` : undefined;
   const helperId = helperText ? `${selectId}-helper` : undefined;
   const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
