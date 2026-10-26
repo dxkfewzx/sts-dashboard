@@ -348,7 +348,7 @@ const InventoryList = () => {
         <Card.Header>
           <div className="d-flex justify-content-between align-items-center">
             <Card.Title className="inventory-table-title">รายการอุปกรณ์ทั้งหมด</Card.Title>
-            <span className="badge badge-secondary">{items.length} รายการ</span>
+            <span className="badge bg-dark">{items.length} รายการ</span>
           </div>
         </Card.Header>
         <Card.Body padding="none">

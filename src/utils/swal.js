@@ -74,6 +74,9 @@ const defaultOptions = {
   // Default width (responsive via CSS)
   width: 'auto',
 
+  // Position - center of screen for all dialogs (toasts use top-end)
+  position: 'center',
+
   // Padding (handled by CSS)
   padding: '0',
 

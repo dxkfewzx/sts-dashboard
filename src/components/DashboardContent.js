@@ -168,7 +168,7 @@ const DashboardContent = () => {
   const itemColumns = [
     { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold', hideInCard: true },
     { key: 'item_name', header: 'รายการ', className: 'fw-medium', cardLabel: 'รายการ' },
-    { key: 'responsible', header: 'ผู้ดูแล', width: '130px', minWidth: '120px', render: (item) => <span className="badge badge-secondary"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</span>, cardLabel: 'ผู้ดูแล' },
+    { key: 'responsible', header: 'ผู้ดูแล', width: '130px', minWidth: '120px', render: (item) => <span className="badge bg-dark"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</span>, cardLabel: 'ผู้ดูแล' },
     { key: 'total_qty', header: 'ทั้งหมด', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-primary">{item.total_qty}</span>, className: 'text-center', cardLabel: 'จำนวนทั้งหมด' },
     { key: 'available', header: 'พร้อมใช้', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-success">{item.total_qty - getWithdrawnCount(item.id) - getRepairCount(item.id)}</span>, className: 'text-center', cardLabel: 'พร้อมใช้' },
     { key: 'withdrawn', header: 'เบิกออก', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-warning">{getWithdrawnCount(item.id)}</span>, className: 'text-center', cardLabel: 'เบิกออก' },
@@ -252,7 +252,7 @@ const DashboardContent = () => {
         <Card.Header>
           <div className="d-flex justify-content-between align-items-center">
             <Card.Title>รายการอุปกรณ์ทั้งหมด</Card.Title>
-            <span className="badge badge-secondary">{totalItems} รายการ</span>
+            <span className="badge bg-dark">{totalItems} รายการ</span>
           </div>
         </Card.Header>
         <Card.Body padding="none">

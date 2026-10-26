@@ -483,3 +483,40 @@
   background: var(--bg-active);
   color: var(--text-primary);
 }
+
+/* Logo Image */
+.ui-sidebar__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+/* Custom logo (React component) */
+.ui-sidebar__logo-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Logo sizes for different states */
+.ui-sidebar__logo .ui-sidebar__logo-img,
+.ui-sidebar__logo .ui-sidebar__logo-custom {
+  width: 36px;
+  height: 36px;
+}
+
+.ui-sidebar__logo-compact .ui-sidebar__logo-img,
+.ui-sidebar__logo-compact .ui-sidebar__logo-custom {
+  width: 32px;
+  height: 32px;
+}
+
+/* Allow custom logo to be larger if needed */
+.ui-sidebar__logo--large .ui-sidebar__logo-img,
+.ui-sidebar__logo--large .ui-sidebar__logo-custom {
+  width: 48px;
+  height: 48px;
+}

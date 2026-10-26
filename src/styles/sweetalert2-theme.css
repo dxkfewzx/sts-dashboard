@@ -19,9 +19,17 @@
   overflow: visible !important; /* Allow animations to overflow */
 }
 
-/* Container z-index - must be above Bootstrap modals (1055) */
+/* Container - must be above Bootstrap modals (1055) and centered */
 .swal2-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  inset: 0 !important;
   z-index: var(--swal2-zindex, 1090) !important;
+  padding: var(--swal2-container-padding, 0.625em) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 
 .swal2-container.swal2-backdrop-show {

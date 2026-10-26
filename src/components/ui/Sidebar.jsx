@@ -16,7 +16,10 @@ import './Sidebar.css';
  * @param {Function} [props.onCollapseChange] - Collapse toggle handler
  * @param {boolean} [props.isOpen] - Mobile open state (controlled)
  * @param {Function} [props.onClose] - Mobile close handler
- * @param {string} [props.isMobile] - Mobile state (from context)
+ * @param {boolean} [props.isMobile] - Mobile state (from context)
+ * @param {string|React.ReactNode} [props.logo] - Company logo: image URL string or React component
+ * @param {string} [props.logoAlt] - Alt text for logo image
+ * @param {string} [props.title] - App title (default: "STS Dashboard")
  * @param {string} [props.className] - Additional CSS classes
  * @returns {JSX.Element}
  */
@@ -30,7 +33,10 @@ const Sidebar = ({
   onCollapseChange,
   isOpen = false,
   onClose,
-  isMobile = false, // Passed from SidebarContext for consistency
+  isMobile = false,
+  logo,
+  logoAlt = 'Company Logo',
+  title = 'STS Dashboard',
   className = '',
   ...rest
 }) => {
@@ -86,6 +92,18 @@ const Sidebar = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isMobile, isOpen, onClose]);
 
+  // Render logo
+  const renderLogo = () => {
+    if (logo) {
+      if (typeof logo === 'string') {
+        return <img src={logo} alt={logoAlt} className="ui-sidebar__logo-img" aria-hidden="true" />;
+      }
+      return <span className="ui-sidebar__logo-custom" aria-hidden="true">{logo}</span>;
+    }
+    // Default fallback icon
+    return <i className="bi bi-box-seam" aria-hidden="true"></i>;
+  };
+
   const sidebarContent = (
     <aside
       ref={sidebarRef}
@@ -112,14 +130,14 @@ const Sidebar = ({
         {!collapsed && (
           <>
             <div className="ui-sidebar__logo" aria-hidden="true">
-              <i className="bi bi-box-seam"></i>
+              {renderLogo()}
             </div>
-            <span className="ui-sidebar__title">STS Dashboard</span>
+            <span className="ui-sidebar__title">{title}</span>
           </>
         )}
         {collapsed && (
           <div className="ui-sidebar__logo-compact" aria-hidden="true">
-            <i className="bi bi-box-seam"></i>
+            {renderLogo()}
           </div>
         )}
       </div>
@@ -210,14 +228,14 @@ const Sidebar = ({
             {!collapsed && (
               <>
                 <div className="ui-sidebar__logo" aria-hidden="true">
-                  <i className="bi bi-box-seam"></i>
+                  {renderLogo()}
                 </div>
-                <span className="ui-sidebar__title">STS Dashboard</span>
+                <span className="ui-sidebar__title">{title}</span>
               </>
             )}
             {collapsed && (
               <div className="ui-sidebar__logo-compact" aria-hidden="true">
-                <i className="bi bi-box-seam"></i>
+                {renderLogo()}
               </div>
             )}
             {/* Mobile close button */}

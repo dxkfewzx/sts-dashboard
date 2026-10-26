@@ -40,7 +40,7 @@
 }
 
 .ui-input--has-icon {
-  padding-left: calc(var(--space-md) * 2 + 1.25rem);
+  padding-left: 4rem !important;
 }
 
 .ui-input {

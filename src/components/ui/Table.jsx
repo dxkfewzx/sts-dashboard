@@ -178,7 +178,7 @@ const Table = ({
                     style={{ width: column.width }}
                   >
                     <div className="ui-table__th-content">
-                      <span>{column.label}</span>
+                      <span>{column.header || column.label}</span>
                     </div>
                   </th>
                 ))}
@@ -249,7 +249,7 @@ const Table = ({
                 aria-sort={sortKey === column.key ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
                 <div className="ui-table__th-content">
-                  <span>{column.label}</span>
+                  <span>{column.header || column.label}</span>
                   {column.sortable && getSortIcon(column.key)}
                 </div>
               </th>

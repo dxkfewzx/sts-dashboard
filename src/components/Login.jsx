@@ -4,7 +4,17 @@ import { useAuth } from '../hooks/useAuth';
 import { swalError } from '../utils/swal';
 import './Login.css';
 
-export default function Login() {
+/**
+ * Login Component
+ *
+ * @param {Object} props
+ * @param {string|React.ReactNode} [props.logo] - Company logo: image URL string or React component
+ * @param {string} [props.logoAlt] - Alt text for logo image (default: "Company Logo")
+ * @param {string} [props.title] - Page title (default: "เข้าสู่ระบบ")
+ * @param {string} [props.subtitle] - Page subtitle (default: "ระบบจัดการสต็อกอุปกรณ์ (STS)")
+ * @returns {JSX.Element}
+ */
+export default function Login({ logo, logoAlt = 'Company Logo', title = 'เข้าสู่ระบบ', subtitle = 'ระบบจัดการสต็อกอุปกรณ์ (STS)' }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,16 +38,28 @@ export default function Login() {
     setLoading(false);
   };
 
+  // Render logo
+  const renderLogo = () => {
+    if (logo) {
+      if (typeof logo === 'string') {
+        return <img src={logo} alt={logoAlt} className="login-logo-img" aria-hidden="true" />;
+      }
+      return <span className="login-logo-custom" aria-hidden="true">{logo}</span>;
+    }
+    // Default fallback icon
+    return <i className="bi bi-shield-lock-fill fs-1 text-white" aria-hidden="true"></i>;
+  };
+
   return (
     <div className="login-container d-flex align-items-center justify-content-center vh-100">
       <div className="card login-card shadow-lg border-0 w-100">
         <div className="card-body login-card-body p-5">
           <div className="text-center mb-4">
             <div className="login-icon-wrapper d-inline-flex align-items-center justify-content-center mb-3" aria-hidden="true">
-              <i className="bi bi-shield-lock-fill fs-1 text-white"></i>
+              {renderLogo()}
             </div>
-            <h2 className="login-title fw-bold mb-1">เข้าสู่ระบบ</h2>
-            <p className="login-subtitle text-muted mb-0">ระบบจัดการสต็อกอุปกรณ์ (STS)</p>
+            <h2 className="login-title fw-bold mb-1">{title}</h2>
+            <p className="login-subtitle text-muted mb-0">{subtitle}</p>
           </div>
 
           <form className="login-form" onSubmit={handleSubmit} noValidate>
