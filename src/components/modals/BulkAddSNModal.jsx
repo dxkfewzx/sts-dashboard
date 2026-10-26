@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Modal, Input, Select, Button, Badge } from '../../components/ui';
 import { SN_STATUS_OPTIONS } from '../../constants/snForms';
+import './BulkAddSNModal.css';
 
 /**
  * Bulk Add SN Modal - Form for adding multiple serial numbers
@@ -86,7 +87,7 @@ const BulkAddSNModal = ({
           onChange={onChange}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+        <div className="form-grid-auto">
           <Select
             name="dept_used"
             label="แผนก (ใช้ร่วมกันทั้งหมด)"
@@ -105,7 +106,7 @@ const BulkAddSNModal = ({
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+        <div className="form-grid-auto">
           <Select
             name="floor"
             label="ชั้น (ใช้ร่วมกันทั้งหมด)"
@@ -131,20 +132,11 @@ const BulkAddSNModal = ({
           onChange={onChange}
         />
 
-        <div style={{
-          marginTop: 'var(--space-md)',
-          padding: 'var(--space-md)',
-          background: 'var(--info-light)',
-          border: '1px solid var(--info)',
-          borderRadius: 'var(--radius-md)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-sm)'
-        }}>
-          <i className="bi bi-info-circle" style={{ color: 'var(--info)', fontSize: '1rem' }} aria-hidden="true"></i>
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--info)' }}>
+        <div className="modal-info-box">
+          <i className="bi bi-info-circle" aria-hidden="true"></i>
+          <span>
             จะเพิ่มหมายเลขเครื่องจำนวน
-            <Badge variant="info" size="md" style={{ marginLeft: 'var(--space-xs)' }}>
+            <Badge variant="info" size="md" className="ms-1">
               {snCount}
             </Badge> รายการ
           </span>

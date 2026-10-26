@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
 import { AuthProvider } from './context/AuthContext';
@@ -13,6 +13,7 @@ import RepairDetails from './components/RepairDetails';
 import Details from './components/Details';
 import Login from './components/Login';
 import { useAuth } from './hooks/useAuth';
+import { initTheme } from './utils/theme';
 import './App.css';
 
 // Supabase configuration
@@ -62,6 +63,7 @@ function AppContent() {
           onCollapseChange={setCollapsed}
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
+          isMobile={isMobile}
         />
       )}
       <main className="main-content">
@@ -123,6 +125,11 @@ function AppContent() {
 }
 
 function App() {
+  // Initialize theme on app startup
+  useEffect(() => {
+    initTheme();
+  }, []);
+
   return (
     <AuthProvider supabase={supabase}>
       <DataProvider supabase={supabase}>

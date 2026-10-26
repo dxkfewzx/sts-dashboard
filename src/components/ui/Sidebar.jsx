@@ -16,6 +16,7 @@ import './Sidebar.css';
  * @param {Function} [props.onCollapseChange] - Collapse toggle handler
  * @param {boolean} [props.isOpen] - Mobile open state (controlled)
  * @param {Function} [props.onClose] - Mobile close handler
+ * @param {string} [props.isMobile] - Mobile state (from context)
  * @param {string} [props.className] - Additional CSS classes
  * @returns {JSX.Element}
  */
@@ -29,18 +30,33 @@ const Sidebar = ({
   onCollapseChange,
   isOpen = false,
   onClose,
+  isMobile = false, // Passed from SidebarContext for consistency
   className = '',
   ...rest
 }) => {
   const sidebarRef = useRef(null);
   const previousActiveElement = useRef(null);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+  const scrollbarWidthRef = useRef(0);
 
-  // Mobile: trap focus, prevent body scroll
+  // Calculate scrollbar width to prevent layout shift
+  const getScrollbarWidth = () => {
+    if (typeof window === 'undefined') return 0;
+    return window.innerWidth - document.documentElement.clientWidth;
+  };
+
+  // Mobile: trap focus, prevent body scroll (with scrollbar compensation)
   useEffect(() => {
     if (!isMobile || !isOpen) return;
 
     previousActiveElement.current = document.activeElement;
+
+    // Save scrollbar width and compensate to prevent layout shift
+    const scrollbarWidth = getScrollbarWidth();
+    scrollbarWidthRef.current = scrollbarWidth;
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
     document.body.style.overflow = 'hidden';
 
     const focusableElements = sidebarRef.current?.querySelectorAll(
@@ -51,6 +67,7 @@ const Sidebar = ({
 
     return () => {
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
       previousActiveElement.current?.focus();
     };
   }, [isMobile, isOpen]);
@@ -109,7 +126,7 @@ const Sidebar = ({
 
       {/* Navigation */}
       <nav className="ui-sidebar__nav" aria-label="นำทางหลัก">
-        <ul className="ui-sidebar__list" role="list">
+        <ul className="ui-sidebar__list">
           {items.map((item) => (
             <li key={item.id} className="ui-sidebar__item">
               <button
@@ -203,11 +220,22 @@ const Sidebar = ({
                 <i className="bi bi-box-seam"></i>
               </div>
             )}
+            {/* Mobile close button */}
+            {isMobile && onClose && (
+              <button
+                type="button"
+                className="ui-sidebar__mobile-close"
+                onClick={onClose}
+                aria-label="ปิดเมนู"
+              >
+                <i className="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            )}
           </div>
 
           {/* Navigation */}
           <nav className="ui-sidebar__nav" aria-label="นำทางหลัก">
-            <ul className="ui-sidebar__list" role="list">
+            <ul className="ui-sidebar__list">
               {items.map((item) => (
                 <li key={item.id} className="ui-sidebar__item">
                   <button

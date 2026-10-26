@@ -1,0 +1,26 @@
+/**
+ * BulkAddSNModal Component Styles
+ * Uses design tokens
+ */
+
+.modal-info-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: var(--info-light);
+  border: 1px solid var(--info);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--info);
+}
+
+.modal-info-box .bi {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.modal-info-box .badge {
+  margin-left: var(--space-xs);
+}

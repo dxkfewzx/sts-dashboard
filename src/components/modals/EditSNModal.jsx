@@ -74,7 +74,7 @@ const EditSNModal = ({
           onChange={onChange}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+        <div className="form-grid-auto">
           <Select
             name="dept_used"
             label="แผนก"
@@ -93,7 +93,7 @@ const EditSNModal = ({
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+        <div className="form-grid-auto">
           <Select
             name="floor"
             label="ชั้น"

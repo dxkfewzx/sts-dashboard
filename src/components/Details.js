@@ -32,6 +32,7 @@ import {
   Badge,
   Button,
 } from '../components/ui';
+import './Details.css';
 
 const Details = () => {
   const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
@@ -47,7 +48,7 @@ const Details = () => {
         aria-expanded={isSidebarOpen}
         className="mobile-menu-toggle"
       >
-        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }} />
+        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} />
       </Button>
     );
   };
@@ -296,22 +297,22 @@ const Details = () => {
 
   // Tab 1: Serial Numbers Table
   const serialColumns = [
-    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center' },
-    { key: 'serial_number', header: 'หมายเลขเครื่อง', width: '130px', minWidth: '110px', render: (sn) => <span className="text-truncate fw-medium" title={sn.serial_number}>{sn.serial_number}</span> },
-    { key: 'brand', header: 'ยี่ห้อ', width: '80px', minWidth: '70px', render: (sn) => <span className="text-truncate" title={sn.brand || ''}>{sn.brand || '-'}</span> },
-    { key: 'status', header: 'สถานะ', width: '90px', minWidth: '80px', className: 'text-center', render: (sn) => <Badge variant={getSNStatusBadgeClass(sn.status).replace('badge-', '')}>{getSNStatusText(sn.status)}</Badge> },
-    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.job_number || ''}>{sn.job_number || '-'}</span> },
-    { key: 'withdrawer_name', header: 'ผู้เบิก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.withdrawer_name || ''}>{sn.withdrawer_name || '-'}</span> },
-    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.dept_used || ''}>{sn.dept_used || '-'}</span> },
-    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.building + (sn.floor ? ' (ชั้น ' + sn.floor + ')' : '')}>{sn.building || '-'} {sn.floor && <span className="text-muted"> (ชั้น {sn.floor})</span>}</span> },
-    { key: 'receive_date', header: 'วันที่รับ', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.receive_date ? new Date(sn.receive_date).toLocaleDateString() : '-'}</span>, className: 'text-center' },
-    { key: 'withdraw_date', header: 'วันที่เบิก', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.withdraw_date ? new Date(sn.withdraw_date).toLocaleDateString() : '-'}</span>, className: 'text-center' },
+    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center col-priority-low', hideInCard: true },
+    { key: 'serial_number', header: 'หมายเลขเครื่อง', width: '130px', minWidth: '110px', render: (sn) => <span className="text-truncate fw-medium" title={sn.serial_number}>{sn.serial_number}</span>, cardLabel: 'หมายเลขเครื่อง', className: 'col-priority-high' },
+    { key: 'brand', header: 'ยี่ห้อ', width: '80px', minWidth: '70px', render: (sn) => <span className="text-truncate" title={sn.brand || ''}>{sn.brand || '-'}</span>, cardLabel: 'ยี่ห้อ', className: 'col-priority-medium' },
+    { key: 'status', header: 'สถานะ', width: '90px', minWidth: '80px', className: 'text-center col-priority-high', render: (sn) => <Badge variant={getSNStatusBadgeClass(sn.status).replace('badge-', '')}>{getSNStatusText(sn.status)}</Badge>, cardLabel: 'สถานะ' },
+    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.job_number || ''}>{sn.job_number || '-'}</span>, cardLabel: 'เลข Job', className: 'col-priority-medium' },
+    { key: 'withdrawer_name', header: 'ผู้เบิก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.withdrawer_name || ''}>{sn.withdrawer_name || '-'}</span>, cardLabel: 'ผู้เบิก', className: 'col-priority-medium' },
+    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.dept_used || ''}>{sn.dept_used || '-'}</span>, cardLabel: 'แผนก', className: 'col-priority-low' },
+    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (sn) => <span className="text-truncate" title={sn.building + (sn.floor ? ' (ชั้น ' + sn.floor + ')' : '')}>{sn.building || '-'} {sn.floor && <span className="text-muted"> (ชั้น {sn.floor})</span>}</span>, cardLabel: 'อาคาร/ชั้น', className: 'col-priority-low' },
+    { key: 'receive_date', header: 'วันที่รับ', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.receive_date ? new Date(sn.receive_date).toLocaleDateString() : '-'}</span>, className: 'text-center col-priority-low', cardLabel: 'วันที่รับ' },
+    { key: 'withdraw_date', header: 'วันที่เบิก', width: '90px', minWidth: '80px', render: (sn) => <span className="text-muted small">{sn.withdraw_date ? new Date(sn.withdraw_date).toLocaleDateString() : '-'}</span>, className: 'text-center col-priority-low', cardLabel: 'วันที่เบิก' },
     {
       key: 'actions',
       header: 'การจัดการ',
       width: '90px',
       minWidth: '90px',
-      className: 'text-center',
+      className: 'text-center col-priority-high',
       render: (sn) => (
         <div className="d-flex justify-content-center gap-1">
           <Button
@@ -357,9 +358,8 @@ const Details = () => {
             <i className="bi bi-clock-history" />
           </Button>
           <Button
-            variant="ghost"
+            variant="danger"
             size="sm"
-            color="danger"
             onClick={() => handleDeleteSN(sn.id)}
             title="ลบ"
           >
@@ -372,24 +372,24 @@ const Details = () => {
 
   // Tab 2: History Table
   const historyColumns = [
-    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => index + 1, className: 'text-muted fw-bold text-center' },
+    { key: 'index', header: '#', width: '40px', minWidth: '40px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center col-priority-low', hideInCard: true },
     { key: 'serial_number', header: 'หมายเลขเครื่อง', width: '130px', minWidth: '110px', render: (log) => {
       const sn = itemSerialNumbers.find(s => s.id === log.serial_number_id);
       return <span className="fw-medium">{sn?.serial_number || '-'}</span>;
-    }},
-    { key: 'action', header: 'การกระทำ', width: '90px', minWidth: '80px', className: 'text-center', render: (log) => <Badge variant={getWithdrawalActionBadgeClass(log.action).replace('badge-', '')}>{getWithdrawalActionText(log.action)}</Badge> },
-    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (log) => log.job_number || '-' },
-    { key: 'person', header: 'ผู้เบิก / ผู้คืน', width: '100px', minWidth: '90px', render: (log) => log.action === 'withdraw' ? log.withdrawer_name : log.receiver_name },
-    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (log) => log.dept_used || '-' },
-    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (log) => `${log.building || '-'} ${log.floor ? ' (ชั้น ' + log.floor + ')' : ''}` },
-    { key: 'condition', header: 'สภาพ', width: '80px', minWidth: '70px', render: (log) => log.condition || '-' },
-    { key: 'note', header: 'หมายเหตุ', width: '150px', minWidth: '120px', render: (log) => <span className="text-truncate" title={log.note || ''} style={{ maxWidth: '200px', display: 'inline-block' }}>{log.note || '-'}</span> },
-    { key: 'performed_by', header: 'ผู้บันทึก', width: '90px', minWidth: '80px', render: (log) => log.performed_by || '-' },
-    { key: 'performed_at', header: 'วันที่/เวลา', width: '140px', minWidth: '130px', render: (log) => <span className="text-muted small">{log.performed_at ? new Date(log.performed_at).toLocaleString() : '-'}</span>, className: 'text-center' },
+    }, cardLabel: 'หมายเลขเครื่อง', className: 'col-priority-high' },
+    { key: 'action', header: 'การกระทำ', width: '90px', minWidth: '80px', className: 'text-center col-priority-high', render: (log) => <Badge variant={getWithdrawalActionBadgeClass(log.action).replace('badge-', '')}>{getWithdrawalActionText(log.action)}</Badge>, cardLabel: 'การกระทำ' },
+    { key: 'job_number', header: 'เลข Job', width: '100px', minWidth: '90px', render: (log) => log.job_number || '-', cardLabel: 'เลข Job', className: 'col-priority-medium' },
+    { key: 'person', header: 'ผู้เบิก / ผู้คืน', width: '100px', minWidth: '90px', render: (log) => log.action === 'withdraw' ? log.withdrawer_name : log.receiver_name, cardLabel: 'ผู้เกี่ยวข้อง', className: 'col-priority-medium' },
+    { key: 'dept_used', header: 'แผนก', width: '100px', minWidth: '90px', render: (log) => log.dept_used || '-', cardLabel: 'แผนก', className: 'col-priority-low' },
+    { key: 'building_floor', header: 'อาคาร/ชั้น', width: '100px', minWidth: '90px', render: (log) => `${log.building || '-'} ${log.floor ? ' (ชั้น ' + log.floor + ')' : ''}`, cardLabel: 'อาคาร/ชั้น', className: 'col-priority-low' },
+    { key: 'condition', header: 'สภาพ', width: '80px', minWidth: '70px', render: (log) => log.condition || '-', cardLabel: 'สภาพ', className: 'col-priority-low' },
+    { key: 'note', header: 'หมายเหตุ', width: '150px', minWidth: '120px', render: (log) => <span className="history-note-cell text-truncate" title={log.note || ''}>{log.note || '-'}</span>, cardLabel: 'หมายเหตุ', className: 'col-priority-low' },
+    { key: 'performed_by', header: 'ผู้บันทึก', width: '90px', minWidth: '80px', render: (log) => log.performed_by || '-', cardLabel: 'ผู้บันทึก', className: 'col-priority-low' },
+    { key: 'performed_at', header: 'วันที่/เวลา', width: '140px', minWidth: '130px', render: (log) => <span className="text-muted small">{log.performed_at ? new Date(log.performed_at).toLocaleString() : '-'}</span>, className: 'text-center col-priority-low', cardLabel: 'วันที่/เวลา' },
   ];
 
   return (
-    <div>
+    <div className="details-page">
       {/* Page Header */}
       <PageHeader
         title={`รายละเอียดอุปกรณ์: ${item.item_name}`}
@@ -426,11 +426,11 @@ const Details = () => {
       />
 
       {/* General Info Card */}
-      <Card variant="outlined" className="mb-4">
+      <Card variant="outlined" className="details-info-card mb-4">
         <Card.Body className="py-3">
           <div className="d-flex flex-wrap gap-4 align-items-center">
-            <span className="fw-bold text-primary small">ข้อมูลทั่วไป</span>
-            <div className="d-flex flex-wrap gap-4 text-sm">
+            <span className="card-label">ข้อมูลทั่วไป</span>
+            <div className="info-item">
               <span><strong>ชื่อรายการ:</strong> {item.item_name}</span>
               <span><strong>จำนวนรวม:</strong> {item.total_qty} {item.unit}</span>
               <span><strong>ผู้รับผิดชอบ:</strong> {item.responsible || '-'}</span>
@@ -455,7 +455,7 @@ const Details = () => {
         />
 
         {/* Tab Panel: Serial Numbers */}
-        <div role="tabpanel" hidden={activeTab !== 'serials'} style={{ display: activeTab === 'serials' ? 'block' : 'none' }}>
+        <div className="details-tab-panel" role="tabpanel" hidden={activeTab !== 'serials'}>
           <Card.Body padding="none" className="p-0">
             <Table
               columns={serialColumns}
@@ -468,13 +468,14 @@ const Details = () => {
               striped
               hoverable
               responsive
+              cardLayout
               minWidth={1000}
             />
           </Card.Body>
         </div>
 
         {/* Tab Panel: History */}
-        <div role="tabpanel" hidden={activeTab !== 'history'} style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
+        <div className="details-tab-panel" role="tabpanel" hidden={activeTab !== 'history'}>
           <Card.Body padding="none" className="p-0">
             <Table
               columns={historyColumns}
@@ -487,17 +488,18 @@ const Details = () => {
               striped
               hoverable
               responsive
+              cardLayout
               minWidth={1100}
             />
           </Card.Body>
         </div>
 
         {/* Tab Panel: Stats */}
-        <div role="tabpanel" hidden={activeTab !== 'stats'} style={{ display: activeTab === 'stats' ? 'block' : 'none' }}>
+        <div className="details-tab-panel" role="tabpanel" hidden={activeTab !== 'stats'}>
           <Card.Body>
-            <div className="row g-3">
+            <div className="details-stats-grid">
               {stats.map((stat, index) => (
-                <div key={index} className="col-6 col-md-3">
+                <div key={index}>
                   <StatCard
                     label={stat.label}
                     value={stat.value}

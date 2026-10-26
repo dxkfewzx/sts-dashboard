@@ -18,6 +18,7 @@ import {
   Badge,
   IconButton,
 } from '../components/ui';
+import './RepairDetails.css';
 
 const RepairDetails = () => {
   const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
@@ -26,15 +27,14 @@ const RepairDetails = () => {
     if (!isMobile) return null;
     return (
       <Button
-        variant="ghost"
+        variant="secondary"
         size="icon"
+        leftIcon={<i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} />}
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
         aria-expanded={isSidebarOpen}
         className="mobile-menu-toggle"
-      >
-        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }} />
-      </Button>
+      />
     );
   };
 
@@ -155,21 +155,21 @@ const RepairDetails = () => {
 
   // Table columns
   const columns = [
-    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center' },
-    { key: 'device_name', header: 'ชื่ออุปกรณ์ / SN', render: (repair) => repair.device_name },
-    { key: 'symptom', header: 'อาการเสีย', render: (repair) => repair.symptom || '-' },
-    { key: 'status', header: 'สถานะ', width: '140px', minWidth: '120px', className: 'text-center', render: (repair) => <Badge variant={getRepairStatusBadgeClass(repair.status).replace('badge-', '')}>{getRepairStatusText(repair.status)}</Badge> },
-    { key: 'created_at', header: 'วันที่แจ้ง', width: '140px', minWidth: '120px', className: 'text-center', render: (repair) => <span className="text-muted small">{new Date(repair.created_at).toLocaleDateString()}</span> },
+    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center col-priority-low', hideInCard: true },
+    { key: 'device_name', header: 'ชื่ออุปกรณ์ / SN', render: (repair) => repair.device_name, cardLabel: 'ชื่ออุปกรณ์/SN', className: 'col-priority-high' },
+    { key: 'symptom', header: 'อาการเสีย', render: (repair) => repair.symptom || '-', cardLabel: 'อาการเสีย', className: 'col-priority-high' },
+    { key: 'status', header: 'สถานะ', width: '140px', minWidth: '120px', className: 'text-center col-priority-high', render: (repair) => <Badge variant={getRepairStatusBadgeClass(repair.status).replace('badge-', '')}>{getRepairStatusText(repair.status)}</Badge>, cardLabel: 'สถานะ' },
+    { key: 'created_at', header: 'วันที่แจ้ง', width: '140px', minWidth: '120px', className: 'text-center col-priority-medium', render: (repair) => <span className="text-muted small">{new Date(repair.created_at).toLocaleDateString()}</span>, cardLabel: 'วันที่แจ้ง' },
     {
       key: 'actions',
       header: 'การจัดการ',
       width: '120px',
       minWidth: '110px',
-      className: 'text-center',
+      className: 'text-center col-priority-high',
       render: (repair) => (
         <div className="d-flex justify-content-center gap-1">
           <IconButton
-            variant="ghost"
+            variant="secondary"
             size="sm"
             onClick={() => {
               setEditRepair({
@@ -181,17 +181,16 @@ const RepairDetails = () => {
               setShowEditModal(true);
             }}
             title="แก้ไข"
-            aria-label={`แก้ไข ${repair.device_name}`}
+            ariaLabel={`แก้ไข ${repair.device_name}`}
           >
             <i className="bi bi-pencil-fill" />
           </IconButton>
           <IconButton
-            variant="ghost"
+            variant="danger"
             size="sm"
-            color="danger"
             onClick={() => handleDeleteRepair(repair.id, repair.device_name)}
             title="ลบ"
-            aria-label={`ลบ ${repair.device_name}`}
+            ariaLabel={`ลบ ${repair.device_name}`}
           >
             <i className="bi bi-trash3-fill" />
           </IconButton>
@@ -201,7 +200,7 @@ const RepairDetails = () => {
   ];
 
   return (
-    <div>
+    <div className="repair-details-page">
       {/* Page Header */}
       <PageHeader
         title="ประวัติแจ้งซ่อม"
@@ -221,9 +220,9 @@ const RepairDetails = () => {
       />
 
       {/* Overview Cards */}
-      <div className="row g-3 mb-4">
+      <div className="repair-stats-grid">
         {statsCards.map((stat, index) => (
-          <div key={index} className="col-6 col-md-3">
+          <div key={index}>
             <StatCard
               label={stat.label}
               value={stat.value}
@@ -235,9 +234,9 @@ const RepairDetails = () => {
       </div>
 
       {/* Repairs Table */}
-      <Card variant="outlined">
+      <Card variant="outlined" className="repair-table-card">
         <Card.Header>
-          <Card.Title>รายการแจ้งซ่อมทั้งหมด</Card.Title>
+          <Card.Title className="repair-table-title">รายการแจ้งซ่อมทั้งหมด</Card.Title>
         </Card.Header>
         <Card.Body padding="none">
           <Table
@@ -251,7 +250,8 @@ const RepairDetails = () => {
             striped
             hoverable
             responsive
-            minWidth={800}
+            cardLayout
+            
           />
         </Card.Body>
       </Card>

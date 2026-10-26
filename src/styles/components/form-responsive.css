@@ -1,0 +1,891 @@
+/**
+ * Responsive Form Patterns for STS Dashboard
+ * Mobile-first form layouts with Bootstrap 5 compatibility
+ *
+ * Patterns:
+ * 1. Vertical Stack (mobile) → Horizontal (desktop)
+ * 2. Inline Forms
+ * 3. Grid-based Forms
+ * 4. Multi-step Forms
+ * 5. Search/Filter Forms
+ */
+
+/* ==========================================================================
+   Base Form Styles (Enhanced Bootstrap 5)
+   ========================================================================== */
+
+.form-control,
+.form-select,
+.form-check-input,
+.form-check-label,
+.form-floating > label,
+.form-text {
+  font-family: var(--font-sans) !important;
+  font-size: var(--input-font-size) !important;
+}
+
+/* Input sizing */
+.form-control-sm,
+.form-select-sm {
+  min-height: var(--input-height-sm) !important;
+  padding: var(--input-padding-y-sm) var(--input-padding-x-sm) !important;
+  font-size: var(--text-sm) !important;
+  border-radius: var(--input-radius-sm) !important;
+}
+
+.form-control-lg,
+.form-select-lg {
+  min-height: var(--input-height-lg) !important;
+  padding: var(--input-padding-y-lg) var(--input-padding-x-lg) !important;
+  font-size: var(--text-base) !important;
+  border-radius: var(--input-radius-lg) !important;
+}
+
+/* Focus state - consistent across all form elements */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus,
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-select:focus ~ label {
+  border-color: var(--input-border-focus) !important;
+  box-shadow: var(--input-focus-shadow) !important;
+}
+
+/* Error state */
+.form-control.is-invalid,
+.form-select.is-invalid,
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+  border-color: var(--input-border-error) !important;
+  padding-right: calc(var(--input-padding-x) + 1.5rem) !important;
+  background-image: none !important;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus,
+.was-validated .form-control:invalid:focus,
+.was-validated .form-select:invalid:focus {
+  box-shadow: var(--input-focus-error-shadow) !important;
+}
+
+/* Valid state */
+.form-control.is-valid,
+.form-select.is-valid,
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+  border-color: var(--bs-success) !important;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+  box-shadow: 0 0 0 3px var(--color-success-light) !important;
+}
+
+/* Disabled state */
+.form-control:disabled,
+.form-select:disabled,
+.form-control[readonly],
+.form-select[readonly] {
+  background-color: var(--input-bg-disabled) !important;
+  border-color: var(--input-border-disabled) !important;
+  color: var(--input-disabled-color) !important;
+  cursor: not-allowed !important;
+}
+
+/* Placeholder color */
+.form-control::placeholder,
+.form-select::placeholder {
+  color: var(--input-placeholder-color) !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+   Form Labels
+   ========================================================================== */
+
+.form-label {
+  font-size: var(--label-font-size) !important;
+  font-weight: var(--label-font-weight) !important;
+  color: var(--label-color) !important;
+  margin-bottom: var(--label-margin-bottom) !important;
+}
+
+/* Required indicator */
+.form-label.required::after {
+  content: ' *';
+  color: var(--color-danger) !important;
+  font-weight: var(--font-normal) !important;
+}
+
+/* Floating labels (Bootstrap 5) */
+.form-floating {
+  flex: 1 1 auto;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+  height: calc(var(--input-height) + var(--label-margin-bottom) + var(--space-xs)) !important;
+  padding-top: 1.625rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
+.form-floating > label {
+  padding: 1rem 0.75rem !important;
+  font-size: var(--label-font-size) !important;
+  color: var(--label-color) !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+  transform: scale(var(--floating-label-scale)) translateY(var(--floating-label-transform-y)) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ==========================================================================
+   Form Help Text / Validation Feedback
+   ========================================================================== */
+
+.form-text {
+  font-size: var(--help-text-font-size) !important;
+  color: var(--help-text-color) !important;
+  margin-top: var(--help-text-margin-top) !important;
+}
+
+.invalid-feedback,
+.valid-feedback {
+  font-size: var(--help-text-font-size) !important;
+  margin-top: var(--help-text-margin-top) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-xs) !important;
+}
+
+.invalid-feedback::before {
+  content: "⚠" !important;
+  font-size: 0.8em !important;
+}
+
+.valid-feedback::before {
+  content: "✓" !important;
+  font-size: 0.8em !important;
+}
+
+/* ==========================================================================
+   Input Groups
+   ========================================================================== */
+
+.input-group {
+  flex-wrap: wrap !important;
+}
+
+.input-group > .form-control,
+.input-group > .form-select {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.input-group-text {
+  background: var(--bg-page) !important;
+  border: var(--input-border-width) solid var(--input-border) !important;
+  color: var(--text-secondary) !important;
+  padding: var(--input-padding-y) var(--input-padding-x) !important;
+  font-size: var(--input-font-size) !important;
+  font-weight: var(--font-normal) !important;
+  border-radius: var(--input-radius) !important;
+  transition: var(--input-transition) !important;
+}
+
+.input-group:focus-within .input-group-text {
+  border-color: var(--input-border-focus) !important;
+  box-shadow: var(--input-focus-shadow) !important;
+  z-index: 3 !important;
+}
+
+/* Input group with button */
+.input-group .btn {
+  border-radius: var(--btn-radius) !important;
+  padding: var(--btn-padding-y) var(--btn-padding-x) !important;
+  white-space: nowrap !important;
+}
+
+/* ==========================================================================
+   Checkbox & Radio (Bootstrap 5 form-check)
+   ========================================================================== */
+
+.form-check {
+  min-height: 44px !important; /* Touch target */
+  padding-left: calc(var(--checkbox-size) + var(--space-sm)) !important;
+  margin-bottom: var(--space-sm) !important;
+}
+
+.form-check-input {
+  width: var(--checkbox-size) !important;
+  height: var(--checkbox-size) !important;
+  margin-top: calc((44px - var(--checkbox-size)) / 2) !important;
+  margin-left: calc(-1 * (var(--checkbox-size) + var(--space-sm))) !important;
+  border: var(--checkbox-border-width) solid var(--input-border) !important;
+  border-radius: var(--checkbox-border-radius) !important;
+  background-color: var(--input-bg) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  transition: var(--input-transition) !important;
+  cursor: pointer !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--checkbox-checked-bg) !important;
+  border-color: var(--checkbox-checked-border) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.form-check-input[type="radio"] {
+  border-radius: 50% !important;
+}
+
+.form-check-input[type="radio"]:checked {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e") !important;
+}
+
+.form-check-input:focus {
+  border-color: var(--input-border-focus) !important;
+  box-shadow: var(--checkbox-focus-shadow) !important;
+  outline: none !important;
+}
+
+.form-check-input:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.form-check-label {
+  cursor: pointer !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-primary) !important;
+  line-height: var(--leading-body) !important;
+  user-select: none !important;
+}
+
+.form-check-inline {
+  margin-right: var(--space-lg) !important;
+}
+
+/* Switch (toggle) */
+.form-switch .form-check-input {
+  width: 2.5rem !important;
+  height: 1.25rem !important;
+  border-radius: var(--radius-pill) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280,0,0,0.25%29'/%3e%3c/svg%3e") !important;
+  background-position: left center !important;
+  border: none !important;
+}
+
+.form-switch .form-check-input:checked {
+  background-position: right center !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+}
+
+.form-switch .form-check-label {
+  margin-left: var(--space-sm) !important;
+}
+
+/* ==========================================================================
+   Form Grid - Responsive Layouts
+   ========================================================================== */
+
+/* Default: stacked on mobile, horizontal on md+ */
+.form-grid {
+  display: grid !important;
+  gap: var(--form-grid-gutter) !important;
+  grid-template-columns: 1fr !important;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .form-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .form-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* Auto-fit grid: responsive columns with min-width */
+.form-grid-auto {
+  display: grid !important;
+  gap: var(--form-grid-gutter) !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+}
+
+/* Compact auto-fit grid for tighter layouts */
+.form-grid-auto-compact {
+  display: grid !important;
+  gap: var(--space-sm) !important;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+}
+
+/* Form grid with label column (Bootstrap 5 horizontal form) */
+.form-horizontal .row {
+  margin-left: calc(var(--form-label-col-padding) * -1) !important;
+  margin-right: calc(var(--form-control-col-padding) * -1) !important;
+}
+
+.form-horizontal .col-form-label {
+  padding-top: calc(var(--input-padding-y) + var(--border-width-thin)) !important;
+  padding-bottom: calc(var(--input-padding-y) + var(--border-width-thin)) !important;
+  font-size: var(--label-font-size) !important;
+  font-weight: var(--label-font-weight) !important;
+  color: var(--label-color) !important;
+  text-align: right !important;
+}
+
+@media (max-width: 767.98px) {
+  .form-horizontal .col-form-label {
+    text-align: left !important;
+    padding-bottom: var(--label-margin-bottom) !important;
+  }
+}
+
+/* ==========================================================================
+   Pattern 1: Vertical Stack → Horizontal (Responsive Form)
+   ========================================================================== */
+
+.form-responsive {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-form-field-gap) !important;
+}
+
+@media (min-width: 768px) {
+  .form-responsive {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-end !important;
+    margin-left: calc(var(--form-grid-gutter) * -1) !important;
+    margin-right: calc(var(--form-grid-gutter) * -1) !important;
+  }
+
+  .form-responsive > * {
+    flex: 1 1 280px !important;
+    padding-left: var(--form-grid-gutter) !important;
+    padding-right: var(--form-grid-gutter) !important;
+  }
+}
+
+/* Form with label on left, input on right (desktop) */
+.form-label-inline {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--label-margin-bottom) !important;
+}
+
+@media (min-width: 768px) {
+  .form-label-inline {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .form-label-inline > label {
+    flex: 0 0 160px !important;
+    margin-bottom: 0 !important;
+    text-align: right !important;
+    padding-right: var(--space-md) !important;
+  }
+
+  .form-label-inline > .form-control,
+  .form-label-inline > .form-select,
+  .form-label-inline > .input-group {
+    flex: 1 1 auto !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   Pattern 2: Inline Form (Search bars, filter bars)
+   ========================================================================== */
+
+.form-inline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  gap: var(--space-sm) !important;
+}
+
+.form-inline > * {
+  flex: 1 1 auto !important;
+  min-width: 140px !important;
+}
+
+.form-inline .form-label {
+  margin-bottom: 0 !important;
+  white-space: nowrap !important;
+}
+
+.form-inline .btn {
+  height: var(--input-height) !important;
+  padding-top: calc(var(--input-padding-y) - 1px) !important;
+  padding-bottom: calc(var(--input-padding-y) - 1px) !important;
+}
+
+/* Compact inline form */
+.form-inline-compact {
+  gap: var(--space-xs) !important;
+}
+
+.form-inline-compact .form-control,
+.form-inline-compact .form-select {
+  min-height: 36px !important;
+  padding: var(--input-padding-y-sm) var(--input-padding-x-sm) !important;
+  font-size: var(--text-sm) !important;
+}
+
+/* ==========================================================================
+   Pattern 3: Search/Filter Form (Common in dashboard)
+   ========================================================================== */
+
+.form-search {
+  display: flex !important;
+  gap: var(--space-sm) !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+.form-search .search-input {
+  flex: 1 1 280px !important;
+  min-width: 200px !important;
+}
+
+.form-search .search-select {
+  min-width: 160px !important;
+  flex: 0 0 auto !important;
+}
+
+.form-search .btn-group {
+  flex: 0 0 auto !important;
+}
+
+/* Filter sidebar form */
+.form-filter {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-form-group-gap) !important;
+}
+
+.form-filter .filter-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--label-margin-bottom) !important;
+}
+
+.form-filter .filter-group-inline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--space-sm) !important;
+  align-items: flex-end !important;
+}
+
+@media (min-width: 576px) {
+  .form-filter .filter-group-inline > * {
+    flex: 1 1 140px !important;
+  }
+}
+
+/* Filter toggle button (mobile) */
+.filter-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: var(--space-md) !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: var(--text-base) !important;
+  font-weight: var(--font-medium) !important;
+  color: var(--text-primary) !important;
+  cursor: pointer !important;
+  transition: var(--transition-fast) !important;
+}
+
+.filter-toggle:hover {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-default) !important;
+}
+
+.filter-toggle .filter-count {
+  background: var(--color-accent) !important;
+  color: var(--text-inverse) !important;
+  font-size: var(--text-xs) !important;
+  font-weight: var(--font-bold) !important;
+  padding: 2px 8px !important;
+  border-radius: var(--radius-pill) !important;
+}
+
+.filter-toggle[aria-expanded="true"] {
+  border-color: var(--color-accent) !important;
+  background: var(--color-accent-light) !important;
+  color: var(--color-accent) !important;
+}
+
+@media (min-width: 768px) {
+  .filter-toggle {
+    display: none !important;
+  }
+}
+
+/* Filter panel (mobile) */
+.filter-panel {
+  display: none !important;
+  animation: slideDown var(--transition-normal) ease-out !important;
+}
+
+.filter-panel.open {
+  display: block !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .filter-panel {
+    display: block !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Pattern 4: Multi-step Form (Wizard)
+   ========================================================================== */
+
+.form-wizard {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-xl) !important;
+}
+
+.form-wizard-steps {
+  display: flex !important;
+  justify-content: center !important;
+  gap: var(--space-md) !important;
+  margin-bottom: var(--space-lg) !important;
+  flex-wrap: wrap !important;
+}
+
+.form-wizard-step {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: var(--space-xs) !important;
+  min-width: 80px !important;
+  position: relative !important;
+}
+
+.form-wizard-step::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 100% !important;
+  height: 2px !important;
+  background: var(--border-subtle) !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 0 !important;
+}
+
+.form-wizard-step:first-child::before {
+  display: none !important;
+}
+
+.form-wizard-step-circle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--bg-surface) !important;
+  border: 2px solid var(--border-subtle) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-semibold) !important;
+  color: var(--text-muted) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: var(--transition-fast) !important;
+}
+
+.form-wizard-step.active .form-wizard-step-circle {
+  background: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--text-inverse) !important;
+  box-shadow: 0 0 0 4px var(--color-accent-light) !important;
+}
+
+.form-wizard-step.completed .form-wizard-step-circle {
+  background: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: var(--text-inverse) !important;
+}
+
+.form-wizard-step.completed .form-wizard-step-circle::after {
+  content: '✓' !important;
+  font-size: 0.8em !important;
+}
+
+.form-wizard-step-label {
+  font-size: var(--text-xs) !important;
+  font-weight: var(--font-medium) !important;
+  color: var(--text-secondary) !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.form-wizard-step.active .form-wizard-step-label {
+  color: var(--color-accent) !important;
+  font-weight: var(--font-semibold) !important;
+}
+
+.form-wizard-content {
+  flex: 1 !important;
+}
+
+.form-wizard-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: var(--space-sm) !important;
+  padding-top: var(--space-lg) !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  margin-top: var(--space-lg) !important;
+  flex-wrap: wrap !important;
+}
+
+/* ==========================================================================
+   Pattern 5: Card-based Form Sections
+   ========================================================================== */
+
+.form-sections {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-lg) !important;
+}
+
+.form-section {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--card-radius) !important;
+  box-shadow: var(--card-shadow) !important;
+  overflow: hidden !important;
+}
+
+.form-section-header {
+  padding: var(--space-md) var(--space-lg) !important;
+  background: var(--card-header-bg) !important;
+  border-bottom: 1px solid var(--card-header-border) !important;
+}
+
+.form-section-title {
+  font-size: var(--text-lg) !important;
+  font-weight: var(--font-semibold) !important;
+  color: var(--text-primary) !important;
+  margin: 0 !important;
+}
+
+.form-section-description {
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  margin: var(--space-xs) 0 0 !important;
+}
+
+.form-section-body {
+  padding: var(--space-lg) !important;
+}
+
+.form-section-footer {
+  padding: var(--space-md) var(--space-lg) !important;
+  background: var(--card-footer-bg) !important;
+  border-top: 1px solid var(--card-footer-border) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: var(--space-sm) !important;
+  flex-wrap: wrap !important;
+}
+
+/* Collapsible form section */
+.form-section.collapsible .form-section-header {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.form-section.collapsible .form-section-header:hover {
+  background: var(--bg-hover) !important;
+}
+
+.form-section.collapsed .form-section-body,
+.form-section.collapsed .form-section-footer {
+  display: none !important;
+}
+
+.form-section-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--space-xs) !important;
+  font-size: var(--text-xs) !important;
+  color: var(--text-muted) !important;
+  transition: var(--transition-fast) !important;
+}
+
+.form-section.collapsed .form-section-toggle::before {
+  transform: rotate(-90deg) !important;
+}
+
+/* ==========================================================================
+   Form Validation Summary
+   ========================================================================== */
+
+.validation-summary {
+  padding: var(--space-md) !important;
+  background: var(--color-danger-light) !important;
+  border: 1px solid var(--color-danger) !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: var(--space-lg) !important;
+  color: var(--color-danger-hover) !important;
+  font-size: var(--text-sm) !important;
+}
+
+.validation-summary-title {
+  font-weight: var(--font-semibold) !important;
+  margin-bottom: var(--space-sm) !important;
+}
+
+.validation-summary-list {
+  margin: 0 !important;
+  padding-left: var(--space-lg) !important;
+}
+
+.validation-summary-list li {
+  margin-bottom: var(--space-xs) !important;
+}
+
+.validation-summary-list a {
+  color: inherit !important;
+  text-decoration: underline !important;
+}
+
+/* ==========================================================================
+   Form Loading State
+   ========================================================================== */
+
+.form-loading {
+  position: relative !important;
+  pointer-events: none !important;
+  opacity: 0.7 !important;
+}
+
+.form-loading::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: -12px 0 0 -12px !important;
+  border: 2px solid var(--border-subtle) !important;
+  border-top-color: var(--color-accent) !important;
+  border-radius: 50% !important;
+  animation: spin 0.75s linear infinite !important;
+  z-index: 10 !important;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .form-control,
+  .form-select,
+  .form-check-input {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .form-label {
+    color: #000 !important;
+  }
+
+  .btn,
+  .form-wizard-actions,
+  .form-section-footer {
+    display: none !important;
+  }
+
+  .form-wizard-steps {
+    display: none !important;
+  }
+
+  .form-section {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .form-section-header {
+    background: #f5f5f5 !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  .form-section.collapsed .form-section-body,
+  .form-section.collapsed .form-section-footer {
+    display: block !important;
+  }
+
+  .validation-summary {
+    border: 1px solid #dc3545 !important;
+    background: #fff5f5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .form-floating > label,
+  .form-check-input,
+  .form-control,
+  .form-select,
+  .btn,
+  .filter-toggle,
+  .filter-panel,
+  .form-wizard-step-circle,
+  .form-section-toggle,
+  .validation-summary {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .filter-panel {
+    animation: none !important;
+    display: block !important;
+  }
+}

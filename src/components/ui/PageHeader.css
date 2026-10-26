@@ -93,7 +93,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 639px) {
+@media (max-width: 767px) {
   .ui-page-header {
     padding: var(--space-md) 0;
     margin-bottom: var(--space-md);

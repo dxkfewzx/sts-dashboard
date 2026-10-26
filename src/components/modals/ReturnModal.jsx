@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Input, Select, Button } from '../../components/ui';
 import { RETURN_CONDITION_OPTIONS } from '../../constants/snForms';
+import './ReturnModal.css';
 
 /**
  * Return Modal - Form for returning equipment
@@ -64,11 +65,11 @@ const ReturnModal = ({
           rows={3}
         />
 
-        <div className="ui-readonly-group" style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-lg)', borderTop: '1px solid var(--border-subtle)' }}>
-          <div className="ui-readonly-group__label" style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--text-muted)', marginBottom: 'var(--space-md)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+        <div className="ui-readonly-group">
+          <div className="ui-readonly-group__label">
             ข้อมูลจากการเบิก (อ่านอย่างเดียว)
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
+          <div className="form-grid-auto">
             <Input
               name="job_number"
               label="เลข Job (จากการเบิก)"

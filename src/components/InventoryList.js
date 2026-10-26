@@ -13,23 +13,28 @@ import {
   IconButton,
   Skeleton,
 } from '../components/ui';
+import './InventoryList.css';
 
 const InventoryList = () => {
   const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
 
+  // Fallback check for mobile - use both context and direct window check
+  // This ensures the button shows even if context hasn't updated yet
+  const isMobileFallback = typeof window !== 'undefined' && window.innerWidth <= 1024;
+  const shouldShowMobileMenu = isMobile || isMobileFallback;
+
   const MobileMenuToggle = () => {
-    if (!isMobile) return null;
+    if (!shouldShowMobileMenu) return null;
     return (
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon"
+        leftIcon={<i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} />}
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
         aria-expanded={isSidebarOpen}
         className="mobile-menu-toggle"
-      >
-        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }} />
-      </Button>
+      />
     );
   };
 
@@ -203,7 +208,7 @@ const InventoryList = () => {
 
   // Table columns
   const columns = [
-    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center' },
+    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold text-center col-priority-low', hideInCard: true },
     {
       key: 'item_name',
       header: 'ชื่อรายการอุปกรณ์',
@@ -211,19 +216,20 @@ const InventoryList = () => {
       sortKey: 'item_name',
       sortDirection: sortConfig.key === 'item_name' ? sortConfig.direction : null,
       onSort: handleSort,
-      render: (item) => <span className="text-truncate d-inline-block" style={{ maxWidth: '300px' }} title={item.item_name}>{item.item_name}</span>,
-      className: 'text-start fw-medium'
+      render: (item) => <span className="item-name-cell text-truncate fw-medium" title={item.item_name}>{item.item_name}</span>,
+      className: 'text-start fw-medium col-priority-high',
+      cardLabel: 'ชื่อรายการ'
     },
-    { key: 'total_qty', header: 'จำนวนรวม', width: '100px', minWidth: '90px', sortable: true, sortKey: 'total_qty', sortDirection: sortConfig.key === 'total_qty' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <span className="fw-bold text-primary">{item.total_qty}</span>, className: 'text-center' },
-    { key: 'unit', header: 'หน่วย', width: '100px', minWidth: '90px', sortable: true, sortKey: 'unit', sortDirection: sortConfig.key === 'unit' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <Badge variant="secondary">{item.unit || '-'}</Badge>, className: 'text-center' },
-    { key: 'responsible', header: 'ผู้ดูแลรับผิดชอบ', width: '180px', minWidth: '160px', sortable: true, sortKey: 'responsible', sortDirection: sortConfig.key === 'responsible' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <Badge variant="secondary"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</Badge>, className: 'text-center' },
-    { key: 'created_at', header: 'วันที่ลงระบบ', width: '140px', minWidth: '120px', sortable: true, sortKey: 'created_at', sortDirection: sortConfig.key === 'created_at' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <span className="text-muted small">{item.created_at ? new Date(item.created_at).toLocaleDateString('th-TH') : '-'}</span>, className: 'text-center' },
+    { key: 'total_qty', header: 'จำนวนรวม', width: '100px', minWidth: '90px', sortable: true, sortKey: 'total_qty', sortDirection: sortConfig.key === 'total_qty' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <span className="fw-bold text-primary">{item.total_qty}</span>, className: 'text-center col-priority-high', cardLabel: 'จำนวนรวม' },
+    { key: 'unit', header: 'หน่วย', width: '100px', minWidth: '90px', sortable: true, sortKey: 'unit', sortDirection: sortConfig.key === 'unit' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <Badge variant="secondary">{item.unit || '-'}</Badge>, className: 'text-center col-priority-medium', cardLabel: 'หน่วย' },
+    { key: 'responsible', header: 'ผู้ดูแลรับผิดชอบ', width: '180px', minWidth: '160px', sortable: true, sortKey: 'responsible', sortDirection: sortConfig.key === 'responsible' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <Badge variant="secondary"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</Badge>, className: 'text-center col-priority-medium', cardLabel: 'ผู้ดูแล' },
+    { key: 'created_at', header: 'วันที่ลงระบบ', width: '140px', minWidth: '120px', sortable: true, sortKey: 'created_at', sortDirection: sortConfig.key === 'created_at' ? sortConfig.direction : null, onSort: handleSort, render: (item) => <span className="text-muted small">{item.created_at ? new Date(item.created_at).toLocaleDateString('th-TH') : '-'}</span>, className: 'text-center col-priority-low', cardLabel: 'วันที่ลง' },
     {
       key: 'actions',
       header: 'การจัดการ',
       width: '120px',
       minWidth: '110px',
-      className: 'text-center',
+      className: 'text-center col-priority-high',
       render: (item) => (
         <div className="d-flex justify-content-center gap-1">
           <IconButton
@@ -239,22 +245,21 @@ const InventoryList = () => {
               });
               setShowEditModal(true);
             }}
-            aria-label={`แก้ไข ${item.item_name}`}
+            ariaLabel={`แก้ไข ${item.item_name}`}
             title="แก้ไข"
           >
             <i className="bi bi-pencil-fill" />
           </IconButton>
           <IconButton
-            variant="ghost"
+            variant="danger"
             size="sm"
-            color="danger"
             onClick={() => handleDeleteItem(item.id, item.item_name)}
-            aria-label={`ลบ ${item.item_name}`}
+            ariaLabel={`ลบ ${item.item_name}`}
             title="ลบ"
           >
             <i className="bi bi-trash3-fill" />
           </IconButton>
-          <a href={`/details/${item.id}`} className="btn-action" title="ดูรายละเอียด" aria-label={`ดูรายละเอียด ${item.item_name}`}>
+          <a href={`/details/${item.id}`} className="btn-action touch-target" title="ดูรายละเอียด" aria-label={`ดูรายละเอียด ${item.item_name}`}>
             <i className="bi bi-eye" />
           </a>
         </div>
@@ -264,25 +269,25 @@ const InventoryList = () => {
 
   // Render skeleton row
   const renderSkeletonRow = () => (
-    <tr className="text-center skeleton-row" style={{ backgroundColor: 'transparent' }}>
-      <td className="text-muted fw-bold"><Skeleton variant="text" width="30px" height="16px" style={{ margin: '0 auto' }} /></td>
+    <tr className="text-center skeleton-row">
+      <td className="text-muted fw-bold"><Skeleton variant="text" width="30px" height="16px" className="skeleton-cell-text" /></td>
       <td className="text-start fw-medium"><Skeleton variant="text" width="80%" height="16px" /></td>
-      <td className="fw-bold text-primary"><Skeleton variant="text" width="40px" height="16px" style={{ margin: '0 auto' }} /></td>
-      <td><Skeleton variant="text" width="60px" height="16px" style={{ margin: '0 auto' }} /></td>
-      <td><Skeleton variant="text" width="100px" height="16px" style={{ margin: '0 auto' }} /></td>
-      <td className="text-muted small"><Skeleton variant="text" width="90px" height="16px" style={{ margin: '0 auto' }} /></td>
+      <td className="fw-bold text-primary"><Skeleton variant="text" width="40px" height="16px" className="skeleton-cell-text" /></td>
+      <td><Skeleton variant="text" width="60px" height="16px" className="skeleton-cell-text" /></td>
+      <td><Skeleton variant="text" width="100px" height="16px" className="skeleton-cell-text" /></td>
+      <td className="text-muted small"><Skeleton variant="text" width="90px" height="16px" className="skeleton-cell-text" /></td>
       <td>
         <div className="d-flex justify-content-center gap-1">
-          <Skeleton variant="button" width="36px" height="36px" borderRadius="8px" />
-          <Skeleton variant="button" width="36px" height="36px" borderRadius="8px" />
-          <Skeleton variant="button" width="36px" height="36px" borderRadius="8px" />
+          <Skeleton variant="button" className="skeleton-cell-button" />
+          <Skeleton variant="button" className="skeleton-cell-button" />
+          <Skeleton variant="button" className="skeleton-cell-button" />
         </div>
       </td>
     </tr>
   );
 
   return (
-    <div>
+    <div className="inventory-list-page">
       {/* Page Header */}
       <PageHeader
         title="รายการอุปกรณ์"
@@ -302,7 +307,7 @@ const InventoryList = () => {
       />
 
       {/* Search and Filter Bar */}
-      <Card variant="outlined" className="mb-3">
+      <Card variant="outlined" className="inventory-search-bar mb-3">
         <Card.Body className="py-3">
           <div className="row g-3 align-items-center">
             <div className="col-12 col-md-6 col-lg-4">
@@ -316,7 +321,7 @@ const InventoryList = () => {
               />
             </div>
             <div className="col-12 col-md-6 col-lg-4">
-              <span className="text-muted small">
+              <span className="inventory-results-count">
                 พบ {filteredAndSortedItems.length} จาก {items.length} รายการ
               </span>
             </div>
@@ -339,10 +344,10 @@ const InventoryList = () => {
       </Card>
 
       {/* Items Table */}
-      <Card variant="outlined">
+      <Card variant="outlined" className="inventory-table-card">
         <Card.Header>
           <div className="d-flex justify-content-between align-items-center">
-            <Card.Title>รายการอุปกรณ์ทั้งหมด</Card.Title>
+            <Card.Title className="inventory-table-title">รายการอุปกรณ์ทั้งหมด</Card.Title>
             <span className="badge badge-secondary">{items.length} รายการ</span>
           </div>
         </Card.Header>
@@ -351,12 +356,12 @@ const InventoryList = () => {
             columns={columns}
             data={filteredAndSortedItems}
             emptyState={
-              <div className="empty-state">
-                <i className="bi bi-box-seam display-1 text-muted mb-3" />
-                <h5 className="text-muted mb-2">
+              <div className="inventory-empty-state">
+                <i className="bi bi-box-seam inventory-empty-state-icon text-muted mb-3" />
+                <h5 className="inventory-empty-state-title text-muted mb-2">
                   {searchTerm ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีข้อมูลวัสดุในระบบ'}
                 </h5>
-                <p className="text-muted small mb-3">
+                <p className="inventory-empty-state-text text-muted small mb-3">
                   {searchTerm
                     ? 'ลองเปลี่ยนคำค้นหาหรือกดปุ่มรีเซ็ต'
                     : 'เริ่มต้นโดยเพิ่มรายการอุปกรณ์แรกของคุณ'}
@@ -374,7 +379,7 @@ const InventoryList = () => {
             striped
             hoverable
             responsive
-            minWidth={900}
+            cardLayout
             onRowMouseEnter={(item) => setActiveRowId(item.id)}
             onRowMouseLeave={() => setActiveRowId(null)}
             getRowStyle={(item) => ({

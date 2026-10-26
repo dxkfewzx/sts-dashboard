@@ -17,6 +17,9 @@ const Skeleton = ({
   rows = 3,
   animate = true,
   className = '',
+  borderRadius,
+  width,
+  height,
   ...rest
 }) => {
   const variantClasses = {
@@ -29,7 +32,7 @@ const Skeleton = ({
   };
 
   const TextLines = () => (
-    <div className="ui-skeleton__text-lines">
+    <div className="ui-skeleton__text-lines" style={{ width, height }}>
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="ui-skeleton__line" style={{ width: i === rows - 1 ? '60%' : '100%' }}></div>
       ))}
@@ -76,7 +79,7 @@ const Skeleton = ({
   );
 
   const ButtonContent = () => (
-    <div className="ui-skeleton__button"></div>
+    <div className="ui-skeleton__button" style={{ borderRadius, width, height }}></div>
   );
 
   const renderVariant = () => {

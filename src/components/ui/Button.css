@@ -107,6 +107,19 @@
   display: none;
 }
 
+/* Mobile: larger touch targets for icon buttons (minimum 44px for accessibility) */
+@media (max-width: 767px) {
+  .ui-button--icon {
+    width: var(--touch-target-min);
+    height: var(--touch-target-min);
+  }
+
+  .ui-button--icon.ui-button--sm {
+    width: var(--touch-target-min);
+    height: var(--touch-target-min);
+  }
+}
+
 /* Variants */
 .ui-button--primary {
   background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);

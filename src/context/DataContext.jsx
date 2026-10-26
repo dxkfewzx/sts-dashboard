@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import Swal from 'sweetalert2';
+import { swalError } from '../utils/swal';
 
 const DataContext = createContext(null);
 
@@ -142,12 +142,9 @@ export function DataProvider({ children, supabase }) {
       setWithdrawalLogs(logsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      Swal.fire({
-        icon: 'error',
+      await swalError({
         title: 'เกิดข้อผิดพลาด',
         text: 'ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่อีกครั้ง',
-        confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#4e73df'
       });
       setItems([]);
       setSerialNumbers([]);
@@ -158,7 +155,7 @@ export function DataProvider({ children, supabase }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     fetchData();
@@ -322,7 +319,7 @@ export function DataProvider({ children, supabase }) {
   // Withdraw / Return Functions with Logging
   // ==========================================
   const onWithdraw = async (serialNumberId, withdrawData) => {
-    const { item_id, serial_number, job_number, withdrawer_name, dept_used, building, floor, withdraw_date } = withdrawData;
+    const { item_id, job_number, withdrawer_name, dept_used, building, floor, withdraw_date } = withdrawData;
 
     try {
       // 1. Update serial_number status to Withdrawn

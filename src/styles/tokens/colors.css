@@ -1,38 +1,39 @@
 /**
  * Color Tokens
- * Core palette + semantic aliases per DESIGN_PLAN.md
+ * Core palette + semantic aliases + Bootstrap 5 + SweetAlert2 mapping
+ * White-Blue Light Theme (original) - NO DARK MODE
  */
 
-/* === Core Palette === */
 :root {
-  /* Base neutrals - cool blue undertone for Thai rendering */
-  --color-base-950: #0D0D12;  /* Primary text, headers */
-  --color-base-700: #4A4A5A;  /* Secondary text, labels */
-  --color-base-400: #9A9AAB;  /* Disabled, placeholders, dividers */
-  --color-base-100: #F0F0F5;  /* Page background - cool off-white */
-  --color-base-0:   #FFFFFF;  /* Card/surface background */
+  /* === Core Palette (Light Mode Only - Original White-Blue) === */
+  /* Base neutrals - pure white background, strong contrast */
+  --color-base-950: #0F172A;  /* Primary text, headers - Slate 950 */
+  --color-base-700: #334155;  /* Secondary text, labels - Slate 700 */
+  --color-base-400: #94A3B8;  /* Disabled, placeholders, dividers - Slate 400 */
+  --color-base-100: #F8FAFC;  /* Page background - Slate 50 (almost white) */
+  --color-base-0:   #FFFFFF;  /* Card/surface background - Pure white */
 
-  /* Accent - Pure blue (#0066FF) - sysadmin terminal blue */
-  --color-accent:        #0066FF;
-  --color-accent-hover:  #0052CC;
-  --color-accent-light:  #E8F0FE;  /* 10% opacity tint */
+  /* Accent - Blue 600 (good contrast on white: 4.5:1+) */
+  --color-accent:        #2563EB;  /* Blue 600 */
+  --color-accent-hover:  #1D4ED8;  /* Blue 700 */
+  --color-accent-light:  #DBEAFE;  /* Blue 50 - subtle tint */
 
-  /* Semantic status colors - designed for contrast on light/dark */
-  --color-success:       #00A859;
-  --color-success-hover: #008F4A;
-  --color-success-light: #E6F7ED;
+  /* Semantic status colors - designed for contrast on white */
+  --color-success:       #16A34A;  /* Green 600 */
+  --color-success-hover: #15803D;  /* Green 700 */
+  --color-success-light: #DCFCE7;  /* Green 50 */
 
-  --color-warning:       #E67700;
-  --color-warning-hover: #CC6600;
-  --color-warning-light: #FFF4E6;
+  --color-warning:       #CA8A04;  /* Yellow 600 - darker for contrast */
+  --color-warning-hover: #A16207;  /* Yellow 700 */
+  --color-warning-light: #FEF9C3;  /* Yellow 50 */
 
-  --color-danger:        #D93025;
-  --color-danger-hover:  #C02A1E;
-  --color-danger-light:  #FDEAE9;
+  --color-danger:        #DC2626;  /* Red 600 */
+  --color-danger-hover:  #B91C1C;  /* Red 700 */
+  --color-danger-light:  #FEF2F2;  /* Red 50 */
 
-  --color-info:          #0066FF;  /* Same as accent for consistency */
-  --color-info-hover:    #0052CC;
-  --color-info-light:    #E8F0FE;
+  --color-info:          #0891B2;  /* Cyan 600 */
+  --color-info-hover:    #0E7490;  /* Cyan 700 */
+  --color-info-light:    #ECFEFF;  /* Cyan 50 */
 
   /* === Legacy Color Aliases (for backward compat) === */
   --color-primary:       var(--color-accent);
@@ -44,18 +45,18 @@
   --color-secondary-hover: var(--color-base-700);
   --color-secondary-light: var(--color-base-100);
 
-  /* Gray scale aliases (matching old App.css values approximately) */
+  /* Gray scale aliases */
   --color-white:         var(--color-base-0);
   --color-gray-50:       var(--color-base-100);
-  --color-gray-100:      var(--color-base-100);
-  --color-gray-200:      var(--border-subtle);
-  --color-gray-300:      var(--border-default);
-  --color-gray-400:      var(--text-muted);
-  --color-gray-500:      var(--text-muted);
-  --color-gray-600:      var(--text-secondary);
-  --color-gray-700:      var(--text-secondary);
-  --color-gray-800:      var(--text-primary);
-  --color-gray-900:      var(--text-primary);
+  --color-gray-100:      #F1F5F9;
+  --color-gray-200:      #E2E8F0;
+  --color-gray-300:      #CBD5E1;
+  --color-gray-400:      var(--color-base-400);
+  --color-gray-500:      #64748B;
+  --color-gray-600:      #475569;
+  --color-gray-700:      var(--color-base-700);
+  --color-gray-800:      #1E293B;
+  --color-gray-900:      var(--color-base-950);
 
   /* Legacy semantic names */
   --primary-blue:        var(--color-accent);
@@ -64,34 +65,32 @@
   --text-dark:           var(--text-primary);
   --text-muted-legacy:   var(--text-muted);
   --soft-shadow:         var(--shadow-md);
-}
 
-/* === Semantic Aliases (for component usage) === */
-:root {
+  /* === Semantic Aliases (for component usage) === */
   /* Text */
-  --text-primary:   var(--color-base-950);
-  --text-secondary: var(--color-base-700);
-  --text-muted:     var(--color-base-400);
-  --text-inverse:   var(--color-base-0);
+  --text-primary:   var(--color-base-950);   /* Slate 950 - high contrast */
+  --text-secondary: var(--color-base-700);   /* Slate 700 - good contrast */
+  --text-muted:     var(--color-base-400);   /* Slate 400 - readable */
+  --text-inverse:   var(--color-base-0);     /* White */
   --text-link:      var(--color-accent);
   --text-link-hover: var(--color-accent-hover);
 
   /* Backgrounds */
-  --bg-page:      var(--color-base-100);
-  --bg-surface:   var(--color-base-0);
-  --bg-hover:     var(--color-base-100);
-  --bg-active:    var(--color-accent-light);
-  --bg-disabled:  var(--color-base-100);
+  --bg-page:      var(--color-base-100);     /* Slate 50 - almost white */
+  --bg-surface:   var(--color-base-0);       /* Pure white */
+  --bg-hover:     #F1F5F9;                   /* Slate 100 */
+  --bg-active:    var(--color-accent-light); /* Blue 50 */
+  --bg-disabled:  #F1F5F9;                   /* Slate 100 */
 
-  /* Legacy background aliases (for backward compat with App.css) */
+  /* Legacy background aliases */
   --bg-primary:   var(--bg-surface);
   --bg-secondary: var(--bg-page);
   --bg-tertiary:  var(--bg-hover);
   --bg-inverse:   var(--color-base-950);
 
-  /* Borders */
-  --border-subtle:  #E0E0EA;
-  --border-default: var(--color-base-400);
+  /* Borders - stronger for readability */
+  --border-subtle:  #E2E8F0;   /* Slate 200 - visible but subtle */
+  --border-default: #CBD5E1;   /* Slate 300 - clear borders */
   --border-focus:   var(--color-accent);
   --border-error:   var(--color-danger);
 
@@ -105,7 +104,7 @@
   --status-available-border: var(--color-success);
 
   --status-withdrawn-bg: var(--color-warning-light);
-  --status-withdrawn-text: #856404;
+  --status-withdrawn-text: #854D0E;  /* Darker for contrast */
   --status-withdrawn-border: var(--color-warning);
 
   --status-repair-bg: var(--color-danger-light);
@@ -116,6 +115,105 @@
   --status-pending-text: var(--color-secondary);
   --status-pending-border: var(--color-secondary);
 
-  /* Shadow color base */
-  --shadow-color: rgba(13, 13, 18, 0.04);
+  /* Shadow color base - subtle blue tint */
+  --shadow-color: rgba(15, 23, 42, 0.06);
+
+  /* === Bootstrap 5 Semantic Color Mapping === */
+  /* Allows using Bootstrap utility classes (bg-primary, text-danger, etc.) with our design tokens */
+  --bs-primary:        var(--color-accent);
+  --bs-primary-rgb:    37, 99, 235;
+  --bs-primary-emphasis: var(--color-accent-light);
+
+  --bs-secondary:      var(--color-base-700);
+  --bs-secondary-rgb:  51, 65, 85;
+  --bs-secondary-emphasis: var(--color-base-100);
+
+  --bs-success:        var(--color-success);
+  --bs-success-rgb:    22, 163, 74;
+  --bs-success-emphasis: var(--color-success-light);
+
+  --bs-info:           var(--color-info);
+  --bs-info-rgb:       8, 145, 178;
+  --bs-info-emphasis:  var(--color-info-light);
+
+  --bs-warning:        var(--color-warning);
+  --bs-warning-rgb:    202, 138, 4;
+  --bs-warning-emphasis: var(--color-warning-light);
+
+  --bs-danger:         var(--color-danger);
+  --bs-danger-rgb:     220, 38, 38;
+  --bs-danger-emphasis: var(--color-danger-light);
+
+  --bs-light:          var(--color-base-100);
+  --bs-light-rgb:      248, 250, 252;
+  --bs-light-emphasis: var(--color-base-0);
+
+  --bs-dark:           var(--color-base-950);
+  --bs-dark-rgb:       15, 23, 42;
+  --bs-dark-emphasis:  var(--color-base-700);
+
+  --bs-body-bg:        var(--bg-page);
+  --bs-body-color:     var(--text-primary);
+  --bs-body-color-rgb: 15, 23, 42;
+  --bs-border-color:   var(--border-subtle);
+  --bs-border-color-rgb: 226, 232, 240;
+  --bs-border-color-translucent: rgba(15, 23, 42, 0.175);
+
+  --bs-font-sans-serif: var(--font-sans);
+  --bs-font-monospace: var(--font-mono);
+  --bs-body-font-size: var(--text-base);
+  --bs-body-font-weight: var(--font-normal);
+  --bs-body-line-height: var(--leading-snug);
+
+  /* === SweetAlert2 Theme Variables === */
+  /* Maps directly to our design tokens for consistent theming */
+  --swal2-bg:          var(--bg-surface);
+  --swal2-border:      var(--border-subtle);
+  --swal2-border-radius: var(--radius-modal);
+  --swal2-padding:     var(--space-xl);
+  --swal2-modal-shadow: var(--shadow-modal);
+
+  --swal2-color:       var(--text-primary);
+  --swal2-title-color: var(--text-primary);
+  --swal2-content-color: var(--text-secondary);
+
+  --swal2-confirm-bg:  var(--bs-primary);
+  --swal2-confirm-hover: var(--color-accent-hover);
+  --swal2-confirm-color: var(--text-inverse);
+  --swal2-confirm-border-radius: var(--radius-button);
+
+  --swal2-cancel-bg:   var(--bs-secondary);
+  --swal2-cancel-hover: var(--color-base-700);
+  --swal2-cancel-color: var(--text-inverse);
+  --swal2-cancel-border-radius: var(--radius-button);
+
+  --swal2-deny-bg:     var(--bs-danger);
+  --swal2-deny-hover:  var(--color-danger-hover);
+  --swal2-deny-color:  var(--text-inverse);
+
+  --swal2-input-border: var(--border-default);
+  --swal2-input-focus-border: var(--bs-primary);
+  --swal2-input-bg:    var(--bg-surface);
+  --swal2-input-color: var(--text-primary);
+  --swal2-input-border-radius: var(--radius-input);
+  --swal2-input-padding: var(--space-sm) var(--space-md);
+
+  --swal2-loader-border-color: var(--swal2-confirm-bg);
+
+  --swal2-success-border-color: var(--bs-success);
+  --swal2-success-line-color: var(--bs-success);
+  --swal2-error-border-color: var(--bs-danger);
+  --swal2-error-x-color: var(--bs-danger);
+  --swal2-warning-border-color: var(--bs-warning);
+  --swal2-warning-color: var(--bs-warning);
+  --swal2-info-border-color: var(--bs-info);
+  --swal2-info-color: var(--bs-info);
+  --swal2-question-border-color: var(--bs-primary);
+  --swal2-question-color: var(--bs-primary);
+
+  --swal2-footer-border-color: var(--border-subtle);
+  --swal2-footer-color: var(--text-secondary);
+  --swal2-footer-padding: var(--space-md);
+
+  --swal2-zindex: 1090;
 }

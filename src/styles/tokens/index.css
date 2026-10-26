@@ -14,6 +14,7 @@
 @import './transitions.css';
 @import './breakpoints.css';
 @import './layout.css';
+@import './components.css';
 
 /*
  * Token loading complete.

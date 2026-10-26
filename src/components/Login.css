@@ -1,0 +1,144 @@
+/**
+ * Login Component Styles
+ * Uses design tokens
+ */
+
+.login-container {
+  background: linear-gradient(135deg, var(--bg-page) 0%, var(--bg-secondary) 100%);
+  min-height: 100vh;
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  max-width: 440px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.login-card-body {
+  padding: var(--space-2xl);
+}
+
+.login-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.login-icon-wrapper .bi {
+  font-size: 1.75rem;
+  color: var(--text-inverse);
+}
+
+.login-title {
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-xs);
+}
+
+.login-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.login-form .form-label {
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.login-form .input-group {
+  border-radius: var(--radius-input);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  background: var(--bg-input);
+  transition: all var(--transition-focus);
+}
+
+.login-form .input-group:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.login-form .input-group-text {
+  background: var(--bg-input);
+  border: none;
+  border-right: 1px solid var(--border-default);
+  color: var(--text-muted);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.login-form .form-control {
+  background: var(--bg-input);
+  border: none;
+  box-shadow: none;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.login-form .form-control:focus {
+  box-shadow: none;
+  background: var(--bg-input);
+}
+
+.login-form .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.login-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  border: none;
+  border-radius: var(--radius-input);
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  padding: var(--space-md) 0;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-hover);
+  color: var(--text-inverse);
+}
+
+.login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 100%);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-footer-text {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.login-footer-text .bi {
+  color: var(--info);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .login-btn,
+  .login-form .input-group {
+    transition: none;
+  }
+}

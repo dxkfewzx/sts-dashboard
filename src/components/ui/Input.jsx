@@ -39,6 +39,7 @@ const Input = React.forwardRef(({
   name,
   className = '',
   autoComplete,
+  leftIcon,
   ...rest
 }, ref) => {
   const generatedId = React.useId();
@@ -55,24 +56,31 @@ const Input = React.forwardRef(({
           {required && <span className="ui-input__required" aria-hidden="true">*</span>}
         </label>
       )}
-      <input
-        ref={ref}
-        id={inputId}
-        name={name}
-        type={type}
-        className={`ui-input ${error ? 'ui-input--error' : ''} ${disabled ? 'ui-input--disabled' : ''} ${readOnly ? 'ui-input--readonly' : ''}`}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        disabled={disabled}
-        readOnly={readOnly}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={describedBy}
-        aria-required={required}
-        autoComplete={autoComplete}
-        {...rest}
-      />
+      <div className="ui-input__inner">
+        {leftIcon && (
+          <span className="ui-input__icon" aria-hidden="true">
+            {leftIcon}
+          </span>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          name={name}
+          type={type}
+          className={`ui-input ${error ? 'ui-input--error' : ''} ${disabled ? 'ui-input--disabled' : ''} ${readOnly ? 'ui-input--readonly' : ''} ${leftIcon ? 'ui-input--has-icon' : ''}`}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          disabled={disabled}
+          readOnly={readOnly}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={describedBy}
+          aria-required={required}
+          autoComplete={autoComplete}
+          {...rest}
+        />
+      </div>
       {error && (
         <div id={errorId} className="ui-input__error" role="alert" aria-live="polite">
           {error}

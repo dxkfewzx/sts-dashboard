@@ -23,6 +23,26 @@
   margin-left: var(--space-xs);
 }
 
+.ui-input__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ui-input__icon {
+  position: absolute;
+  left: var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.ui-input--has-icon {
+  padding-left: calc(var(--space-md) * 2 + 1.25rem);
+}
+
 .ui-input {
   width: 100%;
   padding: var(--space-sm) var(--space-md);

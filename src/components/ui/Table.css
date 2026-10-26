@@ -1,6 +1,7 @@
 /**
  * Table Component Styles
  * Uses design tokens
+ * Responsive: horizontal scroll on tablet, card layout on mobile
  */
 
 .ui-table-wrapper {
@@ -11,10 +12,75 @@
 .ui-table-wrapper--responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  /* Scroll shadow indicators */
+  background: linear-gradient(
+    to right,
+    transparent 30%,
+    var(--bg-surface) 100%
+  );
+  background-position: 0 0;
+  background-size: 100% 100%;
+}
+
+/* Scroll shadow hint when content overflows */
+.ui-table-wrapper--responsive::after {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--accent-light) 50%,
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.ui-table-wrapper--responsive:hover::after,
+.ui-table-wrapper--responsive:focus-within::after {
+  opacity: 1;
+}
+
+/* Scroll hint indicator */
+.ui-table__scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  margin: var(--space-sm) var(--space-md);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-sm);
+  animation: ui-table-scroll-hint-pulse 2s ease-in-out infinite;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.ui-table__scroll-hint .bi {
+  font-size: 0.875rem;
+}
+
+@keyframes ui-table-scroll-hint-pulse {
+  0%, 100% { opacity: 0.6; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(4px); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-table__scroll-hint {
+    animation: none;
+  }
 }
 
 .ui-table {
   width: 100%;
+  min-width: var(--table-min-width);
   border-collapse: collapse;
   font-size: var(--text-sm);
   color: var(--text-primary);
@@ -116,12 +182,197 @@
     animation: none;
     background: var(--bg-hover);
   }
+  .ui-table-wrapper--responsive::after {
+    animation: none;
+    transition: none;
+  }
 }
 
-/* Mobile adjustments */
-@media (max-width: 639px) {
+/* ============================================================
+ * RESPONSIVE BREAKPOINTS
+ * ============================================================ */
+
+/* Tablet: 768px - 1023px */
+/* Horizontal scroll with sticky first column */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ui-table-wrapper--responsive {
+    overflow-x: auto;
+  }
+
+  .ui-table {
+    min-width: 800px;
+  }
+
+  /* Sticky first column (index/name) on tablet */
+  .ui-table__th:first-child,
+  .ui-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg-surface);
+    box-shadow: inset -1px 0 0 var(--border-subtle);
+  }
+
+  .ui-table__th:first-child {
+    z-index: 2;
+    background: var(--bg-page);
+  }
+}
+
+/* Mobile: < 768px */
+/* Option 1: Horizontal scroll (default) */
+/* Option 2: Card layout (when data-card-layout attribute is present) */
+@media (max-width: 767px) {
+  /* Default: improved horizontal scroll */
   .ui-table__th,
   .ui-table td {
     padding: var(--space-sm) var(--space-md);
+    min-width: max-content;
+  }
+
+  .ui-table {
+    min-width: 600px;
+  }
+
+  /* Touch-friendly: larger tap targets for action buttons */
+  .ui-table .btn-action,
+  .ui-table .btn-icon {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+    padding: var(--space-xs);
+  }
+
+  /* Compact action column */
+  .ui-table td:last-child {
+    white-space: nowrap;
+  }
+
+  /* Card layout for dense data tables (opt-in via data-card-layout="true") */
+  .ui-table-wrapper[data-card-layout="true"] .ui-table {
+    display: none;
+  }
+
+  .ui-table-wrapper[data-card-layout="true"] .ui-table__cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+  }
+
+  .ui-table__card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ui-table__card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .ui-table__card-row:last-child {
+    border-bottom: none;
+  }
+
+  .ui-table__card-label {
+    flex: 0 0 100px;
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    flex-shrink: 0;
+  }
+
+  .ui-table__card-value {
+    flex: 1 1 calc(100% - 100px);
+    min-width: 0; /* Allow shrinking for text-wrap */
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    text-align: left;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  /* For single-line values that shouldn't wrap */
+  .ui-table__card-value.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ui-table__card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+  }
+
+  /* Allow long content to scroll horizontally within the card value */
+  .ui-table__card-value.long-content {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: var(--space-xs);
+  }
+}
+
+/* Small mobile: < 480px - even more compact */
+@media (max-width: 479px) {
+  .ui-table__th,
+  .ui-table td {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-xs);
+  }
+
+  .ui-table {
+    min-width: 500px;
+  }
+
+  .ui-table .btn-action,
+  .ui-table .btn-icon {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* Card layout adjustments for very small screens */
+  .ui-table__card {
+    padding: var(--space-sm);
+  }
+
+  .ui-table__card-label {
+    flex: 0 0 80px;
+    font-size: 10px;
+  }
+
+  .ui-table__card-value {
+    flex: 1 1 calc(100% - 80px);
+    font-size: var(--text-xs);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .ui-table__card-actions {
+    gap: var(--space-xs);
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+  .ui-table__th,
+  .ui-table td {
+    padding: var(--space-xs) var(--space-sm);
   }
 }

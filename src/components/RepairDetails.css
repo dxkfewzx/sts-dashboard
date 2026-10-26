@@ -1,0 +1,85 @@
+/**
+ * RepairDetails Component Styles
+ * Uses design tokens
+ */
+
+.repair-details-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle .bi {
+  font-size: 1.25rem;
+}
+
+/* Stats Grid */
+.repair-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .repair-stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Table Card */
+.repair-table-card {
+  /* Card variant handles most styles */
+}
+
+.repair-table-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Table Priority Columns */
+@media (max-width: 767.98px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+  
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+  
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low,
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .repair-table-card,
+  .repair-stats-grid,
+  .mobile-menu-toggle .bi {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

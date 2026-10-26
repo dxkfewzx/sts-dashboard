@@ -1,0 +1,697 @@
+/**
+ * SweetAlert2 Theme for STS Dashboard
+ * Uses CSS Custom Properties from design tokens for consistent theming
+ * Import this in your App.js or index.js after sweetalert2 CSS
+ */
+
+/* ==========================================================================
+   Base Popup Styles
+   ========================================================================== */
+.swal2-popup {
+  background: var(--swal2-bg, var(--bg-surface)) !important;
+  border: 1px solid var(--swal2-border, var(--border-subtle)) !important;
+  border-radius: var(--swal2-border-radius, var(--radius-modal)) !important;
+  box-shadow: var(--swal2-modal-shadow, var(--shadow-xl)) !important;
+  padding: var(--swal2-padding, var(--space-xl)) !important;
+  max-width: var(--swal2-max-width, 90vw) !important;
+  font-family: var(--font-sans, var(--bs-font-sans-serif)) !important;
+  color: var(--swal2-color, var(--text-primary)) !important;
+  overflow: visible !important; /* Allow animations to overflow */
+}
+
+/* Container z-index - must be above Bootstrap modals (1055) */
+.swal2-container {
+  z-index: var(--swal2-zindex, 1090) !important;
+}
+
+.swal2-container.swal2-backdrop-show {
+  background: var(--modal-backdrop-bg, rgba(13, 13, 18, 0.5)) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* ==========================================================================
+   Title & Content
+   ========================================================================== */
+.swal2-title {
+  color: var(--swal2-title-color, var(--text-primary)) !important;
+  font-size: var(--text-xl) !important;
+  font-weight: var(--font-semibold) !important;
+  line-height: var(--leading-heading) !important;
+  margin: 0 0 var(--space-md) 0 !important;
+  padding: 0 !important;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.swal2-html-container {
+  color: var(--swal2-content-color, var(--text-secondary)) !important;
+  font-size: var(--text-base) !important;
+  font-weight: var(--font-normal) !important;
+  line-height: var(--leading-body) !important;
+  margin: 0 0 var(--space-lg) 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.swal2-styled {
+  font-family: var(--font-sans) !important;
+  font-size: var(--btn-font-size) !important;
+  font-weight: var(--btn-font-weight) !important;
+  line-height: var(--btn-line-height) !important;
+  padding: var(--btn-padding-y) var(--btn-padding-x) !important;
+  border-radius: var(--btn-radius) !important;
+  border: var(--btn-border-width) solid transparent !important;
+  cursor: pointer !important;
+  transition: var(--btn-transition) !important;
+  white-space: nowrap !important;
+  min-width: 80px !important;
+}
+
+/* Focus state for accessibility */
+.swal2-styled:focus-visible {
+  outline: var(--btn-focus-outline) !important;
+  outline-offset: var(--btn-focus-outline-offset) !important;
+  box-shadow: var(--btn-focus-shadow) !important;
+}
+
+/* Disabled state */
+.swal2-styled:disabled,
+.swal2-styled.swal2-loading {
+  opacity: var(--btn-disabled-opacity) !important;
+  cursor: var(--btn-disabled-cursor) !important;
+}
+
+/* Confirm Button (Primary Action) */
+.swal2-confirm {
+  background: var(--swal2-confirm-bg, var(--bs-primary)) !important;
+  border-color: var(--swal2-confirm-bg, var(--bs-primary)) !important;
+  color: var(--swal2-confirm-color, var(--text-inverse)) !important;
+}
+
+.swal2-confirm:hover:not(:disabled) {
+  background: var(--swal2-confirm-hover, var(--color-accent-hover)) !important;
+  border-color: var(--swal2-confirm-hover, var(--color-accent-hover)) !important;
+  color: var(--swal2-confirm-color, var(--text-inverse)) !important;
+}
+
+.swal2-confirm:active:not(:disabled) {
+  background: var(--color-accent-hover) !important;
+  border-color: var(--color-accent-hover) !important;
+  transform: scale(0.98) !important;
+}
+
+/* Cancel Button (Secondary Action) */
+.swal2-cancel {
+  background: var(--swal2-cancel-bg, var(--bs-secondary)) !important;
+  border-color: var(--swal2-cancel-bg, var(--bs-secondary)) !important;
+  color: var(--swal2-cancel-color, var(--text-inverse)) !important;
+}
+
+.swal2-cancel:hover:not(:disabled) {
+  background: var(--swal2-cancel-hover, var(--color-base-700)) !important;
+  border-color: var(--swal2-cancel-hover, var(--color-base-700)) !important;
+  color: var(--swal2-cancel-color, var(--text-inverse)) !important;
+}
+
+.swal2-cancel:active:not(:disabled) {
+  background: var(--color-base-700) !important;
+  border-color: var(--color-base-700) !important;
+  transform: scale(0.98) !important;
+}
+
+/* Deny Button (Danger Action) */
+.swal2-deny {
+  background: var(--swal2-deny-bg, var(--bs-danger)) !important;
+  border-color: var(--swal2-deny-bg, var(--bs-danger)) !important;
+  color: var(--swal2-deny-color, var(--text-inverse)) !important;
+}
+
+.swal2-deny:hover:not(:disabled) {
+  background: var(--swal2-deny-hover, var(--color-danger-hover)) !important;
+  border-color: var(--swal2-deny-hover, var(--color-danger-hover)) !important;
+  color: var(--swal2-deny-color, var(--text-inverse)) !important;
+}
+
+/* Button Group Layout */
+.swal2-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--space-sm) !important;
+  justify-content: center !important;
+  margin-top: var(--space-lg) !important;
+  padding: 0 !important;
+}
+
+.swal2-actions button {
+  flex: 0 1 auto !important;
+}
+
+/* Reverse buttons (cancel first, confirm last) */
+.swal2-actions.swal2-reverse-buttons {
+  flex-direction: row-reverse !important;
+}
+
+/* ==========================================================================
+   Inputs (Text, Textarea, Select, Checkbox, Radio, File, Range)
+   ========================================================================== */
+.swal2-input,
+.swal2-textarea,
+.swal2-select,
+.swal2-file,
+.swal2-range {
+  font-family: var(--font-sans) !important;
+  font-size: var(--input-font-size) !important;
+  font-weight: var(--font-normal) !important;
+  line-height: var(--input-line-height) !important;
+  color: var(--swal2-input-color, var(--input-color)) !important;
+  background: var(--swal2-input-bg, var(--input-bg)) !important;
+  border: var(--input-border-width) solid var(--swal2-input-border, var(--input-border)) !important;
+  border-radius: var(--swal2-input-border-radius, var(--input-radius)) !important;
+  padding: var(--swal2-input-padding, var(--input-padding-y) var(--input-padding-x)) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  transition: var(--input-transition) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* Input Focus */
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus,
+.swal2-file:focus,
+.swal2-range:focus {
+  border-color: var(--swal2-input-focus-border, var(--input-border-focus)) !important;
+  box-shadow: var(--input-focus-shadow) !important;
+  outline: none !important;
+}
+
+/* Input Placeholder */
+.swal2-input::placeholder,
+.swal2-textarea::placeholder {
+  color: var(--input-placeholder-color) !important;
+  opacity: 1 !important; /* Firefox */
+}
+
+/* Input Disabled */
+.swal2-input:disabled,
+.swal2-textarea:disabled,
+.swal2-select:disabled {
+  background: var(--input-bg-disabled) !important;
+  border-color: var(--input-border-disabled) !important;
+  color: var(--input-disabled-color) !important;
+  cursor: not-allowed !important;
+}
+
+/* Textarea */
+.swal2-textarea {
+  min-height: 100px !important;
+  resize: vertical !important;
+  line-height: var(--leading-body) !important;
+}
+
+/* Select */
+.swal2-select {
+  padding-right: var(--select-padding-end) !important;
+  background-image: var(--select-bg-image) !important;
+  background-repeat: no-repeat !important;
+  background-position: right var(--space-md) center !important;
+  background-size: 1rem !important;
+}
+
+/* Checkbox & Radio */
+.swal2-checkbox,
+.swal2-radio {
+  width: var(--checkbox-size) !important;
+  height: var(--checkbox-size) !important;
+  border: var(--checkbox-border-width) solid var(--input-border) !important;
+  border-radius: var(--checkbox-border-radius) !important;
+  cursor: pointer !important;
+  accent-color: var(--color-accent) !important;
+  transition: var(--input-transition) !important;
+}
+
+.swal2-checkbox:focus,
+.swal2-radio:focus {
+  box-shadow: var(--checkbox-focus-shadow) !important;
+  outline: none !important;
+}
+
+.swal2-checkbox:checked,
+.swal2-radio:checked {
+  background: var(--checkbox-checked-bg) !important;
+  border-color: var(--checkbox-checked-border) !important;
+}
+
+/* Input Labels */
+.swal2-label {
+  display: block !important;
+  font-size: var(--label-font-size) !important;
+  font-weight: var(--label-font-weight) !important;
+  color: var(--label-color) !important;
+  margin-bottom: var(--label-margin-bottom) !important;
+}
+
+/* Validation Message */
+.swal2-validation-message {
+  display: none !important;
+  font-size: var(--help-text-font-size) !important;
+  color: var(--error-text-color) !important;
+  margin-top: var(--help-text-margin-top) !important;
+  align-items: center !important;
+  gap: var(--space-xs) !important;
+}
+
+.swal2-validation-message::before {
+  content: "!" !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1em !important;
+  height: 1em !important;
+  border-radius: 50% !important;
+  background: currentColor !important;
+  color: var(--text-inverse) !important;
+  font-size: 0.75em !important;
+  font-weight: var(--font-bold) !important;
+}
+
+.swal2-input.swal2-invalid,
+.swal2-textarea.swal2-invalid,
+.swal2-select.swal2-invalid {
+  border-color: var(--input-border-error) !important;
+}
+
+.swal2-input.swal2-invalid:focus,
+.swal2-textarea.swal2-invalid:focus,
+.swal2-select.swal2-invalid:focus {
+  box-shadow: var(--input-focus-error-shadow) !important;
+}
+
+/* Show validation message when input is invalid */
+.swal2-invalid ~ .swal2-validation-message,
+.swal2-invalid + .swal2-validation-message {
+  display: flex !important;
+}
+
+/* ==========================================================================
+   Icons
+   ========================================================================== */
+.swal2-icon {
+  width: 5rem !important;
+  height: 5rem !important;
+  border-width: 0.25rem !important;
+  margin: 0 auto var(--space-lg) !important;
+}
+
+.swal2-icon .swal2-icon-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 2.5rem !important;
+}
+
+/* Success */
+.swal2-icon.swal2-success {
+  border-color: var(--swal2-success-border-color, var(--bs-success)) !important;
+  color: var(--swal2-success-line-color, var(--bs-success)) !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: var(--swal2-success-border-color, var(--bs-success)) !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-icon.swal2-success .swal2-success-line-long {
+  background-color: var(--swal2-success-line-color, var(--bs-success)) !important;
+}
+
+/* Error */
+.swal2-icon.swal2-error {
+  border-color: var(--swal2-error-border-color, var(--bs-danger)) !important;
+  color: var(--swal2-error-x-color, var(--bs-danger)) !important;
+}
+
+.swal2-icon.swal2-error .swal2-x-mark {
+  color: var(--swal2-error-x-color, var(--bs-danger)) !important;
+}
+
+/* Warning */
+.swal2-icon.swal2-warning {
+  border-color: var(--swal2-warning-border-color, var(--bs-warning)) !important;
+  color: var(--swal2-warning-color, var(--bs-warning)) !important;
+}
+
+/* Info */
+.swal2-icon.swal2-info {
+  border-color: var(--swal2-info-border-color, var(--bs-info)) !important;
+  color: var(--swal2-info-color, var(--bs-info)) !important;
+}
+
+/* Question */
+.swal2-icon.swal2-question {
+  border-color: var(--swal2-question-border-color, var(--bs-primary)) !important;
+  color: var(--swal2-question-color, var(--bs-primary)) !important;
+}
+
+/* Custom Icon */
+.swal2-icon.swal2-custom {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ==========================================================================
+   Loader
+   ========================================================================== */
+.swal2-loader {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-width: 0.25rem !important;
+  border-color: var(--swal2-loader-border-color, var(--swal2-confirm-bg)) transparent
+    var(--swal2-loader-border-color, var(--swal2-confirm-bg)) transparent !important;
+  animation: swal2-rotate-loading 0.75s linear infinite !important;
+}
+
+@keyframes swal2-rotate-loading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.swal2-footer {
+  border-top: 1px solid var(--swal2-footer-border-color, var(--border-subtle)) !important;
+  padding-top: var(--swal2-footer-padding, var(--space-md)) !important;
+  margin-top: var(--space-lg) !important;
+  color: var(--swal2-footer-color, var(--text-secondary)) !important;
+  font-size: var(--text-sm) !important;
+  text-align: center !important;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Close Button
+   ========================================================================== */
+.swal2-close {
+  position: absolute !important;
+  top: var(--space-md) !important;
+  right: var(--space-md) !important;
+  width: var(--modal-close-size) !important;
+  height: var(--modal-close-size) !important;
+  font-size: 1.5rem !important;
+  font-weight: var(--font-normal) !important;
+  line-height: var(--modal-close-size) !important;
+  color: var(--modal-close-color) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  cursor: pointer !important;
+  transition: var(--transition-fast) !important;
+  opacity: 0.8 !important;
+}
+
+.swal2-close:hover {
+  color: var(--modal-close-hover-color) !important;
+  opacity: 1 !important;
+  background: var(--bg-hover) !important;
+}
+
+.swal2-close:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* ==========================================================================
+   Progress Steps (for multi-step modals)
+   ========================================================================== */
+.swal2-progress-steps {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--space-sm) !important;
+  margin: 0 0 var(--space-lg) !important;
+  padding: 0 !important;
+}
+
+.swal2-progress-step {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-semibold) !important;
+  color: var(--text-inverse) !important;
+  background: var(--bs-secondary) !important;
+  border-radius: 50% !important;
+  transition: var(--transition-fast) !important;
+}
+
+.swal2-progress-step.swal2-active-progress-step {
+  background: var(--bs-primary) !important;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--color-accent-light) !important;
+}
+
+.swal2-progress-step.swal2-active-progress-step ~ .swal2-progress-step {
+  background: var(--bg-hover) !important;
+  color: var(--text-muted) !important;
+}
+
+.swal2-progress-step-line {
+  width: 2.5rem !important;
+  height: 0.125rem !important;
+  background: var(--border-subtle) !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==========================================================================
+   Image
+   ========================================================================== */
+.swal2-image {
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto var(--space-lg) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+/* ==========================================================================
+   Timer Progress Bar
+   ========================================================================== */
+.swal2-timer-progress-bar-container {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 0.25rem !important;
+  overflow: hidden !important;
+  border-bottom-right-radius: var(--swal2-border-radius) !important;
+  border-bottom-left-radius: var(--swal2-border-radius) !important;
+}
+
+.swal2-timer-progress-bar {
+  width: 100% !important;
+  height: 100% !important;
+  background: var(--bs-primary) !important;
+  border-radius: inherit !important;
+  transition: width var(--transition-fast) linear !important;
+}
+
+/* ==========================================================================
+   Responsive - Mobile First
+   ========================================================================== */
+
+/* Small phones (< 375px) */
+@media (max-width: 374px) {
+  .swal2-popup {
+    margin: var(--space-sm) !important;
+    padding: var(--space-lg) !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .swal2-title {
+    font-size: var(--text-lg) !important;
+  }
+
+  .swal2-html-container {
+    font-size: var(--text-sm) !important;
+  }
+
+  .swal2-styled {
+    padding: var(--btn-sm-padding-y) var(--btn-sm-padding-x) !important;
+    font-size: var(--btn-sm-font-size) !important;
+    min-width: 72px !important;
+    width: 100% !important;
+  }
+
+  .swal2-actions {
+    flex-direction: column-reverse !important;
+    gap: var(--space-xs) !important;
+  }
+
+  .swal2-icon {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+
+  .swal2-icon .swal2-icon-content {
+    font-size: 2rem !important;
+  }
+}
+
+/* Phones (375px - 575px) */
+@media (min-width: 375px) and (max-width: 575.98px) {
+  .swal2-popup {
+    margin: var(--space-md) !important;
+    padding: var(--space-xl) !important;
+  }
+
+  .swal2-styled {
+    width: 100% !important;
+  }
+
+  .swal2-actions {
+    flex-direction: column-reverse !important;
+    gap: var(--space-sm) !important;
+  }
+}
+
+/* Tablets (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .swal2-popup {
+    max-width: var(--modal-width-md) !important;
+  }
+
+  .swal2-actions {
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+  }
+
+  .swal2-styled {
+    width: auto !important;
+    min-width: 80px !important;
+  }
+}
+
+/* Desktop (768px+) */
+@media (min-width: 768px) {
+  .swal2-popup {
+    max-width: var(--modal-width-lg) !important;
+  }
+
+  .swal2-actions {
+    justify-content: flex-end !important;
+  }
+}
+
+/* Large Desktop (992px+) */
+@media (min-width: 992px) {
+  .swal2-popup {
+    max-width: var(--modal-width-lg) !important;
+  }
+}
+
+/* ==========================================================================
+   Animation Classes (Optional - requires animate.css)
+   ========================================================================== */
+/* If using animate.css, these classes work with showClass/hideClass */
+.swal2-show {
+  animation: swal2-show 0.3s ease-out !important;
+}
+
+.swal2-hide {
+  animation: swal2-hide 0.2s ease-in !important;
+}
+
+@keyframes swal2-show {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes swal2-hide {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+/* Backdrop animation */
+.swal2-backdrop-show {
+  animation: swal2-backdrop-show 0.2s ease-out !important;
+}
+
+.swal2-backdrop-hide {
+  animation: swal2-backdrop-hide 0.15s ease-in !important;
+}
+
+@keyframes swal2-backdrop-show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes swal2-backdrop-hide {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .swal2-popup,
+  .swal2-backdrop-show,
+  .swal2-backdrop-hide,
+  .swal2-show,
+  .swal2-hide,
+  .swal2-loader,
+  .swal2-icon,
+  .swal2-styled,
+  .swal2-timer-progress-bar {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .swal2-loader {
+    animation: none !important;
+    border-color: var(--swal2-confirm-bg) !important;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .swal2-container {
+    position: static !important;
+  }
+
+  .swal2-popup {
+    box-shadow: none !important;
+    border: 1px solid var(--border-default) !important;
+    page-break-inside: avoid !important;
+  }
+
+  .swal2-backdrop-show {
+    display: none !important;
+  }
+}

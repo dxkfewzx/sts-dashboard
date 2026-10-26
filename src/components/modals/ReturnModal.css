@@ -1,0 +1,35 @@
+/**
+ * ReturnModal Component Styles
+ * Uses design tokens
+ */
+
+.ui-readonly-group {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ui-readonly-group__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Read-only input styling */
+.ui-readonly-group .form-control[readonly],
+.ui-readonly-group .form-select[readonly] {
+  background-color: var(--input-bg-disabled);
+  border-color: var(--input-border-disabled);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ui-readonly-group {
+    transition-duration: 0.01ms !important;
+  }
+}

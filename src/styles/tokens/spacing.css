@@ -1,35 +1,133 @@
 /**
  * Spacing Tokens
- * 16px base grid - all spacing multiples of 4px (1 unit = 4px)
+ * Bootstrap 5 compatible scale with fluid/responsive values
+ * Base unit: 0.25rem = 4px
+ * All spacing is multiples of 4px for visual rhythm
  */
 
+/* === Bootstrap 5 Spacing Scale === */
+/* 1 unit = 0.25rem = 4px (at default 16px root) */
 :root {
-  /* Base unit: 4px */
+  /* Base spacer */
+  --spacer: 0.25rem;
+
+  /* Bootstrap 5 standard spacing (0-12) */
   --space-0:   0;
-  --space-1:   4px;   /* 1 unit */
-  --space-2:   8px;   /* 2 units */
-  --space-3:   12px;  /* 3 units */
-  --space-4:   16px;  /* 4 units = 1rem base */
-  --space-5:   20px;  /* 5 units */
-  --space-6:   24px;  /* 6 units */
-  --space-8:   32px;  /* 8 units */
-  --space-10:  40px;  /* 10 units */
-  --space-12:  48px;  /* 12 units */
-  --space-16:  64px;  /* 16 units */
+  --space-1:   calc(var(--spacer) * 0.5);  /* 2px */
+  --space-2:   calc(var(--spacer) * 1);    /* 4px */
+  --space-3:   calc(var(--spacer) * 1.5);  /* 6px */
+  --space-4:   calc(var(--spacer) * 2);    /* 8px */
+  --space-5:   calc(var(--spacer) * 3);    /* 12px */
+  --space-6:   calc(var(--spacer) * 4);    /* 16px */
+  --space-7:   calc(var(--spacer) * 5);    /* 20px */
+  --space-8:   calc(var(--spacer) * 6);    /* 24px */
+  --space-9:   calc(var(--spacer) * 8);    /* 32px */
+  --space-10:  calc(var(--spacer) * 10);   /* 40px */
+  --space-11:  calc(var(--spacer) * 12);   /* 48px */
+  --space-12:  calc(var(--spacer) * 16);   /* 64px */
+
+  /* Fluid/Responsive spacing (grows with viewport) */
+  /* Use for page-level padding, section gaps */
+  --space-fluid-xs:  clamp(0.5rem, 0.375rem + 0.5vw, 1rem);      /* 8-16px */
+  --space-fluid-sm:  clamp(0.75rem, 0.5rem + 1vw, 1.5rem);        /* 12-24px */
+  --space-fluid-md:  clamp(1rem, 0.75rem + 1.25vw, 2rem);         /* 16-32px */
+  --space-fluid-lg:  clamp(1.5rem, 1rem + 2vw, 3rem);             /* 24-48px */
+  --space-fluid-xl:  clamp(2rem, 1.5rem + 2.5vw, 4rem);           /* 32-64px */
+  --space-fluid-2xl: clamp(3rem, 2rem + 3vw, 6rem);               /* 48-96px */
 
   /* Semantic aliases (matching existing App.css) */
-  --space-xs:  var(--space-1);
-  --space-sm:  var(--space-2);
-  --space-md:  var(--space-4);
-  --space-lg:  var(--space-6);
-  --space-xl:  var(--space-8);
-  --space-2xl: var(--space-12);
-  --space-3xl: var(--space-16);
+  --space-xs:  var(--space-1);   /* 2px - tiny gaps */
+  --space-sm:  var(--space-2);   /* 4px - tight spacing */
+  --space-md:  var(--space-4);   /* 8px - default spacing */
+  --space-lg:  var(--space-6);   /* 16px - comfortable spacing */
+  --space-xl:  var(--space-8);   /* 24px - section spacing */
+  --space-2xl: var(--space-10);  /* 40px - large section spacing */
+  --space-3xl: var(--space-12);  /* 64px - hero/major section spacing */
 
-  /* Component-specific */
-  --space-card-padding: var(--space-6);
-  --space-card-padding-sm: var(--space-4);
-  --space-modal-padding: var(--space-6);
-  --space-page-padding: var(--space-8);
-  --space-section-gap: var(--space-6);
+  /* Component-specific semantic spacing */
+  --space-card-padding:     var(--space-lg);   /* 16px */
+  --space-card-padding-sm:  var(--space-md);   /* 8px */
+  --space-card-padding-lg:  var(--space-xl);   /* 24px */
+  --space-modal-padding:    var(--space-xl);   /* 24px */
+  --space-modal-padding-sm: var(--space-lg);   /* 16px */
+  --space-page-padding:     var(--space-fluid-md);  /* responsive */
+  --space-section-gap:      var(--space-fluid-lg);  /* responsive */
+  --space-component-gap:    var(--space-md);   /* 8px between components */
+  --space-inline-gap:       var(--space-sm);   /* 4px inline elements */
+
+  /* Form specific */
+  --space-form-field-gap:   var(--space-lg);   /* 16px between fields */
+  --space-form-group-gap:   var(--space-xl);   /* 24px between groups */
+  --space-input-padding-y:  0.5rem;            /* 8px */
+  --space-input-padding-x:  0.75rem;           /* 12px */
+
+  /* Button specific */
+  --space-btn-padding-y:    0.5rem;            /* 8px */
+  --space-btn-padding-x:    1rem;              /* 16px */
+  --space-btn-sm-padding-y: 0.25rem;           /* 4px */
+  --space-btn-sm-padding-x: 0.5rem;            /* 8px */
+  --space-btn-lg-padding-y: 0.75rem;           /* 12px */
+  --space-btn-lg-padding-x: 1.5rem;            /* 24px */
+
+  /* Table specific */
+  --space-table-cell-padding-y: var(--space-md);  /* 8px */
+  --space-table-cell-padding-x: var(--space-md);  /* 8px */
+
+  /* Navbar/Sidebar */
+  --space-navbar-height:      64px;
+  --space-sidebar-width:      260px;
+  --space-sidebar-collapsed-width: 72px;
+
+  /* Legacy aliases (for backward compat) */
+  --space-1-legacy:  var(--space-1);
+  --space-2-legacy:  var(--space-2);
+  --space-3-legacy:  var(--space-3);
+  --space-4-legacy:  var(--space-4);
+  --space-5-legacy:  var(--space-5);
+  --space-6-legacy:  var(--space-6);
+  --space-8-legacy:  var(--space-8);
+  --space-10-legacy: var(--space-10);
+  --space-12-legacy: var(--space-12);
+  --space-16-legacy: var(--space-12);
+}
+
+/* === Bootstrap 5 Utility Classes Mapping === */
+/* These match Bootstrap's spacing utility naming convention */
+/* Usage: .m-3, .p-4, .mx-auto, .py-lg-5, etc. are handled in App.css */
+:root {
+  /* Breakpoint-specific spacing (for responsive utilities) */
+  --space-sm-0:  var(--space-0);
+  --space-sm-1:  var(--space-1);
+  --space-sm-2:  var(--space-2);
+  --space-sm-3:  var(--space-3);
+  --space-sm-4:  var(--space-4);
+  --space-sm-5:  var(--space-5);
+
+  --space-md-0:  var(--space-0);
+  --space-md-1:  var(--space-1);
+  --space-md-2:  var(--space-2);
+  --space-md-3:  var(--space-3);
+  --space-md-4:  var(--space-4);
+  --space-md-5:  var(--space-5);
+
+  --space-lg-0:  var(--space-0);
+  --space-lg-1:  var(--space-1);
+  --space-lg-2:  var(--space-2);
+  --space-lg-3:  var(--space-3);
+  --space-lg-4:  var(--space-4);
+  --space-lg-5:  var(--space-5);
+
+  --space-xl-0:  var(--space-0);
+  --space-xl-1:  var(--space-1);
+  --space-xl-2:  var(--space-2);
+  --space-xl-3:  var(--space-3);
+  --space-xl-4:  var(--space-4);
+  --space-xl-5:  var(--space-5);
+
+  --space-xxl-0:  var(--space-0);
+  --space-xxl-1:  var(--space-1);
+  --space-xxl-2:  var(--space-2);
+  --space-xxl-3:  var(--space-3);
+  --space-xxl-4:  var(--space-4);
+  --space-xxl-5:  var(--space-5);
 }

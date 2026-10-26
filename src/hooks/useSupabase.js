@@ -142,7 +142,7 @@ export function useDashboardStats() {
  * Hook for report statistics
  */
 export function useReportStats() {
-  const { items, serialNumbers, repairs, withdrawalLogs } = useData();
+  const { items, serialNumbers } = useData();
 
   const totalItems = items.length;
   const availableSN = serialNumbers.filter(sn => sn.status === 'Available').length;

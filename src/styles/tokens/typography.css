@@ -1,42 +1,109 @@
 /**
  * Typography Tokens
- * IBM Plex Sans Thai + IBM Plex Mono per DESIGN_PLAN.md
- * Type scale with Thai-appropriate line heights
+ * Fluid type scale + Thai-optimized line heights
+ * Bootstrap 5 compatible with responsive scaling
  */
 
+/* === Font Families === */
 :root {
-  /* Font Families - Original Prompt font per user preference */
-  --font-sans: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Primary: Prompt (Thai + Latin) - user preference */
+  --font-sans: 'Prompt', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Monospace: For serial numbers, codes, technical data */
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Monaco, Consolas, monospace;
 
-  /* Type Scale - Original values from old App.css */
-  --text-xs:     0.7rem;      /* 11.2px - metadata, timestamps */
-  --text-sm:     0.8rem;      /* 12.8px - table cells, form labels */
-  --text-base:   0.9rem;      /* 14.4px - body copy */
-  --text-lg:     1rem;        /* 16px - emphasized body */
-  --text-xl:     1.125rem;    /* 18px - section headers */
-  --text-2xl:    1.25rem;     /* 20px - page titles */
-  --text-3xl:    1.5rem;      /* 24px - hero numbers (KPIs) */
-  --text-4xl:    3rem;        /* 48px - rarely used, empty states */
+  /* Bootstrap 5 font family variables */
+  --bs-font-sans-serif: var(--font-sans);
+  --bs-font-monospace: var(--font-mono);
+}
 
-  /* Line Heights */
-  --leading-tight:   1.2;   /* Headlines, numbers */
-  --leading-snug:    1.4;   /* Thai body text needs more room for vowel stacking */
-  --leading-normal:  1.6;   /* Latin body text */
-  --leading-relaxed: 1.75;  /* Long-form reading */
+/* === Fluid Type Scale === */
+/* Uses clamp() for responsive scaling without breakpoints */
+/* Min at 375px, Max at 1440px, scales smoothly in between */
+:root {
+  /* Extra small - metadata, timestamps, badges */
+  --text-xs:      clamp(0.6875rem, 0.625rem + 0.3125vw, 0.75rem);     /* 11-12px */
 
-  /* Font Weights */
-  --font-normal:   400;
-  --font-medium:   500;
-  --font-semibold: 600;
-  --font-bold:     700;
+  /* Small - table cells, form labels, captions */
+  --text-sm:      clamp(0.8125rem, 0.75rem + 0.3125vw, 0.875rem);      /* 13-14px */
 
-  /* Letter Spacing (tracking) */
-  --tracking-tight:  -0.02em;  /* Headlines */
-  --tracking-normal: 0;        /* Body */
-  --tracking-wide:   0.02em;   /* Labels, all-caps (rare for Thai) */
+  /* Base - body text, paragraphs */
+  --text-base:    clamp(0.9375rem, 0.875rem + 0.3125vw, 1rem);         /* 15-16px */
 
-  /* Legacy aliases (kept for reference) */
+  /* Large - emphasized body, lead paragraphs */
+  --text-lg:      clamp(1.0625rem, 1rem + 0.3125vw, 1.125rem);         /* 17-18px */
+
+  /* XL - section headers, card titles */
+  --text-xl:      clamp(1.25rem, 1.125rem + 0.625vw, 1.375rem);        /* 20-22px */
+
+  /* 2XL - page titles, major headings */
+  --text-2xl:     clamp(1.5rem, 1.375rem + 0.625vw, 1.75rem);          /* 24-28px */
+
+  /* 3XL - hero numbers (KPIs), large displays */
+  --text-3xl:     clamp(1.875rem, 1.75rem + 0.625vw, 2.25rem);         /* 30-36px */
+
+  /* 4XL - empty states, hero headlines */
+  --text-4xl:     clamp(2.25rem, 2rem + 1.25vw, 3rem);                 /* 36-48px */
+
+  /* 5XL - rare, marketing hero */
+  --text-5xl:     clamp(3rem, 2.5rem + 1.5vw, 4rem);                   /* 48-64px */
+
+  /* Bootstrap 5 type scale aliases */
+  --bs-body-font-size: var(--text-base);
+  --bs-body-font-weight: 400;
+  --bs-body-line-height: var(--leading-snug);
+  --bs-h1-font-size: var(--text-4xl);
+  --bs-h2-font-size: var(--text-3xl);
+  --bs-h3-font-size: var(--text-2xl);
+  --bs-h4-font-size: var(--text-xl);
+  --bs-h5-font-size: var(--text-lg);
+  --bs-h6-font-size: var(--text-base);
+}
+
+/* === Line Heights === */
+/* Thai text needs more vertical space for vowel stacking */
+:root {
+  --leading-none:     1;          /* Icons, single line numbers */
+  --leading-tight:    1.2;        /* Headlines, numbers, KPIs */
+  --leading-snug:     1.45;       /* Thai body text - default */
+  --leading-normal:   1.6;        /* Latin body text, comfortable reading */
+  --leading-relaxed:  1.75;       /* Long-form content, articles */
+  --leading-loose:    2;          /* Double spaced, accessibility */
+
+  /* Semantic aliases */
+  --leading-heading:  var(--leading-tight);
+  --leading-body:     var(--leading-snug);
+  --leading-body-latin: var(--leading-normal);
+  --leading-caption:  var(--leading-snug);
+}
+
+/* === Font Weights === */
+:root {
+  --font-light:     300;
+  --font-normal:    400;
+  --font-medium:    500;
+  --font-semibold:  600;
+  --font-bold:      700;
+
+  /* Bootstrap 5 weight aliases */
+  --bs-font-weight-light: var(--font-light);
+  --bs-font-weight-normal: var(--font-normal);
+  --bs-font-weight-medium: var(--font-medium);
+  --bs-font-weight-semibold: var(--font-semibold);
+  --bs-font-weight-bold: var(--font-bold);
+}
+
+/* === Letter Spacing (Tracking) === */
+:root {
+  --tracking-tighter: -0.05em;  /* Large headlines */
+  --tracking-tight:   -0.02em;  /* Headlines */
+  --tracking-normal:  0;        /* Body text */
+  --tracking-wide:    0.02em;   /* Labels, all-caps (rare for Thai) */
+  --tracking-wider:   0.05em;   /* Button text, small caps */
+  --tracking-widest:  0.1em;    /* Letter-spaced headers */
+}
+
+/* === Legacy Aliases (for backward compat) === */
+:root {
   --font-sans-legacy: var(--font-sans);
   --font-mono-legacy: var(--font-mono);
 
@@ -47,27 +114,72 @@
   --text-xl-legacy:  var(--text-xl);
   --text-2xl-legacy: var(--text-2xl);
   --text-3xl-legacy: var(--text-3xl);
+  --text-4xl-legacy: var(--text-4xl);
 
   --font-normal-legacy:   var(--font-normal);
   --font-medium-legacy:   var(--font-medium);
   --font-semibold-legacy: var(--font-semibold);
   --font-bold-legacy:     var(--font-bold);
+
+  --leading-tight-legacy:   var(--leading-tight);
+  --leading-snug-legacy:    var(--leading-snug);
+  --leading-normal-legacy:  var(--leading-normal);
+  --leading-relaxed-legacy: var(--leading-relaxed);
 }
 
-/* Base typography reset - apply to root elements */
+/* === Base Typography Reset === */
+/* Applied globally via App.css import */
 * {
   box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;  /* Base for rem calculations */
+  -webkit-text-size-adjust: 100%;  /* Prevent iOS zoom on input focus */
 }
 
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  line-height: var(--leading-snug);  /* Thai-appropriate default */
+  font-weight: var(--font-normal);
+  line-height: var(--leading-body);
   color: var(--text-primary);
   background-color: var(--bg-page);
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-heading);
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: var(--space-md);
+}
+
+h1 { font-size: var(--text-4xl); letter-spacing: var(--tracking-tighter); }
+h2 { font-size: var(--text-3xl); letter-spacing: var(--tracking-tight); }
+h3 { font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); }
+h4 { font-size: var(--text-xl); letter-spacing: var(--tracking-normal); }
+h5 { font-size: var(--text-lg); letter-spacing: var(--tracking-normal); }
+h6 { font-size: var(--text-base); font-weight: var(--font-medium); letter-spacing: var(--tracking-wide); }
+
+/* Lead paragraph */
+.lead {
+  font-size: var(--text-lg);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+
+/* Small text */
+small, .small {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 
 /* Monospace for code, serial numbers, IDs */
@@ -79,27 +191,98 @@ code, kbd, samp, pre,
   line-height: var(--leading-normal);
 }
 
-/* Thai-specific adjustments */
-:lang(th) {
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-normal);
+/* Preformatted */
+pre {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  overflow-x: auto;
+  padding: var(--space-md);
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
 }
 
-/* No all-caps for Thai (meaningless) */
-.thai-no-caps {
+/* Links */
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--text-link-hover);
+  text-decoration: underline;
+}
+
+/* === Thai-Specific Optimizations === */
+
+/* Prevent Thai word breaking in the middle of words */
+* {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* Thai language specific adjustments */
+:lang(th),
+.thai-text {
+  font-family: var(--font-sans);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-normal);
+  word-break: keep-all;
+}
+
+/* Balance text wrapping for headlines (modern browsers) */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Prevent orphan words in headlines */
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* No all-caps for Thai (meaningless - no uppercase in Thai) */
+.thai-no-caps,
+:lang(th) .text-uppercase {
   text-transform: none !important;
 }
 
-/* Focus visible outline */
+/* Ensure proper line height for mixed Thai/Latin content */
+.mixed-text {
+  line-height: var(--leading-normal);
+}
+
+/* === Focus Visible for Accessibility === */
 :focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
-/* Reduced motion */
+/* === Reduced Motion === */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* === Print Styles === */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
   }
 }

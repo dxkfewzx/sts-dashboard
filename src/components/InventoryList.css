@@ -1,0 +1,153 @@
+/**
+ * InventoryList Component Styles
+ * Uses design tokens
+ */
+
+.inventory-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  border-color: var(--border-focus) !important;
+  color: var(--primary) !important;
+  background-color: var(--primary-light) !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mobile-menu-toggle .bi {
+  font-size: 1.25rem;
+}
+
+/* Touch target utilities */
+.touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* Search & Filter Bar */
+.inventory-search-bar {
+  /* Card variant handles most styles */
+}
+
+.inventory-results-count {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Items Table */
+.inventory-table-card {
+  /* Card variant handles most styles */
+}
+
+.inventory-table-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Table column renderers */
+.item-name-cell {
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Skeleton rows */
+.skeleton-row {
+  background-color: transparent !important;
+}
+
+.skeleton-cell-text {
+  margin: 0 auto;
+}
+
+.skeleton-cell-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Row hover highlight */
+.table-row-highlight {
+  background-color: var(--bg-secondary) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+/* Empty State */
+.inventory-empty-state {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-lg) !important;
+}
+
+.inventory-empty-state-icon {
+  font-size: 3.5rem;
+  opacity: 0.5;
+}
+
+.inventory-empty-state-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.inventory-empty-state-text {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-toggle,
+  .table-row-highlight,
+  .inventory-empty-state-icon {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Table Priority Columns */
+@media (max-width: 767.98px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+  
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+  
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low,
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+}

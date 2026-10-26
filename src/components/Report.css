@@ -1,0 +1,102 @@
+/**
+ * Report Component Styles
+ * Uses design tokens
+ */
+
+.report-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  border-color: var(--border-focus) !important;
+  color: var(--primary) !important;
+  background-color: var(--primary-light) !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mobile-menu-toggle .bi {
+  font-size: 1.25rem;
+}
+
+/* Stats Grid */
+.report-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .report-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Table Cards */
+.report-table-card {
+  /* Card variant handles most styles */
+}
+
+.report-table-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Table Priority Columns */
+@media (max-width: 767.98px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+  
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+  
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low,
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+}
+
+/* Row danger highlight for overdue items */
+.table-danger {
+  background-color: var(--color-danger-light) !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-toggle,
+  .report-table-card,
+  .report-stats-grid {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

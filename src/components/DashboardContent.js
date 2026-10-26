@@ -16,19 +16,22 @@ import {
 const DashboardContent = () => {
   const { isMobile, isSidebarOpen, toggleSidebar } = useSidebar();
 
+  // Fallback check for mobile - use both context and direct window check
+  const isMobileFallback = typeof window !== 'undefined' && window.innerWidth <= 1024;
+  const shouldShowMobileMenu = isMobile || isMobileFallback;
+
   const MobileMenuToggle = () => {
-    if (!isMobile) return null;
+    if (!shouldShowMobileMenu) return null;
     return (
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon"
+        leftIcon={<i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} />}
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? 'ปิดเมนู' : 'เปิดเมนู'}
         aria-expanded={isSidebarOpen}
         className="mobile-menu-toggle"
-      >
-        <i className={isSidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'} style={{ fontSize: '1.25rem' }} />
-      </Button>
+      />
     );
   };
 
@@ -163,14 +166,14 @@ const DashboardContent = () => {
 
   // Table columns for Items table
   const itemColumns = [
-    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold' },
-    { key: 'item_name', header: 'รายการ', className: 'fw-medium' },
-    { key: 'responsible', header: 'ผู้ดูแล', width: '130px', minWidth: '120px', render: (item) => <span className="badge badge-secondary"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</span> },
-    { key: 'total_qty', header: 'ทั้งหมด', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-primary">{item.total_qty}</span>, className: 'text-center' },
-    { key: 'available', header: 'พร้อมใช้', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-success">{item.total_qty - getWithdrawnCount(item.id) - getRepairCount(item.id)}</span>, className: 'text-center' },
-    { key: 'withdrawn', header: 'เบิกออก', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-warning">{getWithdrawnCount(item.id)}</span>, className: 'text-center' },
-    { key: 'repair', header: 'ซ่อม', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-danger">{getRepairCount(item.id)}</span>, className: 'text-center' },
-    { key: 'remaining', header: 'คงเหลือ', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold">{getRemainingCount(item)}</span>, className: 'text-center' },
+    { key: 'index', header: '#', width: '50px', minWidth: '50px', render: (_, index) => String(index + 1).padStart(2, '0'), className: 'text-muted fw-bold', hideInCard: true },
+    { key: 'item_name', header: 'รายการ', className: 'fw-medium', cardLabel: 'รายการ' },
+    { key: 'responsible', header: 'ผู้ดูแล', width: '130px', minWidth: '120px', render: (item) => <span className="badge badge-secondary"><i className="bi bi-person me-1"></i>{item.responsible || '-'}</span>, cardLabel: 'ผู้ดูแล' },
+    { key: 'total_qty', header: 'ทั้งหมด', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-primary">{item.total_qty}</span>, className: 'text-center', cardLabel: 'จำนวนทั้งหมด' },
+    { key: 'available', header: 'พร้อมใช้', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-success">{item.total_qty - getWithdrawnCount(item.id) - getRepairCount(item.id)}</span>, className: 'text-center', cardLabel: 'พร้อมใช้' },
+    { key: 'withdrawn', header: 'เบิกออก', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-warning">{getWithdrawnCount(item.id)}</span>, className: 'text-center', cardLabel: 'เบิกออก' },
+    { key: 'repair', header: 'ซ่อม', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold text-danger">{getRepairCount(item.id)}</span>, className: 'text-center', cardLabel: 'ซ่อม' },
+    { key: 'remaining', header: 'คงเหลือ', width: '80px', minWidth: '70px', render: (item) => <span className="fw-bold">{getRemainingCount(item)}</span>, className: 'text-center', cardLabel: 'คงเหลือ' },
     {
       key: 'actions',
       header: 'การจัดการ',
@@ -189,13 +192,12 @@ const DashboardContent = () => {
           <Button
             variant="outline"
             size="icon"
+            leftIcon={<i className="bi bi-box-arrow-right" />}
             className="btn-action btn-withdraw"
             onClick={() => setShowWithdrawModal(true)}
             title="เบิกอุปกรณ์"
             aria-label={`เบิก ${item.item_name}`}
-          >
-            <i className="bi bi-box-arrow-right" />
-          </Button>
+          />
         </div>
       )
     },
@@ -261,7 +263,7 @@ const DashboardContent = () => {
             striped
             hoverable
             responsive
-            minWidth={1000}
+            cardLayout
           />
         </Card.Body>
       </Card>

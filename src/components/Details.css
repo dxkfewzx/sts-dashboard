@@ -1,0 +1,126 @@
+/**
+ * Details Page Component Styles
+ * Uses design tokens
+ */
+
+.details-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  /* Styles handled by Button component */
+}
+
+.mobile-menu-toggle .bi {
+  font-size: 1.25rem;
+}
+
+/* General Info Card */
+.details-info-card {
+  /* Card variant="outlined" handles most styles */
+}
+
+.details-info-card .card-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.details-info-card .info-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.details-info-card .info-item strong {
+  color: var(--text-primary);
+}
+
+/* Tab Panels */
+.details-tab-panel {
+  /* Hidden/show handled by hidden attribute */
+}
+
+.details-tab-panel[hidden] {
+  display: none !important;
+}
+
+.details-tab-panel:not([hidden]) {
+  display: block !important;
+}
+
+/* Stats Grid */
+.details-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .details-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Table Column Priority Classes - for Table component */
+.table-priority th.col-priority-high,
+.table-priority td.col-priority-high {
+  display: table-cell !important;
+}
+
+@media (max-width: 767.98px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+  
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+  
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .table-priority th.col-priority-low,
+  .table-priority td.col-priority-low,
+  .table-priority th.col-priority-medium,
+  .table-priority td.col-priority-medium {
+    display: table-cell !important;
+  }
+}
+
+/* Note column with max-width */
+.history-note-cell {
+  max-width: 200px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .details-tab-panel,
+  .details-stats-grid,
+  .details-info-card {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

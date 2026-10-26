@@ -1,0 +1,589 @@
+/**
+ * Responsive Table Patterns for STS Dashboard
+ * Three patterns for different use cases:
+ * 1. Horizontal Scroll (default Bootstrap) - for wide tables with many columns
+ * 2. Card Layout - for mobile-friendly data display
+ * 3. Priority Columns - show/hide columns based on screen size
+ *
+ * Usage: Add class to table wrapper or table element
+ */
+
+/* ==========================================================================
+   Pattern 1: Horizontal Scroll (Bootstrap Default)
+   Best for: Tables with many columns that must stay aligned
+   ========================================================================== */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.table-responsive > .table {
+  margin-bottom: 0;
+  min-width: 100%;
+}
+
+.table-responsive > .table-bordered {
+  border: 0;
+}
+
+/* Ensure sticky columns work in horizontal scroll */
+.table-responsive .sticky-column {
+  position: sticky;
+  background: var(--bg-surface);
+  z-index: 1;
+}
+
+.table-responsive .sticky-column:first-child {
+  left: 0;
+}
+
+.table-responsive .sticky-column:last-child {
+  right: 0;
+}
+
+/* Scroll indicator */
+.table-responsive::after {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-light),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.table-responsive:hover::after,
+.table-responsive:focus-within::after {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Pattern 2: Card Layout (Mobile < 768px)
+   Best for: Data display on mobile, transforms table rows into cards
+   ========================================================================== */
+
+/* Base table styles for card layout */
+.table-card-layout {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-card-layout thead {
+  display: none; /* Hidden on mobile, shown via CSS below */
+}
+
+.table-card-layout tbody {
+  display: block;
+  width: 100%;
+}
+
+.table-card-layout tr {
+  display: block;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  margin-bottom: var(--space-md);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--card-transition);
+}
+
+.table-card-layout tr:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* Selected row state */
+.table-card-layout tr.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.table-card-layout td {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  min-height: 44px; /* Touch target */
+}
+
+.table-card-layout td:last-child {
+  border-bottom: none;
+}
+
+/* Label (from data-label attribute) */
+.table-card-layout td::before {
+  content: attr(data-label);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  flex-shrink: 0;
+  margin-right: var(--space-md);
+  min-width: 100px;
+}
+
+/* Value */
+.table-card-layout td > *:not(:last-child) {
+  margin-right: var(--space-sm);
+}
+
+/* Actions column */
+.table-card-layout td.actions {
+  flex-direction: row;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-xs);
+}
+
+.table-card-layout td.actions::before {
+  display: none;
+}
+
+.table-card-layout td.actions .btn {
+  padding: var(--btn-sm-padding-y) var(--btn-sm-padding-x);
+  font-size: var(--btn-sm-font-size);
+  min-width: auto;
+}
+
+/* Badge in card layout */
+.table-card-layout td .badge {
+  flex-shrink: 0;
+}
+
+/* Show header on tablet+ */
+@media (min-width: 768px) {
+  .table-card-layout {
+    display: table;
+  }
+
+  .table-card-layout thead {
+    display: table-header-group;
+  }
+
+  .table-card-layout tbody {
+    display: table-row-group;
+  }
+
+  .table-card-layout tr {
+    display: table-row;
+    border: none;
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .table-card-layout tr:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--table-hover-bg);
+  }
+
+  .table-card-layout td {
+    display: table-cell;
+    padding: var(--space-md);
+    border: none;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: var(--table-cell-font-size);
+  }
+
+  .table-card-layout td::before {
+    display: none;
+  }
+
+  .table-card-layout td.actions {
+    display: table-cell;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: var(--space-md);
+    border-top: none;
+    margin: 0;
+  }
+
+  .table-card-layout thead th {
+    padding: var(--space-md);
+    border-bottom: 2px solid var(--border-default);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    color: var(--table-head-color);
+    background: var(--table-head-bg);
+    white-space: nowrap;
+  }
+}
+
+/* ==========================================================================
+   Pattern 3: Priority Columns (Hide less important columns on mobile)
+   Best for: Tables where some columns are secondary
+   ========================================================================== */
+
+.table-priority {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Mobile: hide low priority columns */
+@media (max-width: 767.98px) {
+  .table-priority .col-priority-low,
+  .table-priority th.col-priority-low {
+    display: none !important;
+  }
+
+  .table-priority .col-priority-medium,
+  .table-priority th.col-priority-medium {
+    display: none !important;
+  }
+}
+
+/* Tablet: show medium priority */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .table-priority .col-priority-medium,
+  .table-priority th.col-priority-medium {
+    display: table-cell !important;
+  }
+
+  .table-priority .col-priority-low,
+  .table-priority th.col-priority-low {
+    display: none !important;
+  }
+}
+
+/* Desktop: show all */
+@media (min-width: 992px) {
+  .table-priority .col-priority-low,
+  .table-priority th.col-priority-low,
+  .table-priority .col-priority-medium,
+  .table-priority th.col-priority-medium {
+    display: table-cell !important;
+  }
+}
+
+/* ==========================================================================
+   Pattern 4: Stacked Headers (Complex tables with grouped columns)
+   ========================================================================== */
+
+.table-stacked-headers thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--table-head-bg);
+}
+
+.table-stacked-headers thead th:first-child {
+  left: 0;
+  z-index: 3;
+}
+
+@media (max-width: 767.98px) {
+  .table-stacked-headers thead {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Pattern 5: Expandable Rows (Master-detail on mobile)
+   ========================================================================== */
+
+.table-expandable tbody tr {
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.table-expandable tbody tr:hover {
+  background: var(--table-hover-bg);
+}
+
+.table-expandable tbody tr.expanded {
+  background: var(--color-accent-light);
+}
+
+.table-expandable .expand-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.table-expandable .expand-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.table-expandable .expand-toggle[aria-expanded="true"] {
+  transform: rotate(180deg);
+}
+
+.table-expandable .expandable-content {
+  display: none;
+  padding: var(--space-md);
+  background: var(--bg-page);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.table-expandable tr.expanded + .expandable-row .expandable-content {
+  display: block;
+  animation: expandDown var(--transition-normal) ease-out;
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .table-expandable .expand-toggle {
+    display: none;
+  }
+
+  .table-expandable .expandable-content {
+    display: contents;
+  }
+
+  .table-expandable .expandable-row {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Table Utilities
+   ========================================================================== */
+
+/* Sticky header for long tables */
+.table-sticky-header thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--table-head-bg);
+  box-shadow: 0 2px 4px -2px var(--shadow-color);
+}
+
+/* Sticky first column */
+.table-sticky-first-col th:first-child,
+.table-sticky-first-col td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: var(--bg-surface);
+}
+
+.table-sticky-first-col thead th:first-child {
+  z-index: 15;
+  background: var(--table-head-bg);
+}
+
+/* Hover row highlight */
+.table-hover-row tbody tr:hover {
+  background: var(--table-hover-bg) !important;
+}
+
+/* Striped rows */
+.table-striped-rows tbody tr:nth-of-type(odd) {
+  background: var(--table-striped-bg);
+}
+
+/* Bordered table */
+.table-bordered-cells th,
+.table-bordered-cells td {
+  border: 1px solid var(--border-subtle);
+}
+
+/* Compact table (less padding) */
+.table-compact th,
+.table-compact td {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+}
+
+/* Table with vertical middle alignment */
+.table-valign-middle td,
+.table-valign-middle th {
+  vertical-align: middle;
+}
+
+/* Fixed layout table (faster rendering) */
+.table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table-fixed th,
+.table-fixed td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   DataTable Integration (if using DataTables.net)
+   ========================================================================== */
+
+.dataTable {
+  width: 100% !important;
+  margin-bottom: var(--space-md) !important;
+}
+
+.dataTable thead th {
+  padding: var(--space-md) !important;
+  font-weight: var(--font-semibold) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--table-head-color) !important;
+  background: var(--table-head-bg) !important;
+  border-bottom: 2px solid var(--border-default) !important;
+  white-space: nowrap !important;
+}
+
+.dataTable tbody td {
+  padding: var(--space-md) !important;
+  font-size: var(--table-cell-font-size) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  vertical-align: middle !important;
+}
+
+.dataTable tbody tr:hover {
+  background: var(--table-hover-bg) !important;
+}
+
+.dataTable .dataTables_wrapper {
+  padding: 0 !important;
+}
+
+.dataTable .dataTables_length,
+.dataTable .dataTables_filter,
+.dataTable .dataTables_info,
+.dataTable .dataTables_paginate {
+  padding: var(--space-md) !important;
+}
+
+.dataTable .dataTables_filter input,
+.dataTable .dataTables_length select {
+  margin-left: var(--space-sm) !important;
+  padding: var(--space-xs) var(--space-sm) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: var(--text-sm) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.dataTable .dataTables_filter input:focus,
+.dataTable .dataTables_length select:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 3px var(--color-accent-light) !important;
+  outline: none !important;
+}
+
+.dataTable .paginate_button {
+  padding: var(--space-xs) var(--space-md) !important;
+  margin: 0 var(--space-xs) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  background: var(--bg-surface) !important;
+  cursor: pointer !important;
+  transition: var(--transition-fast) !important;
+}
+
+.dataTable .paginate_button.current,
+.dataTable .paginate_button.current:hover {
+  background: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--text-inverse) !important;
+}
+
+.dataTable .paginate_button:hover:not(.current):not(.disabled) {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-default) !important;
+}
+
+.dataTable .paginate_button.disabled,
+.dataTable .paginate_button.disabled:hover {
+  color: var(--text-muted) !important;
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+  cursor: not-allowed !important;
+}
+
+/* DataTables responsive */
+@media (max-width: 767.98px) {
+  .dataTable .dataTables_wrapper {
+    overflow-x: auto;
+  }
+
+  .dataTable .dataTables_length,
+  .dataTable .dataTables_filter,
+  .dataTable .dataTables_info,
+  .dataTable .dataTables_paginate {
+    text-align: center !important;
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: var(--space-sm) !important;
+  }
+
+  .dataTable .dataTables_filter input {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .table-responsive {
+    overflow: visible !important;
+    border: none !important;
+  }
+
+  .table-card-layout tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  .table-card-layout td {
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .table-card-layout td.actions {
+    display: none !important;
+  }
+
+  .dataTable .dataTables_wrapper {
+    overflow: visible !important;
+  }
+
+  .dataTable .dataTables_length,
+  .dataTable .dataTables_filter,
+  .dataTable .dataTables_info,
+  .dataTable .dataTables_paginate {
+    display: none !important;
+  }
+}

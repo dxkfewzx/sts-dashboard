@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Hook สำหรับจัดการ cascading dropdowns (Building -> Floor -> Department)
