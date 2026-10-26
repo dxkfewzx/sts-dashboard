@@ -16,4 +16,3 @@ export { default as PageHeader } from './PageHeader';
 export { default as StatCard } from './StatCard';
 export { default as Sidebar } from './Sidebar';
 export { default as Skeleton } from './Skeleton';
-export { default as ThemeToggle } from './ThemeToggle';

@@ -512,3 +512,81 @@ src/components/ui/
 **Total Refactored:** 6 pages, 1 sidebar, 5 modals, 1 App.js
 **CSS Reduction:** 9.39 kB → 7.31 kB (without icons) / 20.67 kB (with icons bundled)
 **Code Quality:** Consistent API, TypeScript-ready props, ARIA accessible, mobile-first responsive
+---
+
+# Workflow - การทำความสะอาดโปรเจกต์และแก้ไข Key Warning
+
+**วันที่:** 2026-10-26
+
+---
+
+## สรุปการแก้ไขวันนี้
+
+### 1. ลบไฟล์ที่ไม่จำเป็นออกจากโปรเจกต์
+- **ลบ:** `/src/components/Sidebar.js` - Sidebar เก่า (ถูกแทนที่ด้วย `/src/components/ui/Sidebar.jsx` ที่ใช้ portal-based rendering)
+- **ลบ:** `/src/components/Sidebar.css` - CSS ของ Sidebar เก่า
+- **ลบ:** `/src/components/ui/ThemeToggle.jsx` - Theme Toggle component (ไม่ได้ใช้ที่ไหน ผู้ใช้ไม่ต้องการ dark mode)
+- **ลบ export:** ThemeToggle ออกจาก `/src/components/ui/index.js`
+
+### 2. ลบ Debug Console.log Spam จาก DataContext.jsx
+**ลบ console.log debug statements 8 จุด:**
+- `=== RAW DEPT DATA ===`
+- `First 5:`
+- `Unique buildings:`
+- `Unique floors:`
+- `=== DERIVED DATA ===`
+- `Buildings:`
+- `Floors:`
+- `Departments:`
+
+**เก็บไว้:** `console.error` และ `console.warn` สำหรับ error handling จริง (ไม่ใช่ debug spam)
+
+### 3. แก้ไข ESLint Warning ใน theme.js
+- **ปัญหา:** `THEME_STORAGE_KEY` ถูก declare แต่ไม่ได้ใช้
+- **แก้ไข:** ลบ constant ที่ไม่ได้ใช้ออก และลบ comment ที่เกี่ยวข้อง
+
+### 4. แก้ไข React Key Warning ใน Table Component
+**ปัญหา:** `Each child in a list should have a unique "key" prop.` ที่ DashboardContent.js:183
+
+**สาเหตุ:** Table component render ทั้ง table rows และ card layout พร้อมกันใน DOM เดียวกัน แต่อยู่ใน mobile ใช้ CSS `display: none` ซ่อน table แต่ React ยังเห็น keys ซ้ำ:
+- `<tr key={row[rowKey]}>` (table rows)
+- `<article key={row[rowKey]}>` (card layout)
+
+**แก้ไขใน `/src/components/ui/Table.jsx`:**
+- Table cells: `key={`${column.key}-${rowUniqueKey}`}` (เดิม `key={column.key}`)
+- Card articles: `key={`card-${rowUniqueKey}`}` (เดิม `key={row[rowKey]}`)
+- Card rows: `key={`${column.key}-${rowUniqueKey}`}` (เดิม `key={column.key}`)
+- Card actions: `key={`actions-${rowUniqueKey}`}` (เพิ่มใหม่)
+
+**ผลลัพธ์:** Build ผ่าน ไม่มี warning, ไม่มี duplicate key error
+
+### 5. Build ผ่านสำเร็จ
+- **ก่อนแก้:** มี ESLint warning 1 จุด (theme.js unused var)
+- **หลังแก้:** Build สำเร็จ 0 warnings, 0 errors
+- Bundle size: 183.56 kB (gzipped JS), 40.11 kB (gzipped CSS)
+
+---
+
+## ไฟล์ที่เปลี่ยนแปลงวันนี้
+
+### ลบไฟล์ (3 ไฟล์)
+1. `src/components/Sidebar.js` - ลบ
+2. `src/components/Sidebar.css` - ลบ
+3. `src/components/ui/ThemeToggle.jsx` - ลบ
+
+### แก้ไขไฟล์ (4 ไฟล์)
+1. `src/components/ui/index.js` - ลบ ThemeToggle export
+2. `src/context/DataContext.jsx` - ลบ debug console.log 8 จุด
+3. `src/utils/theme.js` - ลบ THEME_STORAGE_KEY ที่ไม่ได้ใช้
+4. `src/components/ui/Table.jsx` - แก้ไข duplicate key issue
+
+---
+
+## สถานะโปรเจกต์ปัจจุบัน
+✅ ไม่มีไฟล์ที่ไม่จำเป็น  
+✅ ไม่มี console.log debug spam  
+✅ ไม่มี ESLint warnings  
+✅ ไม่มี React key warnings  
+✅ Build production สำเร็จ 100%  
+✅ โครงสร้างโค้ดสะอาด พร้อมใช้งาน
+

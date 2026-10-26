@@ -3,8 +3,6 @@
  * No dark mode support
  */
 
-// Theme storage key (kept for consistency, but not used for dark mode)
-const THEME_STORAGE_KEY = 'sts-dashboard-theme';
 
 /**
  * Get current theme - always returns 'light'

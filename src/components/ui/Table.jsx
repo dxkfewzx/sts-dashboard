@@ -130,33 +130,36 @@ const Table = ({
 
     return (
       <div className="ui-table__cards" role="list" aria-label={`${emptyState} - รายการข้อมูล`}>
-        {sortedData.map((row, index) => (
-          <article key={row[rowKey]} className="ui-table__card" role="listitem">
-            {columns.map((column) => {
-              const value = column.render ? column.render(row, index) : row[column.key];
-              // Skip action columns in card layout (they'll be rendered separately)
-              if (column.key === 'actions' || column.hideInCard) return null;
-              return (
-                <div key={column.key} className="ui-table__card-row">
-                  <span className="ui-table__card-label">
-                    {column.cardLabel || column.label}
-                  </span>
-                  <span className="ui-table__card-value">
-                    {value}
-                  </span>
+        {sortedData.map((row, index) => {
+          const rowUniqueKey = row[rowKey];
+          return (
+            <article key={`card-${rowUniqueKey}`} className="ui-table__card" role="listitem">
+              {columns.map((column) => {
+                const value = column.render ? column.render(row, index) : row[column.key];
+                // Skip action columns in card layout (they'll be rendered separately)
+                if (column.key === 'actions' || column.hideInCard) return null;
+                return (
+                  <div key={`${column.key}-${rowUniqueKey}`} className="ui-table__card-row">
+                    <span className="ui-table__card-label">
+                      {column.cardLabel || column.label}
+                    </span>
+                    <span className="ui-table__card-value">
+                      {value}
+                    </span>
+                  </div>
+                );
+              })}
+              {/* Actions at bottom of card */}
+              {columns.some(col => col.key === 'actions') && (
+                <div key={`actions-${rowUniqueKey}`} className="ui-table__card-actions">
+                  {columns
+                    .filter(col => col.key === 'actions')
+                    .flatMap(col => col.render ? col.render(row, index) : [])}
                 </div>
-              );
-            })}
-            {/* Actions at bottom of card */}
-            {columns.some(col => col.key === 'actions') && (
-              <div className="ui-table__card-actions">
-                {columns
-                  .filter(col => col.key === 'actions')
-                  .flatMap(col => col.render ? col.render(row, index) : [])}
-              </div>
-            )}
-          </article>
-        ))}
+              )}
+            </article>
+          );
+        })}
       </div>
     );
   };
@@ -264,17 +267,18 @@ const Table = ({
             sortedData.map((row, index) => {
               const rowClass = resolveRowClass ? resolveRowClass(row) : '';
               const rowStyle = getRowStyle ? getRowStyle(row) : {};
+              const rowUniqueKey = row[rowKey];
 
               return (
                 <tr
-                  key={row[rowKey]}
+                  key={rowUniqueKey}
                   className={rowClass}
                   style={rowStyle}
                   onMouseEnter={() => handleRowMouseEnter(row)}
                   onMouseLeave={handleRowMouseLeave}
                 >
                   {columns.map((column) => (
-                    <td key={column.key} className={column.className || ''}>
+                    <td key={`${column.key}-${rowUniqueKey}`} className={column.className || ''}>
                       {column.render ? column.render(row, index) : row[column.key]}
                     </td>
                   ))}

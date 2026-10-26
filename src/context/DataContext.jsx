@@ -61,12 +61,6 @@ export function DataProvider({ children, supabase }) {
         console.warn('Failed to fetch departments table, falling back to computed values:', deptError);
       }
 
-      // DEBUG: log raw data
-      console.log('=== RAW DEPT DATA ===', deptData.length, 'rows');
-      console.log('First 5:', deptData.slice(0, 5));
-      console.log('Unique buildings:', [...new Set(deptData.map(d => d.building_default).filter(Boolean))]);
-      console.log('Unique floors:', [...new Set(deptData.map(d => d.floor_default).filter(Boolean))]);
-
       // Derive buildings, floors, departments from departments table
       // Buildings: unique building_default
       const uniqueBuildings = [...new Set(
@@ -94,12 +88,6 @@ export function DataProvider({ children, supabase }) {
         building_name: d.building_default,
         floor_name: d.floor_default
       }));
-
-      // DEBUG: log derived data
-      console.log('=== DERIVED DATA ===');
-      console.log('Buildings:', uniqueBuildings);
-      console.log('Floors:', uniqueFloors);
-      console.log('Departments:', departments.length);
 
       // Fallback from serialNumbers if departments table empty
       let fallbackDepartments = [];
