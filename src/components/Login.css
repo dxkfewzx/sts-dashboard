@@ -4,7 +4,7 @@
  */
 
 .login-container {
-  background: linear-gradient(135deg, var(--bg-page) 0%, var(--bg-secondary) 100%);
+  background: var(--bg-surface);
   min-height: 100vh;
   padding: var(--space-lg);
   display: flex;
@@ -15,6 +15,7 @@
 .login-card {
   max-width: 440px;
   width: 100%;
+  margin: 0 auto;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border-subtle);
@@ -30,7 +31,8 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +41,7 @@
 
 .login-icon-wrapper .bi {
   font-size: 1.75rem;
-  color: var(--text-inverse);
+  color: var(--color-primary);
 }
 
 .login-title {
@@ -164,6 +166,8 @@
 .login-icon-wrapper .login-logo-img {
   max-width: 90px;
   max-height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .login-icon-wrapper .login-logo-custom {

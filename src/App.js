@@ -64,11 +64,13 @@ function AppContent() {
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
           isMobile={isMobile}
+          logo="/logoss.png"
+          logoAlt="STS Dashboard Logo"
         />
       )}
       <main className="main-content">
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login logo="/logoss.png" logoAlt="STS Dashboard Logo" />} />
           <Route
             path="/"
             element={

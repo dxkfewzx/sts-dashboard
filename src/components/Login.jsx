@@ -52,7 +52,7 @@ export default function Login({ logo, logoAlt = 'Company Logo', title = 'เข�
 
   return (
     <div className="login-container d-flex align-items-center justify-content-center vh-100">
-      <div className="card login-card shadow-lg border-0 w-100">
+      <div className="card login-card shadow-lg border-0">
         <div className="card-body login-card-body p-5">
           <div className="text-center mb-4">
             <div className="login-icon-wrapper d-inline-flex align-items-center justify-content-center mb-3" aria-hidden="true">
