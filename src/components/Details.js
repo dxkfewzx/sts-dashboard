@@ -86,6 +86,12 @@ const Details = () => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historySN, setHistorySN] = useState(null);
 
+  // Submitting States
+  const [isAddingSN, setIsAddingSN] = useState(false);
+  const [isAddingBulkSN, setIsAddingBulkSN] = useState(false);
+  const [isEditingSN, setIsEditingSN] = useState(false);
+  const [isReturning, setIsReturning] = useState(false);
+
   // Form States
   const [addSNForm, setAddSNForm] = useState(INITIAL_SN_FORM);
   const [bulkForm, setBulkForm] = useState(INITIAL_BULK_FORM);
@@ -146,6 +152,7 @@ const Details = () => {
       return;
     }
 
+    setIsAddingSN(true);
     try {
       await addSerialNumber(createSNFormData(addSNForm, itemId));
       setAddSNForm(INITIAL_SN_FORM);
@@ -154,6 +161,8 @@ const Details = () => {
     } catch (error) {
       console.error('Error adding serial number:', error);
       operationToast.createError('หมายเลขเครื่อง', error?.message);
+    } finally {
+      setIsAddingSN(false);
     }
   };
 
@@ -169,6 +178,7 @@ const Details = () => {
       return;
     }
 
+    setIsAddingBulkSN(true);
     try {
       const snArray = createBulkSNArray(bulkForm, itemId);
       for (const snData of snArray) {
@@ -180,6 +190,8 @@ const Details = () => {
     } catch (error) {
       console.error('Error adding serial numbers:', error);
       operationToast.createError('หมายเลขเครื่อง', error?.message);
+    } finally {
+      setIsAddingBulkSN(false);
     }
   };
 
@@ -192,6 +204,7 @@ const Details = () => {
       return;
     }
 
+    setIsEditingSN(true);
     try {
       await updateSerialNumber(editSN.id, createSNFormData(editSN, itemId));
       setShowEditSNModal(false);
@@ -200,6 +213,8 @@ const Details = () => {
     } catch (error) {
       console.error('Error updating serial number:', error);
       operationToast.updateError('หมายเลขเครื่อง', error?.message);
+    } finally {
+      setIsEditingSN(false);
     }
   };
 
@@ -256,6 +271,7 @@ const Details = () => {
       return;
     }
 
+    setIsReturning(true);
     try {
       await onReturn(returnSN.id, createReturnFormData(returnForm, returnSN));
       setShowReturnModal(false);
@@ -265,6 +281,8 @@ const Details = () => {
     } catch (error) {
       console.error('Error returning:', error);
       operationToast.returnError(error?.message);
+    } finally {
+      setIsReturning(false);
     }
   };
 
@@ -525,6 +543,7 @@ const Details = () => {
         departments={departments}
         buildings={buildings}
         floors={floors}
+        isSubmitting={isAddingSN}
       />
 
       <BulkAddSNModal
@@ -536,6 +555,7 @@ const Details = () => {
         filteredFloors={bulkDropdowns.filteredFloors}
         filteredDepartments={bulkDropdowns.filteredDepartments}
         buildings={buildings}
+        isSubmitting={isAddingBulkSN}
       />
 
       <EditSNModal
@@ -550,6 +570,7 @@ const Details = () => {
         filteredFloors={editDropdowns.filteredFloors}
         filteredDepartments={editDropdowns.filteredDepartments}
         buildings={buildings}
+        isSubmitting={isEditingSN}
       />
 
       <ReturnModal
@@ -563,6 +584,7 @@ const Details = () => {
         formData={returnForm}
         onChange={handleReturnChange}
         sn={returnSN}
+        isSubmitting={isReturning}
       />
 
       <HistoryModal

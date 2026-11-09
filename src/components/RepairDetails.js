@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRepairs } from '../hooks/useSupabase';
-import { operationToast } from '../utils/toast';
+import { operationToast, confirm } from '../utils/toast';
 import { useSidebar } from '../context/SidebarContext';
 import {
   getRepairStatusBadgeClass,
@@ -128,7 +128,7 @@ const RepairDetails = () => {
 
   // Handle delete repair
   const handleDeleteRepair = async (id, name) => {
-    const confirmed = await operationToast.confirm({
+    const confirmed = await confirm({
       title: 'ยืนยันการลบ?',
       text: `คุณต้องการลบรายการซ่อม "${name}" หรือไม่?`,
       icon: 'warning',

@@ -34,14 +34,9 @@ const BulkAddSNModal = ({
       title="เพิ่มหมายเลขเครื่องหลายรายการ"
       size="lg"
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            ยกเลิก
-          </Button>
-          <Button variant="success" type="submit" disabled={isSubmitting} loading={isSubmitting} leftIcon={<i className="bi bi-plus-square me-1"></i>}>
-            เพิ่มทั้งหมด
-          </Button>
-        </>
+        <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          ยกเลิก
+        </Button>
       }
     >
       <form onSubmit={onSubmit}>
@@ -140,6 +135,12 @@ const BulkAddSNModal = ({
               {snCount}
             </Badge> รายการ
           </span>
+        </div>
+
+        <div className="modal-form-actions">
+          <Button variant="success" type="submit" disabled={isSubmitting} loading={isSubmitting} leftIcon={<i className="bi bi-plus-square me-1"></i>}>
+            เพิ่มทั้งหมด
+          </Button>
         </div>
       </form>
     </Modal>

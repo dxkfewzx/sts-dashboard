@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Input, Select, Button } from '../../components/ui';
 import { SN_STATUS_OPTIONS } from '../../constants/snForms';
+import './EditSNModal.css';
 
 /**
  * Edit SN Modal - Form for editing serial number
@@ -24,14 +25,9 @@ const EditSNModal = ({
       onClose={onClose}
       title="แก้ไขหมายเลขเครื่อง"
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            ยกเลิก
-          </Button>
-          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
-            บันทึกการแก้ไข
-          </Button>
-        </>
+        <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          ยกเลิก
+        </Button>
       }
     >
       <form onSubmit={onSubmit}>
@@ -118,6 +114,12 @@ const EditSNModal = ({
           value={formData.withdraw_date}
           onChange={onChange}
         />
+
+        <div className="modal-form-actions">
+          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
+            บันทึกการแก้ไข
+          </Button>
+        </div>
       </form>
     </Modal>
   );

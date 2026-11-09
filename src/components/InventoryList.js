@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useItems, useSerialNumbers } from '../hooks/useSupabase';
-import { operationToast } from '../utils/toast';
+import { operationToast, confirm } from '../utils/toast';
 import { useSidebar } from '../context/SidebarContext';
 import {
   PageHeader,
@@ -189,7 +189,7 @@ const InventoryList = () => {
 
   // Handle delete item
   const handleDeleteItem = async (id, name) => {
-    const confirmed = await operationToast.confirm({
+    const confirmed = await confirm({
       title: 'ยืนยันการลบ?',
       text: `คุณต้องการลบรายการ "${name}" หรือไม่?`,
       icon: 'warning',

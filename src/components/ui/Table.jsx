@@ -27,6 +27,14 @@ import './Table.css';
  * @param {string} [props.className] - Additional CSS classes
  * @returns {JSX.Element}
  */
+// DOM props that should NOT be passed to the wrapper div
+const TABLE_PROPS_TO_OMIT = new Set([
+  'columns', 'data', 'rowKey', 'onSort', 'sortState', 'emptyState',
+  'rowClassName', 'getRowClass', 'getRowStyle', 'onRowMouseEnter', 'onRowMouseLeave',
+  'renderLoadingRow', 'loading', 'skeletonRows', 'striped', 'hoverable', 'responsive',
+  'cardLayout', 'minWidth', 'loadingRows', 'renderSkeletonRow', 'onRowMouseEnter', 'onRowMouseLeave'
+]);
+
 const Table = ({
   columns = [],
   data = [],
@@ -50,6 +58,13 @@ const Table = ({
   className = '',
   ...rest
 }) => {
+  // Filter out custom table props from rest to avoid React warnings
+  const domProps = {};
+  for (const [key, value] of Object.entries(rest)) {
+    if (!TABLE_PROPS_TO_OMIT.has(key)) {
+      domProps[key] = value;
+    }
+  }
   const [sortKey, setSortKey] = useState(sortState?.key || null);
   const [sortDirection, setSortDirection] = useState(sortState?.direction || 'asc');
   const [isMobile, setIsMobile] = useState(false);
@@ -167,7 +182,7 @@ const Table = ({
   if (loading) {
     if (renderLoadingRow) {
       return (
-        <div className={`ui-table-wrapper ${responsive ? 'ui-table-wrapper--responsive' : ''} ${className}`} {...rest} style={{ minWidth }}>
+        <div className={`ui-table-wrapper ${responsive ? 'ui-table-wrapper--responsive' : ''} ${className}`} {...domProps} style={{ minWidth }}>
           <table className={`ui-table ${striped ? 'ui-table--striped' : ''} ${hoverable ? 'ui-table--hoverable' : ''}`}>
             <thead>
               <tr>
@@ -197,7 +212,7 @@ const Table = ({
     }
 
     return (
-      <div className={`ui-table-wrapper ${responsive ? 'ui-table-wrapper--responsive' : ''} ${className}`} {...rest} style={{ minWidth }}>
+      <div className={`ui-table-wrapper ${responsive ? 'ui-table-wrapper--responsive' : ''} ${className}`} {...domProps} style={{ minWidth }}>
         <div className="ui-table__skeleton">
           {Array.from({ length: skeletonRows }, (_, i) => (
             <div key={i} className="ui-table__skeleton-row">
@@ -225,7 +240,7 @@ const Table = ({
     <div
       ref={wrapperRef}
       className={wrapperClassName}
-      {...rest}
+      {...domProps}
       data-card-layout={cardLayout && isMobile}
       style={{ minWidth }}
     >

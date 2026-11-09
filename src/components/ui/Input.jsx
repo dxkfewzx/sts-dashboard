@@ -4,13 +4,14 @@ import './Input.css';
 /**
  * Input Component
  * Wraps form-control + label + error + helper text
+ * Supports both <input> and <textarea> via `as` prop
  *
  * @param {Object} props
  * @param {string} [props.label] - Label text
  * @param {string} [props.error] - Error message
  * @param {string} [props.helperText] - Helper text below input
  * @param {boolean} [props.required=false] - Required indicator
- * @param {'text'|'email'|'password'|'number'|'tel'|'url'|'date'|'datetime-local'} [props.type='text'] - Input type
+ * @param {'text'|'email'|'password'|'number'|'tel'|'url'|'date'|'datetime-local'} [props.type='text'] - Input type (ignored when as="textarea")
  * @param {string} [props.placeholder] - Placeholder text
  * @param {string|number} [props.value] - Controlled value
  * @param {Function} [props.onChange] - Change handler
@@ -21,6 +22,8 @@ import './Input.css';
  * @param {string} [props.name] - Input name
  * @param {string} [props.className] - Additional CSS classes
  * @param {string} [props.autoComplete] - Autocomplete attribute
+ * @param {'input'|'textarea'} [props.as='input'] - Render as input or textarea
+ * @param {number} [props.rows] - Rows for textarea
  * @returns {JSX.Element}
  */
 const Input = React.forwardRef(({
@@ -40,6 +43,8 @@ const Input = React.forwardRef(({
   className = '',
   autoComplete,
   leftIcon,
+  as = 'input',
+  rows,
   ...rest
 }, ref) => {
   const generatedId = React.useId();
@@ -47,6 +52,27 @@ const Input = React.forwardRef(({
   const errorId = error ? `${inputId}-error` : undefined;
   const helperId = helperText ? `${inputId}-helper` : undefined;
   const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
+  const isTextarea = as === 'textarea';
+
+  const baseClassName = `ui-input ${error ? 'ui-input--error' : ''} ${disabled ? 'ui-input--disabled' : ''} ${readOnly ? 'ui-input--readonly' : ''} ${leftIcon ? 'ui-input--has-icon' : ''} ${isTextarea ? 'ui-textarea' : ''}`;
+
+  const commonProps = {
+    ref,
+    id: inputId,
+    name,
+    className: baseClassName,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    disabled,
+    readOnly,
+    'aria-invalid': error ? 'true' : 'false',
+    'aria-describedby': describedBy,
+    'aria-required': required,
+    autoComplete,
+    ...rest,
+  };
 
   return (
     <div className={`ui-input-wrapper ${className}`}>
@@ -57,29 +83,16 @@ const Input = React.forwardRef(({
         </label>
       )}
       <div className="ui-input__inner">
-        {leftIcon && (
+        {leftIcon && !isTextarea && (
           <span className="ui-input__icon" aria-hidden="true">
             {leftIcon}
           </span>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          name={name}
-          type={type}
-          className={`ui-input ${error ? 'ui-input--error' : ''} ${disabled ? 'ui-input--disabled' : ''} ${readOnly ? 'ui-input--readonly' : ''} ${leftIcon ? 'ui-input--has-icon' : ''}`}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          disabled={disabled}
-          readOnly={readOnly}
-          aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={describedBy}
-          aria-required={required}
-          autoComplete={autoComplete}
-          {...rest}
-        />
+        {isTextarea ? (
+          <textarea {...commonProps} rows={rows} />
+        ) : (
+          <input {...commonProps} type={type} />
+        )}
       </div>
       {error && (
         <div id={errorId} className="ui-input__error" role="alert" aria-live="polite">

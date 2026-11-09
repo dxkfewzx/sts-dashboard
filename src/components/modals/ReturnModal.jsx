@@ -23,14 +23,9 @@ const ReturnModal = ({
       onClose={onClose}
       title={`รับคืนอุปกรณ์: ${sn.serial_number}`}
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            ยกเลิก
-          </Button>
-          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
-            ยืนยันการรับคืน
-          </Button>
-        </>
+        <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          ยกเลิก
+        </Button>
       }
     >
       <form onSubmit={onSubmit}>
@@ -95,6 +90,12 @@ const ReturnModal = ({
               readOnly
             />
           </div>
+        </div>
+
+        <div className="modal-form-actions">
+          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
+            ยืนยันการรับคืน
+          </Button>
         </div>
       </form>
     </Modal>

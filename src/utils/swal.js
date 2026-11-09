@@ -223,6 +223,13 @@ export const swalToast = (options = {}) => Swal.fire(
     showConfirmButton: false,
     timer: options.timer || 3000,
     timerProgressBar: true,
+    // Override incompatible options for toasts
+    focusConfirm: false,
+    focusCancel: false,
+    focusDeny: false,
+    allowEnterKey: false,
+    allowOutsideClick: false,
+    allowEscapeKey: true,
     didOpen: (toast) => {
       toast.addEventListener('mouseenter', Swal.stopTimer);
       toast.addEventListener('mouseleave', Swal.resumeTimer);

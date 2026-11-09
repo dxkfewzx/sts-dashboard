@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Input, Select, Button } from '../../components/ui';
 import { SN_STATUS_OPTIONS } from '../../constants/snForms';
+import './AddSNModal.css';
 
 /**
  * Add SN Modal - Form for adding single serial number
@@ -26,14 +27,9 @@ const AddSNModal = ({
       onClose={onClose}
       title="เพิ่มหมายเลขเครื่อง"
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            ยกเลิก
-          </Button>
-          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
-            บันทึกข้อมูล
-          </Button>
-        </>
+        <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          ยกเลิก
+        </Button>
       }
     >
       <form onSubmit={onSubmit}>
@@ -122,6 +118,12 @@ const AddSNModal = ({
           value={formData.withdraw_date}
           onChange={onChange}
         />
+
+        <div className="modal-form-actions">
+          <Button variant="primary" type="submit" disabled={isSubmitting} loading={isSubmitting}>
+            บันทึกข้อมูล
+          </Button>
+        </div>
       </form>
     </Modal>
   );

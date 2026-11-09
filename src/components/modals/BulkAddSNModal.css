@@ -24,3 +24,11 @@
 .modal-info-box .badge {
   margin-left: var(--space-xs);
 }
+
+.modal-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}

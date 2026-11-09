@@ -43,7 +43,8 @@
   padding-left: 4rem !important;
 }
 
-.ui-input {
+.ui-input,
+.ui-textarea {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-sans);
@@ -55,39 +56,55 @@
   border-radius: var(--radius-input);
   transition: all var(--transition-focus);
   outline: none;
+  resize: vertical;
 }
 
-.ui-input::placeholder {
+.ui-textarea {
+  min-height: 100px;
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  align-self: flex-start;
+}
+
+.ui-input::placeholder,
+.ui-textarea::placeholder {
   color: var(--text-muted);
 }
 
-.ui-input:hover:not(.ui-input--disabled):not(.ui-input--readonly) {
+.ui-input:hover:not(.ui-input--disabled):not(.ui-input--readonly),
+.ui-textarea:hover:not(.ui-input--disabled):not(.ui-input--readonly) {
   border-color: var(--text-muted);
 }
 
-.ui-input:focus {
+.ui-input:focus,
+.ui-textarea:focus {
   border-color: var(--border-focus);
   box-shadow: var(--shadow-focus);
   background: var(--bg-surface);
 }
 
-.ui-input--error {
+.ui-input--error,
+.ui-textarea.ui-input--error {
   border-color: var(--border-error);
 }
 
-.ui-input--error:focus {
+.ui-input--error:focus,
+.ui-textarea.ui-input--error:focus {
   box-shadow: var(--shadow-focus-error);
 }
 
 .ui-input--disabled,
-.ui-input[disabled] {
+.ui-input[disabled],
+.ui-textarea--disabled,
+.ui-textarea[disabled] {
   background: var(--bg-disabled);
   color: var(--text-muted);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.ui-input--readonly {
+.ui-input--readonly,
+.ui-textarea--readonly {
   background: var(--bg-hover);
   cursor: default;
 }
@@ -106,7 +123,8 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ui-input {
+  .ui-input,
+  .ui-textarea {
     transition: none;
   }
 }
